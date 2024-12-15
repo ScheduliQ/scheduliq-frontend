@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import SignUpButton from "../components/SignUpButton";
 
 export default function LandingPage() {
   return (
@@ -46,6 +47,7 @@ export default function LandingPage() {
           />
         </div>
       </div>
+      <SignUpButton />
     </main>
   );
 }
