@@ -18,16 +18,41 @@ export default function SignupPage() {
     setError("");
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert("Signup successful!");
-      router.push("/login"); // Redirect to login page
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user; // שליפת המשתמש שנרשם
+
+      // קבלת ה-ID Token מהמשתמש שנרשם
+      const idToken = await user.getIdToken();
+
+      // שליחת ה-ID Token והאימייל ל-Backend לצורך רישום במסד הנתונים
+      const response = await fetch("http://127.0.0.1:5000/auth/register-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`, // שליחת הטוקן ב-Header
+        },
+        body: JSON.stringify({
+          email: user.email, // שליחת המייל לשרת
+        }),
+      });
+
+      // בדיקת התגובה מהשרת
+      if (!response.ok) {
+        throw new Error("Failed to register user in the database.");
+      }
+
+      alert("Signup successful and user registered in the database!");
+      router.push("/login"); // הפניה לדף ההתחברות
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message); // טיפול בשגיאות
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
