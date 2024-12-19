@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../config/firebase"; // Adjust path based on your setup
 import { useRouter } from "next/navigation";
+import nookies from "nookies"; // For managing cookies
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -18,11 +19,15 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       alert("Login successful!");
-      router.push("/dashboard"); // Redirect on success
+      router.push("/dashboard");
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
