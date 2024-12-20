@@ -6,7 +6,9 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "packageManager": "npm@10.5.2",
   "overrides": {},
@@ -23,6 +25,7 @@
     "@types/nookies": "^2.0.3",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cypress": "^13.17.0",
     "eslint": "^8",
     "eslint-config-next": "15.0.0",
     "postcss": "^8",
