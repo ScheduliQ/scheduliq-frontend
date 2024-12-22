@@ -35,7 +35,9 @@ export default function LoginPage() {
       alert("Login successful!");
       router.push("/dashboard");
     } catch (err: any) {
-      setLoginError(err.message || "An unexpected error occurred.");
+      if (err.message === "Firebase: Error (auth/invalid-credential).")
+        setLoginError("Email or Password incorrect!");
+      else setLoginError(err.message || "An unexpected error occurred.");
     } finally {
       setLoginLoading(false);
     }
@@ -68,59 +70,76 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen bg-gray-50">
-      <Image
-        src="/logo.png"
-        alt="logo"
-        width={450}
-        height={250}
-        className="pb-14 ml-4"
-      />
-      <h1 className="text-2xl font-bold mb-4 text-black">Login</h1>
-
-      {/* Forgot Password Button */}
-      <button
-        className="text-blue-500 underline text-sm mb-4"
-        onClick={() => setShowModal(true)}
-      >
-        Forgot Password?
-      </button>
-
-      {loginError && <p className="text-red-500 mb-4">{loginError}</p>}
-      <form
-        className="flex flex-col space-y-4 w-full max-w-sm"
-        onSubmit={handleLogin}
-      >
-        <input
-          type="email"
-          placeholder="Email"
-          value={loginEmail}
-          onChange={(e) => setLoginEmail(e.target.value)}
-          className="px-4 py-2 text-black border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={loginPassword}
-          onChange={(e) => setLoginPassword(e.target.value)}
-          className="px-4 py-2 border text-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <button
-          type="submit"
-          className={`px-6 py-3 text-white rounded-md font-bold ${
-            loginLoading
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600"
-          }`}
-          disabled={loginLoading}
+    <main className="flex items-center justify-center min-h-screen bg-landing bg-cover bg-center px-4">
+      {/* Container for both sections */}
+      <div className="flex flex-col lg:flex-row items-center justify-center w-full max-w-4xl">
+        {/* Left Section - Image */}
+        <div
+          className="w-full lg:w-1/2 h-[300px] lg:h-[550px] flex items-center justify-center bg-cover bg-bottom rounded-l-lg shadow-lg"
+          style={{ backgroundImage: "url('/leftside2.jpg')" }}
         >
-          {loginLoading ? "Logging in..." : "Login"}
-        </button>
-      </form>
+          {/* Optional content inside the div */}
+        </div>
 
-      {/* Forgot Password Modal */}
+        {/* Right Section - Login */}
+        <div className="w-full lg:w-1/2 h-auto lg:h-[550px] flex flex-col items-center justify-center bg-white/8 backdrop-blur-md rounded-r-lg shadow-lg p-6">
+          <Image
+            src="/logo.png"
+            alt="logo"
+            width={200}
+            height={100}
+            className="mb-6"
+          />
+          {loginError && <p className="text-red-500 mb-4">{loginError}</p>}
+          <form
+            className="flex flex-col space-y-4 w-full"
+            onSubmit={handleLogin}
+          >
+            <div className="space-y-4 w-full">
+              {/* Email Input */}
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                required
+              />
+
+              {/* Password Input */}
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                required
+              />
+
+              {/* Forgot Password Link */}
+            </div>
+            <button
+              type="submit"
+              className={`px-6 py-3 text-white rounded-md font-bold ${
+                loginLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-[#014DAE] hover:bg-[#012F70]"
+              }`}
+              disabled={loginLoading}
+            >
+              {loginLoading ? "Logging in..." : "Sign in"}
+            </button>
+          </form>
+          <div className="text-right">
+            <button
+              className="text-[#014DAE] underline text-sm"
+              onClick={() => setShowModal(true)}
+            >
+              Forgot password?
+            </button>
+          </div>
+        </div>
+      </div>
       {showModal && (
         <div className="modal modal-open">
           <div className="modal-box">
