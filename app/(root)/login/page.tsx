@@ -1,6 +1,9 @@
 "use client";
 import Image from "next/image";
 import { useState } from "react";
+import Loading from "../../components/Loading";
+import SecondaryButton from "../../components/SecondaryButton";
+
 import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -32,7 +35,7 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-      alert("Login successful!");
+      // alert("Login successful!");
       router.push("/dashboard");
     } catch (err: any) {
       if (err.message === "Firebase: Error (auth/invalid-credential).")
@@ -50,6 +53,7 @@ export default function LoginPage() {
     setForgotError("");
 
     try {
+      // setForgotLoading(true);
       await sendPasswordResetEmail(auth, forgotEmail);
       setForgotMessage("Password reset link has been sent to your email.");
     } catch (err: any) {
@@ -71,6 +75,8 @@ export default function LoginPage() {
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-landing bg-cover bg-center px-4">
+      {loginLoading && <Loading />}
+
       {/* Container for both sections */}
       <div className="flex flex-col lg:flex-row items-center justify-center w-full max-w-4xl">
         {/* Left Section - Image */}
@@ -142,8 +148,10 @@ export default function LoginPage() {
       </div>
       {showModal && (
         <div className="modal modal-open">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Forgot Password</h3>
+          <div className="modal-box bg-[#F7FAFC]">
+            <h3 className="text-[#666666] font-sans font-bold text-lg">
+              Forgot Password
+            </h3>
             {forgotMessage && (
               <p className="text-green-500 mt-2">{forgotMessage}</p>
             )}
@@ -155,12 +163,12 @@ export default function LoginPage() {
                 placeholder="Enter your email"
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
-                className="input input-bordered w-full mb-4"
+                className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent mb-4"
                 required
               />
               <button
                 type="submit"
-                className={`btn btn-primary w-full ${
+                className={`btn border-none  text-white text-bold w-full bg-[#014DAE] hover:bg-[#012F70] ${
                   forgotLoading ? "loading" : ""
                 }`}
                 disabled={forgotLoading}
@@ -170,12 +178,10 @@ export default function LoginPage() {
             </form>
 
             <div className="modal-action">
-              <button
+              <SecondaryButton
+                label="Close"
                 onClick={() => setShowModal(false)}
-                className="btn btn-ghost"
-              >
-                Close
-              </button>
+              />
             </div>
           </div>
         </div>
