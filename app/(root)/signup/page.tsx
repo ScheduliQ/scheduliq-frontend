@@ -29,16 +29,19 @@ export default function SignupPage() {
       const idToken = await user.getIdToken();
 
       // שליחת ה-ID Token והאימייל ל-Backend לצורך רישום במסד הנתונים
-      const response = await fetch("http://127.0.0.1:5000/auth/register-user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${idToken}`, // שליחת הטוקן ב-Header
-        },
-        body: JSON.stringify({
-          email: user.email, // שליחת המייל לשרת
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`, // שליחת הטוקן ב-Header
+          },
+          body: JSON.stringify({
+            email: user.email, // שליחת המייל לשרת
+          }),
+        }
+      );
 
       // בדיקת התגובה מהשרת
       if (!response.ok) {

@@ -5,6 +5,7 @@ import axios from "axios";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation"; // Import router for navigation
 import { auth } from "../../config/firebase"; // Adjust path based on your setup
+import Loading from "../components/Loading";
 
 export default function Dashboard() {
   const user = useSessionGuard(); // Checks session guard
@@ -17,10 +18,24 @@ export default function Dashboard() {
     if (!user) return; // Ensure the user is defined before making the request
 
     const fetchDashboard = async () => {
+      setLoading(true);
+
       try {
+        const idToken = await auth.currentUser?.getIdToken(); // Get the current user's ID token
+
+        if (!idToken) {
+          throw new Error("User is not authenticated");
+        }
+
         const response = await axios.get(
-          "http://localhost:5000/user/dashboard"
+          `${process.env.NEXT_PUBLIC_BASE_URL}/user/dashboard`,
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`, // Include the token in the Authorization header
+            },
+          }
         );
+
         setMessage(response.data.message); // Save the message from the response
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -42,7 +57,7 @@ export default function Dashboard() {
   };
 
   if (!user || loading) {
-    return <p>Loading...</p>; // Show loading while waiting for session or data
+    return <Loading />; // Show loading while waiting for session or data
   }
 
   return (
