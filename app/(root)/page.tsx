@@ -1,53 +1,51 @@
-import Link from "next/link";
 import Image from "next/image";
-import SignUpButton from "../components/SignUpButton";
+import PrimaryButton from "../components/PrimaryButton";
+import SecondaryButton from "../components/SecondaryButton";
+import SignupButton from "../components/SignUpButton";
 
 export default function LandingPage() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-10">
-      {/* Left & Right Centered */}
-      <div className="flex w-full items-center justify-between max-w-7xl">
-        {/* Left Side */}
-        <div className="w-1/2 flex flex-col justify-center space-y-6">
-          <Image
-            src="/logo.png"
-            alt="logo"
-            width={350}
-            height={200}
-            className="ml-20"
-          />
-          <p className="text-lg text-gray-600 leading-relaxed">
-            ScheduliQ is a smart system for managing work schedules and shifts,
-            designed to provide an efficient and automated solution for team
-            managers and employees.
-          </p>
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-landing bg-cover bg-center">
+      <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex flex-col lg:flex-row items-center">
+          {/* Left section */}
+          <div className="pl-20 w-full lg:w-[35%] flex flex-col items-center justify-center px-4">
+            <Image
+              src="/logo.png"
+              alt="logo"
+              width={550}
+              height={350}
+              className="w-full max-w-[400px]"
+              priority
+            />
+            <p className="font-sans font-bold text-2xl text-[#666666] text-center mt-6 ">
+              Effortless Scheduling with ScheduliQ!
+            </p>
+            <p className="font-sans text-lg text-[#666666] text-center  mb-8">
+              Smart, efficient, and tailored to your needs.
+            </p>
 
-          <div className="flex space-x-4">
-            <Link href="/login">
-              <button className="px-6 py-3 bg-blue-500 text-white text-lg font-semibold rounded-md hover:bg-blue-600">
-                Get Started
-              </button>
-            </Link>
-            <Link href="/learn-more">
-              <button className="px-6 py-3 bg-gray-300 text-black text-lg font-semibold rounded-md hover:bg-gray-400">
-                Learn More
-              </button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <PrimaryButton label="Get Started" href="/login" />
+              <SecondaryButton label="Learn More" href="/learn-more" />
+            </div>
+          </div>
+
+          {/* Right section */}
+          <div className="pt-10 pl-20 w-full lg:w-[57%] flex items-center justify-center mt-8 lg:mt-0">
+            <div className="relative w-full">
+              <Image
+                src="/hero-pic.png"
+                alt="illustration"
+                width={1200}
+                height={1200}
+                className="rounded-lg w-full h-auto object-contain"
+                priority
+              />
+            </div>
           </div>
         </div>
-
-        {/* Right Side */}
-        <div className="w-1/2 flex items-center justify-center">
-          <Image
-            src="/hand.png"
-            alt="illustration"
-            width={500}
-            height={500}
-            className="rounded-lg"
-          />
-        </div>
       </div>
-      <SignUpButton />
     </main>
   );
 }
