@@ -2,15 +2,24 @@
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../config/firebase";
-// import { handleUpload } from "../components/cloudinaryUploader"; // Adjust the path to your upload logic
+import Swal from "sweetalert2";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Eye icons
+import MainColorButton from "./MainColorButton";
+import RegularButton from "./RegularButton";
 
 export default function SignupButton() {
+  // or via CommonJS
   const defaultProfilePictureUrl =
     "https://res.cloudinary.com/dcrhswmzi/image/upload/v1735645762/profile_pictures/hqsm6svm2pgp1zqzpohk.png";
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [emailPattern, setEmailPattern] = useState(true);
+  const [passwordConfirmation, setpasswordConfirmation] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isConfirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,6 +32,17 @@ export default function SignupButton() {
     jobs: "",
     businessId: "",
   });
+  const [fieldErrors, setFieldErrors] = useState({
+    email: false,
+    password: false,
+    confirmPassword: false,
+    firstName: false,
+    lastName: false,
+    phone: false,
+    gender: false,
+    jobs: false,
+    businessId: false,
+  });
   const openSuccessModal = () => setIsSuccessModalOpen(true);
   const closeSuccessModal = () => setIsSuccessModalOpen(false);
 
@@ -32,6 +52,13 @@ export default function SignupButton() {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setConfirmPasswordVisible(!isConfirmPasswordVisible);
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -49,11 +76,48 @@ export default function SignupButton() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+    const newFieldErrors = {
+      email: !formData.email,
+      password: !formData.password,
+      confirmPassword: !formData.confirmPassword,
+      firstName: !formData.firstName,
+      lastName: !formData.lastName,
+      phone: !formData.phone,
+      gender: !formData.gender,
+      jobs: !formData.jobs,
+      businessId: !formData.businessId,
+    };
+
+    setFieldErrors(newFieldErrors);
+
+    if (Object.values(newFieldErrors).some((error) => error)) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please fill the required fields",
+        confirmButtonText: "Close",
+        customClass: {
+          confirmButton:
+            "bg-gray-300 text-white font-semibold px-4 py-2 rounded hover:bg-gray-500 focus:outline-none",
+        },
+      });
+
+      return; // Stop submission if there are errors
+    }
+
+    const isEmailValid = emailRegex.test(formData.email);
+    const isPasswordMatch = formData.password === formData.confirmPassword;
+    // Update the state for UI feedback
+    setEmailPattern(isEmailValid);
+    setpasswordConfirmation(isPasswordMatch);
+
+    // Use the temporary variables for logic
+    if (!isEmailValid || !isPasswordMatch) {
       return;
     }
+
     let profilePictureUrl = "";
     const fileFormData = new FormData();
     // Ensure profilePicture exists before appending
@@ -217,7 +281,7 @@ export default function SignupButton() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="label label-text text-[#666666]">
-                    First Name
+                    First Name *
                   </label>
                   <input
                     type="text"
@@ -225,13 +289,17 @@ export default function SignupButton() {
                     value={formData.firstName}
                     onChange={handleChange}
                     placeholder="Enter First Name"
-                    className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                    className={`w-full px-4 py-3 bg-[#F3F6FA]  ${
+                      fieldErrors.firstName
+                        ? "border-red-500 border-2"
+                        : "border-gray-300 border"
+                    } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
                     required
                   />
                 </div>
                 <div>
                   <label className="label label-text text-[#666666]">
-                    Last Name
+                    Last Name *
                   </label>
                   <input
                     type="text"
@@ -239,7 +307,11 @@ export default function SignupButton() {
                     value={formData.lastName}
                     onChange={handleChange}
                     placeholder="Enter Last Name"
-                    className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                    className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                      fieldErrors.lastName
+                        ? "border-red-500 border-2"
+                        : "border-gray-300 border"
+                    } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
                     required
                   />
                 </div>
@@ -247,60 +319,147 @@ export default function SignupButton() {
 
               {/* Email */}
               <div className="mb-4">
-                <label className="label label-text text-[#666666]">Email</label>
+                <label className="label label-text text-[#666666]">
+                  Email *
+                </label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter Email"
-                  className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                    fieldErrors.email
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border"
+                  } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
                   required
                 />
+                {!emailPattern && (
+                  <p className="text-red-500 font-sans text-sm mt-1">
+                    Please enter a valid email address.
+                  </p>
+                )}
               </div>
 
               {/* Password */}
-              <div className="mb-4">
+              {/* <div className="mb-4 relative">
                 <label className="label label-text text-[#666666]">
-                  Password
+                  Password *
                 </label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter Password"
-                  className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                    fieldErrors.password
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border"
+                  } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
                   required
                 />
-              </div>
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute inset-y-0 right-3 top-16 flex items-center text-gray-500 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="w-5 h-5" />
+                  ) : (
+                    <FaEye className="w-5 h-5" />
+                  )}
+                </button>
+              </div> */}
 
+              {/* ******************************* */}
+              <div className="mb-4">
+                <label className="label label-text text-[#666666]">
+                  Password *
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder="Enter Password"
+                    className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                      fieldErrors.password
+                        ? "border-red-500 border-2"
+                        : "border-gray-300 border"
+                    } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <FaEye className="w-5 h-5" />
+                    ) : (
+                      <FaEyeSlash className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              {/* ******************************* */}
               {/* Rewrite Password */}
               <div className="mb-4">
                 <label className="label label-text text-[#666666]">
-                  Rewrite Password
+                  Rewrite Password *
                 </label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Re-enter Password"
-                  className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={isConfirmPasswordVisible ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder="Re-enter Password"
+                    className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                      fieldErrors.confirmPassword
+                        ? "border-red-500 border-2"
+                        : "border-gray-300 border"
+                    } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={toggleConfirmPasswordVisibility}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 focus:outline-none"
+                  >
+                    {isConfirmPasswordVisible ? (
+                      <FaEye className="w-5 h-5" />
+                    ) : (
+                      <FaEyeSlash className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {!passwordConfirmation && (
+                  <p className="text-red-500 font-sans text-sm mt-1">
+                    The passwords do not match.
+                  </p>
+                )}
               </div>
 
               {/* Phone */}
               <div className="mb-4">
-                <label className="label label-text text-[#666666]">Phone</label>
+                <label className="label label-text text-[#666666]">
+                  Phone *
+                </label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Enter Phone Number"
-                  className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                    fieldErrors.phone
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border"
+                  } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
                   required
                 />
               </div>
@@ -321,7 +480,7 @@ export default function SignupButton() {
               {/* Gender */}
               <div className="mb-4">
                 <label className="label label-text text-[#666666]">
-                  Gender
+                  Gender *
                 </label>
                 <div className="flex gap-4">
                   <label className="flex items-center">
@@ -353,14 +512,20 @@ export default function SignupButton() {
 
               {/* Jobs */}
               <div className="mb-4">
-                <label className="label label-text text-[#666666]">Jobs</label>
+                <label className="label label-text text-[#666666]">
+                  Jobs *
+                </label>
                 <input
                   type="text"
                   name="jobs"
                   value={formData.jobs}
                   onChange={handleChange}
                   placeholder="Enter Jobs (comma-separated)"
-                  className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                    fieldErrors.jobs
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border"
+                  } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
                   required
                 />
               </div>
@@ -368,7 +533,7 @@ export default function SignupButton() {
               {/* Business ID */}
               <div className="mb-4">
                 <label className="label label-text text-[#666666]">
-                  Business ID
+                  Business ID *
                 </label>
                 <input
                   type="text"
@@ -376,23 +541,26 @@ export default function SignupButton() {
                   value={formData.businessId}
                   onChange={handleChange}
                   placeholder="Enter Business ID"
-                  className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                  className={`w-full px-4 py-3 bg-[#F3F6FA] ${
+                    fieldErrors.businessId
+                      ? "border-red-500 border-2"
+                      : "border-gray-300 border"
+                  } rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent`}
                   required
                 />
               </div>
 
               {/* Submit Button */}
               <div className="modal-action">
-                <button
+                {/* <button
                   onClick={handleSubmit}
                   type="submit"
                   className="btn border-none text-white bg-[#014DAE] hover:bg-[#012F70]"
-                >
+                  >
                   Submit
-                </button>
-                <button type="button" className="btn" onClick={closeModal}>
-                  Close
-                </button>
+                  </button> */}
+                <MainColorButton label="Submit" onClick={() => handleSubmit} />
+                <RegularButton label="Close" onClick={closeModal} />
               </div>
             </form>
           </div>

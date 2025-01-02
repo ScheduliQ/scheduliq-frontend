@@ -15,13 +15,14 @@
   "dependencies": {
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
-    "cloudinary": "^2.5.1",
     "daisyui": "^4.12.22",
     "firebase": "^11.1.0",
     "next": "15.0.0",
     "nookies": "^2.5.2",
     "react": "19.0.0-rc-65a56d0e-20241020",
-    "react-dom": "19.0.0-rc-65a56d0e-20241020"
+    "react-dom": "19.0.0-rc-65a56d0e-20241020",
+    "react-icons": "^5.4.0",
+    "sweetalert2": "^11.15.6"
   },
   "devDependencies": {
     "@types/node": "^20",

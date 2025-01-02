@@ -46,7 +46,6 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
-      <SignupButton />
     </main>
   );
 }
