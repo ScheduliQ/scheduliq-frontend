@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "../../../config/firebase"; // Adjust path based on your setup
+import { auth } from "../../../config/firebase";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
