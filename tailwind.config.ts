@@ -13,9 +13,6 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
-      backgroundImage: {
-        landing: "url('/Animated.svg')",
-      },
       fontFamily: {
         sans: ["'Open Sans'", ...fontFamily.sans], // Set Open Sans as the primary sans font
       },
