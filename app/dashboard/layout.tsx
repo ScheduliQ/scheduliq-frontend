@@ -8,9 +8,9 @@ export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="h-screen flex flex-col bg-[#FCE6D4]">
+    <div className="min-h-screen flex flex-col bg-[#FCE6D4]">
       {/* Navbar */}
-      <div className="relative z-50  h-20 pt-1 flex items-center justify-center ">
+      <div className="relative z-50 h-20 pt-1 flex items-center justify-center ">
         <Navbar />
       </div>
 
@@ -22,7 +22,7 @@ export default function Layout({
         </div>
 
         {/* Main Content */}
-        <div className="flex-1  p-4">
+        <div className="flex-1 p-4">
           <div className="bg-[#F7FAFC]/70 backdrop-blur-md shadow-lg border border-gray-300 rounded-3xl p-6 h-full">
             <main>{children}</main>
           </div>

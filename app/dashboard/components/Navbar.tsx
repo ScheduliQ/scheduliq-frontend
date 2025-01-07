@@ -2,9 +2,25 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import { auth } from "../../../config/firebase"; // עדכן את הנתיב לפי ההגדרות שלך
 
 export default function Navbar() {
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      router.push("/login"); // Redirect to login page after sign-out
+    } catch (error) {
+      console.error("Error signing out:", error);
+      alert("An error occurred while signing out. Please try again.");
+    }
+  };
+
   return (
+    // bg-[#F7FAFC]/70
     <div className="relative bg-[#F7FAFC]/70  backdrop-blur-md shadow-lg border border-gray-300 rounded-3xl w-full mx-4">
       <div className="flex justify-between items-center px-6 py-2">
         {/* Logo */}
@@ -57,16 +73,13 @@ export default function Navbar() {
               className="menu menu-sm dropdown-content bg-white/80 backdrop-blur-md rounded-box z-[1] mt-3 w-52 p-2 shadow-md"
             >
               <li>
-                <a className="justify-between">
-                  Profile
-                  <span className="badge">New</span>
-                </a>
+                <a className="justify-between">Profile</a>
               </li>
               <li>
                 <a>Settings</a>
               </li>
               <li>
-                <a>Logout</a>
+                <a onClick={handleSignOut}>Logout</a>
               </li>
             </ul>
           </div>

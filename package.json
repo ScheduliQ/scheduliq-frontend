@@ -13,6 +13,10 @@
   "packageManager": "npm@10.5.2",
   "overrides": {},
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/interaction": "^6.1.15",
+    "@fullcalendar/react": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.15",
     "@nextui-org/react": "^2.6.10",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",

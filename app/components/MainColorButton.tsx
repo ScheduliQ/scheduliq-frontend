@@ -14,7 +14,7 @@ export default function MainColorButton({
   return href ? (
     <Link href={href}>
       <button
-        className="whitespace-nowrap rounded-md bg-[#014DAE] px-4 py-2 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-[#012F70] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#014DAE] font-['Open_Sans']"
+        className="whitespace-nowrap rounded-md bg-[#014DAE] px-4 py-2 text-lg  text-white shadow-lg transition-all duration-300 hover:bg-[#012F70] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#014DAE] font-['Open_Sans']"
         onClick={onClick}
       >
         {label}
@@ -22,7 +22,7 @@ export default function MainColorButton({
     </Link>
   ) : (
     <button
-      className="whitespace-nowrap rounded-md bg-[#014DAE] px-4 py-2 text-lg font-semibold text-white shadow-lg transition-all duration-300 hover:bg-[#012F70] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#014DAE] font-['Open_Sans']"
+      className="whitespace-nowrap rounded-md bg-[#014DAE] px-4 py-2 text-lg  text-white shadow-lg transition-all duration-300 hover:bg-[#012F70] hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#014DAE] font-['Open_Sans']"
       onClick={onClick}
     >
       {label}
