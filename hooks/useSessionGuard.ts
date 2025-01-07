@@ -9,9 +9,21 @@ const useSessionGuard = () => {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        setUser(currentUser); // Save the user info
+        try {
+          const idTokenResult = await currentUser.getIdTokenResult(true);
+          const role = idTokenResult.claims.role;
+          setUser({
+            ...currentUser,
+            role, // Attach role to user object
+          });
+        } catch (error) {
+          console.error("Error fetching user token:", error);
+          router.push("/login");
+        }
+        // alert(`hey------${currentUser}`);
+        // setUser(currentUser); // Save the user info
       } else {
         router.push("/login"); // Redirect to login if not authenticated
       }
