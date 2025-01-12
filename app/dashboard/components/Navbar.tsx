@@ -5,13 +5,19 @@ import Image from "next/image";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { auth } from "../../../config/firebase"; // עדכן את הנתיב לפי ההגדרות שלך
+import { useRole } from "../../../hooks/RoleContext"; // עדכן את הנתיב לפי הקובץ שלך
 
 export default function Navbar() {
   const router = useRouter();
-
+  const { role, setRole } = useRole();
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      // clear the role from the context
+      setRole(null);
+      // delete the role from localStorage
+      localStorage.removeItem("userRole");
+
       router.push("/login"); // Redirect to login page after sign-out
     } catch (error) {
       console.error("Error signing out:", error);
@@ -70,13 +76,21 @@ export default function Navbar() {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-white/80 backdrop-blur-md rounded-box z-[1] mt-3 w-52 p-2 shadow-md"
+              className="menu menu-sm dropdown-content bg-[#F7FAFC] backdrop-blur-md rounded-box z-[1] mt-3 w-52 p-2 shadow-md"
             >
               <li>
-                <a className="justify-between">Profile</a>
+                <a className="justify-between">View Profile</a>
               </li>
               <li>
-                <a>Settings</a>
+                <a>General Settings</a>
+              </li>
+              {role === "manager" && (
+                <li>
+                  <a>Manager Settings</a>
+                </li>
+              )}
+              <li>
+                <a>Help & Support</a>
               </li>
               <li>
                 <a onClick={handleSignOut}>Logout</a>

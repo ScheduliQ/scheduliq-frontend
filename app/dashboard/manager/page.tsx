@@ -9,6 +9,7 @@ import interactionPlugin from "@fullcalendar/interaction"; // Enables drag-and-d
 import timeGridPlugin from "@fullcalendar/timegrid";
 import MainColorButton from "../../components/MainColorButton";
 import RegularButton from "../../components/RegularButton";
+
 // Enables time-based grid
 export default function ManagerDashboard() {
   const router = useRouter();
@@ -70,7 +71,7 @@ export default function ManagerDashboard() {
 
   return (
     <div className="relative  h-full flex flex-col">
-      <h1 className="text-xl font-bold mb-4">Manager Dashboard</h1>
+      <h1 className="text-xl font-bold font-sans  mb-4">Manager Dashboard</h1>
 
       {/* FullCalendar */}
       {/* Calendar Container */}

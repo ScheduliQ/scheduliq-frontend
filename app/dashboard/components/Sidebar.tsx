@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-
+import { useRole } from "../../../hooks/RoleContext";
 export default function Sidebar() {
+  const { role } = useRole();
   return (
     <aside className="h-[calc(100vh-8rem-2rem)] bg-[#F7FAFC]/70 backdrop-blur-md flex flex-col border border-gray-300 rounded-3xl p-4 shadow-lg">
       {/* כותרת קבועה */}
@@ -156,9 +157,11 @@ export default function Sidebar() {
 
       {/* כפתור קבוע בתחתית */}
       <div className="pt-4 border-t border-gray-300 mt-2">
-        <button className="btn btn-circle btn-primary w-full">
-          <span className="text-xl">+</span>
-        </button>
+        {role === "manager" && (
+          <button className="btn btn-circle btn-primary w-full">
+            <span className="text-xl">+</span>
+          </button>
+        )}
       </div>
     </aside>
   );
