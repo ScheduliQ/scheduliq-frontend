@@ -5,7 +5,7 @@ import SignupButton from "../components/SignUpButton";
 
 export default function LandingPage() {
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-landing bg-cover bg-center">
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-none ">
       <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row items-center">
           {/* Left section */}

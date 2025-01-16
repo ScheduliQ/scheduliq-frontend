@@ -74,7 +74,7 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-landing bg-cover bg-center px-4">
+    <main className="flex items-center justify-center min-h-screen bg-none  px-4">
       {loginLoading && <Loading />}
 
       {/* Container for both sections */}
