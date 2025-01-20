@@ -90,7 +90,10 @@ export default function DynamicScheduleTable() {
         <h1 className="text-3xl font-bold tracking-tight">
           Dynamic Schedule Table
         </h1>
-        <p className="mt-2 text-blue-100">Manage your weekly availability</p>
+        <p className="mt-2 text-blue-100">
+          Select the desired shifts by cliking on them and add additional
+          constraints in the text box below if needed, finally click 'Submit'.
+        </p>
       </div>
 
       {/* Shift Counter */}
