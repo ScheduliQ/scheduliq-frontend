@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth } from "../../../config/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -9,10 +9,22 @@ import interactionPlugin from "@fullcalendar/interaction"; // Enables drag-and-d
 import timeGridPlugin from "@fullcalendar/timegrid";
 import MainColorButton from "../../components/MainColorButton";
 import RegularButton from "../../components/RegularButton";
+import useSessionGuard from "../../../hooks/useSessionGuard";
+import { useRole } from "../../../hooks/RoleContext";
 
-// Enables time-based grid
 export default function ManagerDashboard() {
+  const user = useSessionGuard();
   const router = useRouter();
+  const { role } = useRole();
+  useEffect(() => {
+    if (user === null) {
+      return;
+    }
+    if (!user || role !== "manager") {
+      router.push("/login");
+    }
+  }, [user, role, router]);
+
   const [isEditing, setIsEditing] = useState(false); // Manage edit mode state
 
   const [events, setEvents] = useState([
