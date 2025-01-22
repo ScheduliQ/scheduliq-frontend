@@ -92,7 +92,8 @@ export default function DynamicScheduleTable() {
         </h1>
         <p className="mt-2 text-blue-100">
           Select the desired shifts by cliking on them and add additional
-          constraints in the text box below if needed, finally click 'Submit'.
+          constraints in the text box below if needed, finally click
+          &apos;Submit&apos;.
         </p>
       </div>
 
