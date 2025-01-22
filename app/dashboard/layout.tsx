@@ -1,6 +1,7 @@
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import DynamicBackground from "../components/DynamicBackground";
 
 import React from "react";
 
@@ -8,7 +9,8 @@ export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="min-h-screen flex flex-col bg-[#FCE6D4]">
+    <div className="min-h-screen flex flex-col ">
+      <DynamicBackground />
       {/* Navbar */}
       <div className="relative z-50 h-20 pt-1 flex items-center justify-center ">
         <Navbar />

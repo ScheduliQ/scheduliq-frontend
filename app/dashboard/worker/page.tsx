@@ -90,7 +90,10 @@ export default function WorkerDashboard() {
           {/* <button className="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600">
             Reports
           </button> */}
-          <MainColorButton label="Assign shifts" href="/" />
+          <MainColorButton
+            label="Assign shifts"
+            href="/dashboard/worker/worker-availability"
+          />
 
           {/* <button className="px-4 py-2 bg-purple-500 text-white rounded-lg shadow-md hover:bg-purple-600">
             New Schedule
