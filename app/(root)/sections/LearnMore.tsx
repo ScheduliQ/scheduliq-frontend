@@ -62,7 +62,7 @@ const features = [
 ];
 export const LearnMore = () => {
   return (
-    <section className="bg-gradient-to-b from-white to-[#D2DCFF] py-24">
+    <section className="bg-none py-24">
       <div className="container lg:mx-auto ">
         <div>
           {/* חלק ראשון */}

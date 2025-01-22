@@ -18,13 +18,14 @@ export const LogoTicker = () => {
   const totalItems = [...textItems, ...textItems]; // שכפול רשימה
 
   return (
-    <div className="py-8 md:py-12 bg-white overflow-hidden relative">
+    <div className="py-8 md:py-12 bg-white/30 overflow-hidden relative">
       {/* אפקט דהייה בצדדים */}
       <div
         className="absolute inset-0 pointer-events-none z-10"
         style={{
           background:
             "linear-gradient(to right, white, transparent 15%, transparent 85%, white)",
+          // "linear-gradient(to right, #a6c5ed, transparent 15%, transparent 85%, white)",
         }}
       />
 

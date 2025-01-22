@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 export const Hero = () => {
   return (
-    <section className="pt-8 pb-20 md:pt-5 md:pb-10 bg-[radial-gradient(ellipse_200%_100%_at_bottom_left,#183EC2,#EAEEFE_66%)] md:ovreflow-x-clip">
+    <section className="pt-8 pb-20 md:pt-5 md:pb-10 bg-none md:ovreflow-x-clip">
       <div className="h-28 lg:h-12"> </div>
       <div className="container ">
         <div className="md:flex items-center">
