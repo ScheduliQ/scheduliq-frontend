@@ -13,18 +13,6 @@ import useSessionGuard from "../../../hooks/useSessionGuard";
 import { useRole } from "../../../hooks/RoleContext";
 
 export default function ManagerDashboard() {
-  const user = useSessionGuard();
-  const router = useRouter();
-  const { role } = useRole();
-  useEffect(() => {
-    if (user === null) {
-      return;
-    }
-    if (!user || role !== "manager") {
-      router.push("/login");
-    }
-  }, [user, role, router]);
-
   const [isEditing, setIsEditing] = useState(false); // Manage edit mode state
 
   const [events, setEvents] = useState([
