@@ -6,7 +6,7 @@ import Loading from "../components/Loading";
 import { useRole } from "../../hooks/RoleContext"; // ייבוא ה-Context
 
 export default function NavigationDashboard() {
-  const user = useSessionGuard(); // Fetch authenticated user and their role
+  const { user, isLoading } = useSessionGuard(); // Fetch authenticated user and their role
   const router = useRouter();
   const { setRole } = useRole(); // קריאת ה-Context ועדכון הפונקציה setRole
 

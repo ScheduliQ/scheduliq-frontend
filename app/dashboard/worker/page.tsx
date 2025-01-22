@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth } from "../../../config/firebase";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -10,8 +10,6 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import MainColorButton from "../../components/MainColorButton";
 
 export default function WorkerDashboard() {
-  const router = useRouter();
-
   return (
     <div className="relative  h-full flex flex-col">
       <h1 className="text-xl font-bold font-sans mb-4">Worker Dashboard</h1>
