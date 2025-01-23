@@ -1,6 +1,7 @@
 "use client";
-
+import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
+import { useRole } from "../../../../hooks/RoleContext"; // ייבוא ה-Context
 
 const INITIAL_DAYS = [
   "Sunday",
@@ -11,11 +12,12 @@ const INITIAL_DAYS = [
   "Friday",
   "Saturday",
 ];
-
 const INITIAL_SHIFTS = ["Morning", "Afternoon", "Evening"];
 const MIN_SHIFTS_REQUIRED = 3; // Minimum shifts required to submit
 
 export default function DynamicScheduleTable() {
+  const { uid, role } = useRole();
+
   const [workDays, setWorkDays] = useState(6);
   const [shiftsPerDay, setShiftsPerDay] = useState(3);
   const [shiftNames, setShiftNames] = useState(INITIAL_SHIFTS);
@@ -54,12 +56,110 @@ export default function DynamicScheduleTable() {
     setConstraints("");
   };
 
-  const saveDraft = () => {
-    console.log("Saving draft:", { availability, constraints });
-    alert("Draft saved!");
+  const saveDraft = async () => {
+    try {
+      const draftData = {
+        uid,
+        availability: availability.flatMap((row, shiftIndex) =>
+          row
+            .map((isAvailable, dayIndex) =>
+              isAvailable
+                ? {
+                    shift: shiftIndex,
+                    day: dayIndex,
+                    priority: 10,
+                  }
+                : null
+            )
+            .filter(Boolean)
+        ),
+        constraints,
+      };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/constraints/save-draft`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(draftData),
+        }
+      );
+      const result = await response.json();
+      // טיפול בתגובה מהשרת
+      if (response.ok) {
+        Swal.fire({
+          icon: "success", // מציג אייקון של הצלחה
+          title: "Success", // כותרת החלון
+          text: result.message, // הודעת ההצלחה
+          confirmButtonText: "OK", // כפתור סגירה
+          timer: 3000, // זמן בסימניות (3 שניות)
+          timerProgressBar: true,
+        });
+      } else {
+        alert(`Failed to save draft: ${result.error || "Unknown error"}`);
+        console.error("Error from server:", result);
+      }
+    } catch (error: any) {
+      alert(`An unexpected error occurred: ${error.message}`);
+      console.error("Error saving draft:", error);
+    }
   };
 
-  const submitAvailability = () => {
+  const loadDraft = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/constraints/draft/${uid}`
+      );
+      const result = await response.json();
+
+      if (response.ok && result.draft) {
+        const updatedAvailability = Array.from({ length: shiftsPerDay }, () =>
+          Array.from({ length: workDays }, () => false)
+        );
+
+        result.draft.availability.forEach(
+          ({ shift, day }: { shift: number; day: number }) => {
+            updatedAvailability[shift][day] = true;
+          }
+        );
+
+        setAvailability(updatedAvailability);
+        setConstraints(result.draft.constraints || "");
+      } else {
+        if (result.message === "No draft found") {
+          Swal.fire({
+            icon: "error", // מציג אייקון של שגיאה
+            title: "Error", // כותרת החלון
+            text: "No draft found, try saving one.", // הודעת השגיאה
+            confirmButtonText: "Close", // כפתור סגירה
+            timer: 3000, // זמן בסימניות (3 שניות)
+            timerProgressBar: true,
+          });
+        } else {
+          Swal.fire({
+            icon: "error", // מציג אייקון של שגיאה
+            title: "Error", // כותרת החלון
+            text: "Error loading draft!", // הודעת השגיאה
+            confirmButtonText: "Close", // כפתור סגירה
+            timer: 3000, // זמן בסימניות (3 שניות)
+            timerProgressBar: true,
+          });
+        }
+      }
+    } catch (error: any) {
+      console.error("Error loading draft:", error);
+      Swal.fire({
+        icon: "error", // מציג אייקון של שגיאה
+        title: "Error", // כותרת החלון
+        text: error, // הודעת השגיאה
+        confirmButtonText: "Close", // כפתור סגירה
+      });
+    }
+  };
+
+  const submitAvailability = async () => {
     if (availableShiftsCount < MIN_SHIFTS_REQUIRED) {
       alert(
         `You must select at least ${MIN_SHIFTS_REQUIRED} shifts to submit.`
@@ -69,17 +169,45 @@ export default function DynamicScheduleTable() {
 
     // Collect indices as tuples [shiftIndex, dayIndex] where availability is true
     const submissionData = {
+      uid,
       availability: availability.flatMap((row, shiftIndex) =>
         row
           .map((isAvailable, dayIndex) =>
-            isAvailable ? [shiftIndex, dayIndex] : null
+            isAvailable
+              ? {
+                  shift: shiftIndex,
+                  day: dayIndex,
+                  priority: 10,
+                }
+              : null
           )
           .filter(Boolean)
       ),
       constraints,
     };
 
-    console.log("Submitting JSON:", JSON.stringify(submissionData, null, 2));
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/constraints/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(submissionData),
+        }
+      );
+
+      const result = await response.json();
+      console.log("Response from server:");
+    } catch (error) {
+      console.error("Error sending constraints:", error);
+    }
+    // console.log(
+    //   "Submitting JSON:",
+    //   JSON.stringify(submissionData, null, 2),
+    //   `uid:${uid},role:${role}`
+    // );
     alert("Schedule submitted! Check the console for the JSON output.");
   };
 
@@ -200,6 +328,12 @@ export default function DynamicScheduleTable() {
           className="px-4 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
         >
           Save Draft
+        </button>
+        <button
+          onClick={loadDraft}
+          className="px-4 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+        >
+          Load Draft
         </button>
         <button
           onClick={submitAvailability}
