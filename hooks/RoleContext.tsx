@@ -1,10 +1,13 @@
-"use client"; // הפעלת המצב 'client' עבור Next.js
-import React, { createContext, useContext, useState, useEffect } from "react"; // ייבוא פונקציות React ליצירת קונטקסט ושימוש בו
+"use client";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import useSessionGuard from "./useSessionGuard";
 
-// הגדרת הממשק שמכיל את המידע על הרול (role) והפונקציה לעדכונו (setRole)
 interface RoleContextType {
-  role: string | null; // המידע על הרול, יכול להיות מחרוזת או null
-  setRole: (role: string | null) => void; // פונקציה לעדכון הרול
+  role: string | null;
+  uid: string | null;
+  isLoading: boolean;
+  setRole: (role: string | null) => void;
+  setUid: (uid: string | null) => void;
 }
 
 // יצירת הקונטקסט עבור המידע על הרול
@@ -14,20 +17,35 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined);
 export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  // מצב עבור הרול, כולל טעינה מה-localStorage אם קיים
+  const { user, isLoading: sessionLoading } = useSessionGuard();
   const [role, setRoleState] = useState<string | null>(null);
+  const [uid, setUidState] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true); // מצב טעינה ל-Context
 
-  // פונקציה לעדכון הרול שמעדכנת גם את ה-localStorage
+  // טעינת UID ו-Role לסטייט
+  useEffect(() => {
+    if (!sessionLoading) {
+      if (user) {
+        setUidState(user.uid || null);
+      } else {
+        setUidState(null);
+      }
+      setIsLoading(false); // הטעינה הושלמה
+    }
+  }, [user, sessionLoading]);
+
   const setRole = (newRole: string | null) => {
     setRoleState(newRole); // עדכון המצב הפנימי
     if (newRole) {
-      localStorage.setItem("userRole", newRole); // שמירה ב-localStorage
+      localStorage.setItem("userRole", newRole);
     } else {
-      localStorage.removeItem("userRole"); // מחיקה אם אין רול
+      localStorage.removeItem("userRole");
     }
   };
+  const setUid = (newUid: string | null) => {
+    setUidState(newUid);
+  };
 
-  // טעינת הרול מ-localStorage פעם אחת כשנטען ה-Provider
   useEffect(() => {
     const storedRole = localStorage.getItem("userRole");
     if (storedRole) {
@@ -36,7 +54,7 @@ export const RoleProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   return (
-    <RoleContext.Provider value={{ role, setRole }}>
+    <RoleContext.Provider value={{ role, uid, isLoading, setRole, setUid }}>
       {children}
     </RoleContext.Provider>
   );
