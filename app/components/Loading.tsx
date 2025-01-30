@@ -1,21 +1,20 @@
-import Image from "next/image";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../public/animations/animated_coffee.json";
 
 export default function Loading() {
   return (
-    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white/90 rounded-lg shadow-lg p-8 flex flex-col items-center">
-      {/* Coffee Image */}
-      <Image
-        src="/coffee.png" // Path to image inside the public folder
-        alt="Coffee illustration"
-        width={150}
-        height={150}
-        className="mb-4"
-      />
-      {/* Text below the image */}
-      <p className="text-gray-600 text-center font-sans text-lg">
-        <span className="font-bold">Loading...</span> <br />
-        How about a coffee pic while you wait?
-      </p>
+    <div className="fixed inset-0 z-50 flex items-center rounded-xl justify-center bg-white/20 backdrop-blur-md">
+      <div className="bg-none p-2 text-center flex flex-col items-center justify-center">
+        <Lottie
+          animationData={loadingAnimation}
+          loop={true}
+          autoplay={true}
+          className="w-96 h-96 object-contain"
+        />
+        <p className="text-blue-950 font-medium text-xl -mt-24">
+          How about a coffee animation while you wait?
+        </p>
+      </div>
     </div>
   );
 }
