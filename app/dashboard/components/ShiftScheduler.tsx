@@ -20,78 +20,6 @@ interface Day {
   name: string;
   shifts: Shift[];
 }
-// {
-//   id: "1",
-//   name: "Sunday",
-//   shifts: [
-//     {
-//       id: "s1",
-//       time: "08:00-16:00",
-//       employees: [
-//         { id: "e1", name: "Yossi Cohen", role: "Manager", hours: "8" },
-//         { id: "e2", name: "Michal Levi", role: "Cashier", hours: "8" },
-//       ],
-//     },
-//     {
-//       id: "s2",
-//       time: "16:00-24:00",
-//       employees: [
-//         { id: "e3", name: "David Mizrahi", role: "Security", hours: "8" },
-//         { id: "e4", name: "Sarah Goldman", role: "Waitress", hours: "6" },
-//       ],
-//     },
-//   ],
-// },
-// {
-//   id: "2",
-//   name: "Monday",
-//   shifts: [
-//     {
-//       id: "s3",
-//       time: "08:00-16:00",
-//       employees: [
-//         { id: "e5", name: "Ariel Netanyahu", role: "Chef", hours: "8" },
-//         { id: "e6", name: "Lior Ashkenazi", role: "Waiter", hours: "6" },
-//       ],
-//     },
-//     {
-//       id: "s4",
-//       time: "16:00-24:00",
-//       employees: [
-//         {
-//           id: "e7",
-//           name: "Tal Mosseri",
-//           role: "Shift Manager",
-//           hours: "8",
-//         },
-//       ],
-//     },
-//   ],
-// },
-// {
-//   id: "3",
-//   name: "Tuesday",
-//   shifts: [
-//     { id: "s5", time: "08:00-16:00", employees: [] },
-//     { id: "s6", time: "16:00-24:00", employees: [] },
-//   ],
-// },
-// {
-//   id: "4",
-//   name: "Wednesday",
-//   shifts: [
-//     { id: "s7", time: "08:00-16:00", employees: [] },
-//     { id: "s8", time: "16:00-24:00", employees: [] },
-//   ],
-// },
-// {
-//   id: "5",
-//   name: "Thursday",
-//   shifts: [
-//     { id: "s9", time: "08:00-16:00", employees: [] },
-//     { id: "s10", time: "16:00-24:00", employees: [] },
-//   ],
-// },
 
 const ShiftScheduler = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -132,9 +60,73 @@ const ShiftScheduler = () => {
     hours: string;
   }>({ id: "", name: "", role: "", hours: "" });
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
+  const [editingEmployee, setEditingEmployee] = useState<{
+    dayId: string;
+    shiftId: string;
+    employeeId: string;
+    employeeData: Employee;
+  } | null>(null);
 
+  const handleEditEmployee = (
+    dayId: string,
+    shiftId: string,
+    employeeId: string
+  ) => {
+    const day = days.find((d) => d.id === dayId);
+    if (!day) return;
+
+    const shift = day.shifts.find((s) => s.id === shiftId);
+    if (!shift) return;
+
+    const employee = shift.employees.find((e) => e.id === employeeId);
+    if (!employee) return;
+
+    setEditingEmployee({
+      dayId,
+      shiftId,
+      employeeId,
+      employeeData: { ...employee },
+    });
+  };
+
+  const handleSaveEditedEmployee = () => {
+    if (!editingEmployee) return;
+
+    const { dayId, shiftId, employeeId, employeeData } = editingEmployee;
+
+    const newDays = days.map((day) => {
+      if (day.id === dayId) {
+        return {
+          ...day,
+          shifts: day.shifts.map((shift) => {
+            if (shift.id === shiftId) {
+              return {
+                ...shift,
+                employees: shift.employees.map((employee) =>
+                  employee.id === employeeId ? employeeData : employee
+                ),
+              };
+            }
+            return shift;
+          }),
+        };
+      }
+      return day;
+    });
+
+    setDays(newDays);
+    setEditingEmployee(null);
+  };
+  const handleDragEnd = (result: any) => {
+    const { source, destination } = result;
+
+    if (
+      !destination ||
+      (source.droppableId === destination.droppableId &&
+        source.index === destination.index)
+    ) {
+      return;
+    }
     const sourceDayIndex = days.findIndex((day) =>
       day.shifts.some((shift) => shift.id === result.source.droppableId)
     );
@@ -243,9 +235,18 @@ const ShiftScheduler = () => {
   });
 
   return (
-    <div className="p-4">
+    <div
+      className={`p-4 ${
+        isEditing ? "border-2 border-dashed border-blue-700 rounded-3xl" : ""
+      }`}
+    >
       <div className="flex justify-between mb-4">
         <h1 className="text-2xl font-bold">Shift Schedule</h1>
+        {isEditing && (
+          <div className="text-center text-blue-500 font-semibold mb-4">
+            ✎ You are in edit mode. Drag and drop to rearrange shifts.
+          </div>
+        )}
         <button
           onClick={() => setIsEditing(!isEditing)}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -282,7 +283,7 @@ const ShiftScheduler = () => {
                               onClick={() =>
                                 handleAddEmployee(day.id, shift.id)
                               }
-                              className="text-green-500 hover:text-green-700"
+                              className="text-green-500 hover:text-green-700 text-xl"
                             >
                               +
                             </button>
@@ -322,18 +323,32 @@ const ShiftScheduler = () => {
                                     </div>
                                   </div>
                                   {isEditing && (
-                                    <button
-                                      onClick={() =>
-                                        handleDeleteEmployee(
-                                          day.id,
-                                          shift.id,
-                                          employee.id
-                                        )
-                                      }
-                                      className="text-red-500 hover:text-red-700"
-                                    >
-                                      ✕
-                                    </button>
+                                    <div className="flex items-center space-x-0">
+                                      <button
+                                        onClick={() =>
+                                          handleEditEmployee(
+                                            day.id,
+                                            shift.id,
+                                            employee.id
+                                          )
+                                        }
+                                        className="text-blue-500 hover:text-blue-700 mr-2"
+                                      >
+                                        ✎
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleDeleteEmployee(
+                                            day.id,
+                                            shift.id,
+                                            employee.id
+                                          )
+                                        }
+                                        className="text-red-500 hover:text-red-700"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
                                   )}
                                 </div>
                               </div>
@@ -420,6 +435,101 @@ const ShiftScheduler = () => {
                 </button>
                 <button
                   onClick={handleSaveEmployee}
+                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {editingEmployee && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Edit Employee</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Employee Name"
+                value={editingEmployee.employeeData.name}
+                onChange={(e) =>
+                  setEditingEmployee({
+                    ...editingEmployee,
+                    employeeData: {
+                      ...editingEmployee.employeeData,
+                      name: e.target.value,
+                    },
+                  })
+                }
+                className="w-full p-2 border rounded"
+              />
+              <input
+                type="text"
+                placeholder="Role"
+                value={editingEmployee.employeeData.role}
+                onChange={(e) =>
+                  setEditingEmployee({
+                    ...editingEmployee,
+                    employeeData: {
+                      ...editingEmployee.employeeData,
+                      role: e.target.value,
+                    },
+                  })
+                }
+                className="w-full p-2 border rounded"
+              />
+              <div className="flex justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  Start Time:
+                </label>
+                <input
+                  type="time"
+                  value={editingEmployee.employeeData.hours.split("-")[0] || ""}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      employeeData: {
+                        ...editingEmployee.employeeData,
+                        hours: `${e.target.value}-${
+                          editingEmployee.employeeData.hours.split("-")[1] || ""
+                        }`,
+                      },
+                    })
+                  }
+                  className="p-2 border rounded"
+                />
+              </div>
+              <div className="flex justify-between">
+                <label className="text-sm font-medium text-gray-700">
+                  End Time:
+                </label>
+                <input
+                  type="time"
+                  value={editingEmployee.employeeData.hours.split("-")[1] || ""}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      employeeData: {
+                        ...editingEmployee.employeeData,
+                        hours: `${
+                          editingEmployee.employeeData.hours.split("-")[0] || ""
+                        }-${e.target.value}`,
+                      },
+                    })
+                  }
+                  className="p-2 border rounded"
+                />
+              </div>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setEditingEmployee(null)}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEditedEmployee}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
                 >
                   Save
