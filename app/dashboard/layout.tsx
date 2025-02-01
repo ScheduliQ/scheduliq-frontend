@@ -1,3 +1,5 @@
+"use client";
+import { usePathname } from "next/navigation";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -9,6 +11,18 @@ import React from "react";
 export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const pathname = usePathname();
+
+  // אם המשתמש נמצא ב-'/dashboard/contact', אל תשתמש ב-Layout הזה
+  if (pathname.startsWith("/dashboard/contact")) {
+    return (
+      <div className="relative min-h-screen">
+        <DynamicBackground /> {/* רקע דינמי */}
+        <div className="relative z-10">{children}</div> {/* תוכן הדף */}
+      </div>
+    );
+  }
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex flex-col ">
@@ -21,7 +35,7 @@ export default function Layout({
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col md:flex-row">
           {/* Sidebar Container */}
-          <div className="w-full  md:w-1/4 lg:w-1/5 p-4">
+          <div className="w-full md:w-1/4 lg:w-1/5 p-4">
             <Sidebar />
           </div>
 

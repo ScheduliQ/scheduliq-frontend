@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className=" backdrop-blur py-3 text-center">
@@ -5,9 +7,9 @@ export default function Footer() {
         <a href="/terms" className="mx-2 hover:underline">
           Terms of Service
         </a>
-        <a href="/contact" className="mx-2 hover:underline">
+        <Link href="/dashboard/contact" className="mx-2 hover:underline">
           Contact Us
-        </a>
+        </Link>
         <a href="/privacy" className="mx-2 hover:underline">
           Privacy Policy
         </a>
