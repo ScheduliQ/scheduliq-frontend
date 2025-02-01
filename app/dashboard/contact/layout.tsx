@@ -9,7 +9,7 @@ export default function ContactLayout({
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col">
       {/* Navbar */}
-      <div className="relative flex-1 flex items-center justify-center">
+      <div className="py-2 relative flex-1 flex items-center justify-center">
         <Navbar />
       </div>
 
