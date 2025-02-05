@@ -1,7 +1,6 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { FaCheck } from "react-icons/fa6";
 
 interface Employee {
   id: string;
@@ -22,235 +21,27 @@ interface Day {
   shifts: Shift[];
 }
 
-const basicSchedule = [
-  {
-    id: "d0",
-    name: "Sunday",
-    shifts: [
-      {
-        id: "s0",
-        time: "Morning",
-        employees: [
-          {
-            id: "e0_s0",
-            name: "Employee 1",
-            role: "Role",
-            hours: "8",
-          },
-        ],
-      },
-      {
-        id: "s1",
-        time: "Evening",
-        employees: [],
-      },
-      {
-        id: "s2",
-        time: "Night",
-        employees: [],
-      },
-    ],
-  },
-  {
-    id: "d1",
-    name: "Monday",
-    shifts: [
-      {
-        id: "s3",
-        time: "Morning",
-        employees: [],
-      },
-      {
-        id: "s4",
-        time: "Evening",
-        employees: [
-          {
-            id: "e0_s4",
-            name: "Employee 2",
-            role: "Role",
-            hours: "8",
-          },
-        ],
-      },
-      {
-        id: "s5",
-        time: "Night",
-        employees: [],
-      },
-    ],
-  },
-  {
-    id: "d2",
-    name: "Tuesday",
-    shifts: [
-      {
-        id: "s6",
-        time: "Morning",
-        employees: [],
-      },
-      {
-        id: "s7",
-        time: "Evening",
-        employees: [],
-      },
-      {
-        id: "s8",
-        time: "Night",
-        employees: [
-          {
-            id: "e0_s8",
-            name: "Employee 3",
-            role: "Role",
-            hours: "8",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "d3",
-    name: "Wednesday",
-    shifts: [
-      {
-        id: "s9",
-        time: "Morning",
-        employees: [
-          {
-            id: "e0_s9",
-            name: "Employee 4",
-            role: "Role",
-            hours: "8",
-          },
-        ],
-      },
-      {
-        id: "s10",
-        time: "Evening",
-        employees: [],
-      },
-      {
-        id: "s11",
-        time: "Night",
-        employees: [],
-      },
-    ],
-  },
-  {
-    id: "d4",
-    name: "Thursday",
-    shifts: [
-      {
-        id: "s12",
-        time: "Morning",
-        employees: [],
-      },
-      {
-        id: "s13",
-        time: "Evening",
-        employees: [
-          {
-            id: "e0_s13",
-            name: "Employee 5",
-            role: "Role",
-            hours: "8",
-          },
-        ],
-      },
-      {
-        id: "s14",
-        time: "Night",
-        employees: [],
-      },
-    ],
-  },
-  {
-    id: "d5",
-    name: "Friday",
-    shifts: [
-      {
-        id: "s15",
-        time: "Morning",
-        employees: [],
-      },
-      {
-        id: "s16",
-        time: "Evening",
-        employees: [],
-      },
-      {
-        id: "s17",
-        time: "Night",
-        employees: [
-          {
-            id: "e0_s17",
-            name: "Employee 6",
-            role: "Role",
-            hours: "8",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: "d6",
-    name: "Saturday",
-    shifts: [
-      {
-        id: "s18",
-        time: "Morning",
-        employees: [
-          {
-            id: "e0_s18",
-            name: "Employee 7",
-            role: "Role",
-            hours: "8",
-          },
-        ],
-      },
-      {
-        id: "s19",
-        time: "Evening",
-        employees: [],
-      },
-      {
-        id: "s20",
-        time: "Night",
-        employees: [],
-      },
-    ],
-  },
-];
-const ShiftScheduler = ({ scheduleData }: { scheduleData: Day[] | null }) => {
+const ShiftScheduler = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [days, setDays] = useState<Day[]>(basicSchedule);
+  const [days, setDays] = useState<Day[]>([]);
+
   useEffect(() => {
-    if (scheduleData) {
-      setDays(scheduleData);
-    }
-  }, [scheduleData]);
+    const fetchSchedule = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/latest`
+        );
+        if (!response.ok) throw new Error("Failed to fetch schedule");
 
-  // useEffect(() => {
-  //   const fetchSchedule = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${process.env.NEXT_PUBLIC_BASE_URL}/csp/generate-schedule`
-  //       );
-  //       if (!response.ok) throw new Error("Failed to fetch schedule");
+        const result = await response.json();
+        setDays(result.days); // השמה למשתנה days אם הפלט תקין
+      } catch (error) {
+        console.error("Error fetching schedule:", error);
+      }
+    };
 
-  //       const result = await response.json();
-  //       console.log("Fetched Data Type:", typeof result); // חייב להיות 'object' או 'array'
-
-  //       console.log(result);
-  //       const parsedData = JSON.parse(result);
-
-  //       setDays(parsedData); // השמה למשתנה days אם הפלט תקין
-  //     } catch (error) {
-  //       console.error("Error fetching schedule:", error);
-  //     }
-  //   };
-
-  //   fetchSchedule();
-  // }, []);
+    fetchSchedule();
+  }, []);
 
   const [selectedShift, setSelectedShift] = useState<{
     dayId: string;
