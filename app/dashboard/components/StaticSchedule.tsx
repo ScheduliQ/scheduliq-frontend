@@ -1,6 +1,9 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useRole } from "../../../hooks/RoleContext";
+import { FaArrowLeft } from "react-icons/fa6";
+import { FaArrowRight } from "react-icons/fa6";
 
 interface Employee {
   id: string;
@@ -22,26 +25,69 @@ interface Day {
 }
 
 const ShiftScheduler = () => {
+  const { role } = useRole();
+  const [schedules, setSchedules] = useState<Day[][]>([]); ///////////////////////
+  const [currentIndex, setCurrentIndex] = useState(0); ///////////////////////
   const [isEditing, setIsEditing] = useState(false);
   const [days, setDays] = useState<Day[]>([]);
 
+  const goBack = () => {
+    if (currentIndex < schedules.length - 1) {
+      const newIndex = currentIndex + 1;
+      setCurrentIndex(newIndex);
+      setDays(schedules[newIndex]);
+    }
+  };
+
+  const goForward = () => {
+    if (currentIndex > 0) {
+      const newIndex = currentIndex - 1;
+      setCurrentIndex(newIndex);
+      setDays(schedules[newIndex]);
+    }
+  };
+
+  const goToLatest = () => {
+    setCurrentIndex(0);
+    setDays(schedules[0]);
+  };
+
   useEffect(() => {
-    const fetchSchedule = async () => {
+    const fetchSchedules = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/latest`
+          `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/all`
         );
-        if (!response.ok) throw new Error("Failed to fetch schedule");
+        if (!response.ok) throw new Error("Failed to fetch schedules");
 
         const result = await response.json();
-        setDays(result.days); // השמה למשתנה days אם הפלט תקין
+        setSchedules(result.map((schedule: any) => schedule.days)); // רק ה-"days" מכל סידור
+        setCurrentIndex(0); // מתחילים מהסידור האחרון
+        setDays(result[0].days); // מציגים את הסידור הכי חדש
       } catch (error) {
-        console.error("Error fetching schedule:", error);
+        console.error("Error fetching schedules:", error);
       }
     };
-
-    fetchSchedule();
+    fetchSchedules();
   }, []);
+
+  // useEffect(() => {
+  //   const fetchSchedule = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/latest`
+  //       );
+  //       if (!response.ok) throw new Error("Failed to fetch schedule");
+
+  //       const result = await response.json();
+  //       setDays(result.days); // השמה למשתנה days אם הפלט תקין
+  //     } catch (error) {
+  //       console.error("Error fetching schedule:", error);
+  //     }
+  //   };
+
+  //   fetchSchedule();
+  // }, []);
 
   const [selectedShift, setSelectedShift] = useState<{
     dayId: string;
@@ -237,17 +283,58 @@ const ShiftScheduler = () => {
     >
       <div className="flex justify-between mb-4">
         <h1 className="text-2xl font-bold">Shift Schedule</h1>
+
         {isEditing && (
           <div className="text-center text-blue-500 font-semibold mb-4">
             ✎ You are in edit mode. Drag and drop to rearrange shifts.
           </div>
         )}
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          {isEditing ? "Done ✔" : "Edit ✎"}
-        </button>
+
+        <div className="flex  gap-x-1 ">
+          <button
+            onClick={goBack}
+            disabled={currentIndex >= schedules.length - 1}
+            className={`px-4 py-2 rounded ${
+              currentIndex >= schedules.length - 1
+                ? "bg-gray-300"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
+          >
+            <FaArrowLeft />
+          </button>
+
+          <button
+            onClick={goToLatest}
+            disabled={currentIndex === 0}
+            className={`px-4 py-2 font-sans rounded ${
+              currentIndex === 0
+                ? "bg-gray-300"
+                : "bg-green-500 hover:bg-green-600 text-white"
+            }`}
+          >
+            Current
+          </button>
+
+          <button
+            onClick={goForward}
+            disabled={currentIndex === 0}
+            className={`px-4 py-2 rounded ${
+              currentIndex === 0
+                ? "bg-gray-300"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
+          >
+            <FaArrowRight />
+          </button>
+          {role === "manager" && (
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="bg-blue-500 hover:bg-blue-600 text-white ml-5 px-4 py-2 rounded-lg transition-colors"
+            >
+              {isEditing ? "Done ✔" : "Edit ✎"}
+            </button>
+          )}
+        </div>
       </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="overflow-x-auto pb-4">
