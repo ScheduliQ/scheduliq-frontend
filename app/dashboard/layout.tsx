@@ -21,14 +21,14 @@ export default function Layout({
     return (
       <div className="relative min-h-screen">
         <DynamicBackground /> {/* רקע דינמי */}
-        <div className="relative z-10">{children}</div> {/* תוכן הדף */}
+        <div className="relative">{children}</div> {/* תוכן הדף */}
       </div>
     );
   } else if (pathname.startsWith("/dashboard/terms")) {
     return (
       <div className="relative min-h-screen">
         <DynamicBackground /> {/* רקע דינמי */}
-        <div className="relative z-10">{children}</div> {/* תוכן הדף */}
+        <div className="relative">{children}</div> {/* תוכן הדף */}
       </div>
     );
   }
