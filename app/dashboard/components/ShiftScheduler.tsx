@@ -2,6 +2,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { FaCheck } from "react-icons/fa6";
+import { useRef } from "react";
 
 interface Employee {
   id: string;
@@ -220,14 +221,29 @@ const basicSchedule = [
     ],
   },
 ];
-const ShiftScheduler = ({ scheduleData }: { scheduleData: Day[] | null }) => {
+const ShiftScheduler = ({
+  scheduleData,
+  publishDays,
+  setPublishDays,
+}: {
+  scheduleData: Day[] | null;
+  publishDays: Day[];
+  setPublishDays: React.Dispatch<React.SetStateAction<Day[]>>;
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [days, setDays] = useState<Day[]>(basicSchedule);
+
   useEffect(() => {
     if (scheduleData) {
       setDays(scheduleData);
     }
   }, [scheduleData]);
+
+  useEffect(() => {
+    if (days) {
+      setPublishDays(days);
+    }
+  }, [days]);
 
   // useEffect(() => {
   //   const fetchSchedule = async () => {

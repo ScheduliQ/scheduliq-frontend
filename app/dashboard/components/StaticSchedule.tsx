@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useRole } from "../../../hooks/RoleContext";
 import { FaArrowLeft } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa6";
-
+import Swal from "sweetalert2";
 interface Employee {
   id: string;
   name: string;
@@ -30,7 +30,7 @@ const ShiftScheduler = () => {
   const [currentIndex, setCurrentIndex] = useState(0); ///////////////////////
   const [isEditing, setIsEditing] = useState(false);
   const [days, setDays] = useState<Day[]>([]);
-
+  const [daysId, setDaysId] = useState<string[]>([]); //###############
   const goBack = () => {
     if (currentIndex < schedules.length - 1) {
       const newIndex = currentIndex + 1;
@@ -61,6 +61,7 @@ const ShiftScheduler = () => {
         if (!response.ok) throw new Error("Failed to fetch schedules");
 
         const result = await response.json();
+        setDaysId(result.map((schedule: any) => schedule._id)); //###############
         setSchedules(result.map((schedule: any) => schedule.days)); // רק ה-"days" מכל סידור
         setCurrentIndex(0); // מתחילים מהסידור האחרון
         setDays(result[0].days); // מציגים את הסידור הכי חדש
@@ -71,6 +72,64 @@ const ShiftScheduler = () => {
     fetchSchedules();
   }, []);
 
+  const updateSchedule = async () => {
+    try {
+      // נניח שה-API מעדכן לפי ID של הסידור
+      const scheduleId = daysId[currentIndex];
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/update/${scheduleId}`,
+        {
+          method: "PUT", // או POST בהתאם ל-API שלך
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ days }), // שולחים את הסידור המעודכן
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update schedule");
+      Swal.fire({
+        title: "Schedule Updated!",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+        width: "300px",
+        position: "center",
+        background: "#f0f9ff",
+        iconColor: "#014DAE",
+        customClass: {
+          popup: "rounded-lg shadow-md",
+          title: "text-2xl font-sans font-semibold text-blue-700",
+        },
+      });
+    } catch (error) {
+      Swal.fire({
+        title: "Error!",
+        text: "Error updating schedule",
+        icon: "error",
+        confirmButtonText: "OK",
+        timer: 3000,
+        showConfirmButton: false,
+        position: "center",
+        width: "300px",
+        background: "#fee2e2",
+        iconColor: "#dc2626",
+        customClass: {
+          popup: "rounded-lg shadow-md",
+          title: "text-2xl font-sans font-semibold text-red-700",
+          htmlContainer: "font-sans text-gray-700",
+        },
+      });
+    }
+  };
+
+  const handleToggleEdit = async () => {
+    if (isEditing) {
+      await updateSchedule();
+      setIsEditing(false);
+    } else {
+      setIsEditing(true);
+    }
+  };
   // useEffect(() => {
   //   const fetchSchedule = async () => {
   //     try {
@@ -328,7 +387,7 @@ const ShiftScheduler = () => {
           </button>
           {role === "manager" && (
             <button
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={handleToggleEdit}
               className="bg-blue-500 hover:bg-blue-600 text-white ml-5 px-4 py-2 rounded-lg transition-colors"
             >
               {isEditing ? "Done ✔" : "Edit ✎"}
