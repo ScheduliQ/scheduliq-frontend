@@ -27,7 +27,7 @@ export default function Navbar() {
 
   return (
     // bg-[#F7FAFC]/70
-    <div className="relative bg-[#F7FAFC]/70  backdrop-blur-md shadow-lg border border-gray-300 rounded-3xl w-full mx-4">
+    <div className="relative bg-[#F7FAFC]/70 z-10 backdrop-blur-md shadow-lg border border-gray-300 rounded-3xl w-full mx-4">
       <div className="flex justify-between items-center px-6 py-2">
         {/* Logo */}
         <div className="flex items-center">
