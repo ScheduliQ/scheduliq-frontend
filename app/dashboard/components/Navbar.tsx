@@ -94,7 +94,13 @@ export default function Navbar() {
                 </Link>
               </li>
               <li>
-                <a>General Settings</a>
+                <Link
+                  href="/dashboard/user-setting"
+                  className="justify-between"
+                  onClick={blurActiveElement}
+                >
+                  General Settings
+                </Link>
               </li>
               {role === "manager" && (
                 <li>
