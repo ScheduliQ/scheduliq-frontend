@@ -58,7 +58,7 @@ export default function ManagerDashboard() {
     } catch (error) {
       Swal.fire({
         title: "Error!",
-        text: "Could not publish schedule.",
+        text: "Could not publish schedule!",
         icon: "error",
         confirmButtonText: "OK",
         timer: 3000,

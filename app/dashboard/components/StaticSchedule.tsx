@@ -104,7 +104,7 @@ const ShiftScheduler = () => {
     } catch (error) {
       Swal.fire({
         title: "Error!",
-        text: "Error updating schedule",
+        text: "Error updating schedule.",
         icon: "error",
         confirmButtonText: "OK",
         timer: 3000,
