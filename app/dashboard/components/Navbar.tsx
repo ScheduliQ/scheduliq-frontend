@@ -24,7 +24,13 @@ export default function Navbar() {
       alert("An error occurred while signing out. Please try again.");
     }
   };
-
+  const blurActiveElement = () =>
+    setTimeout(() => {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement instanceof HTMLElement) {
+        activeElement.blur();
+      }
+    }, 0);
   return (
     // bg-[#F7FAFC]/70
     <div className="relative bg-[#F7FAFC]/70 z-10 backdrop-blur-md shadow-lg border border-gray-300 rounded-3xl w-full mx-4">
@@ -79,7 +85,13 @@ export default function Navbar() {
               className="menu menu-sm dropdown-content bg-[#F7FAFC] backdrop-blur-md rounded-box z-[1] mt-3 w-52 p-2 shadow-md"
             >
               <li>
-                <a className="justify-between">View Profile</a>
+                <Link
+                  href="/dashboard/profile-page"
+                  className="justify-between"
+                  onClick={blurActiveElement}
+                >
+                  View Profile
+                </Link>
               </li>
               <li>
                 <a>General Settings</a>
