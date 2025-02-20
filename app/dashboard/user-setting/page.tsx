@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRole } from "../../../hooks/RoleContext"; // adjust path if needed
+import Swal from "sweetalert2";
 
 export default function SettingsPage() {
   const { uid } = useRole();
@@ -12,10 +13,11 @@ export default function SettingsPage() {
     email: "",
     phone: "",
     gender: "",
-    jobs: "",
-    business_id: "",
   });
-  const [error, setError] = useState<string | null>(null);
+  const [initialFormData, setInitialFormData] = useState<any>(null);
+  // הודעות שגיאה עבור ולידציות פרטניות
+  const [fieldErrors, setFieldErrors] = useState<any>({});
+  const [error, setError] = useState<string | null>(null); // שגיאות כלליות (למשל מהשרת)
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +30,6 @@ export default function SettingsPage() {
     }
     const fetchUserData = async () => {
       try {
-        // Assuming you have a GET route to fetch user data
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/user/userdata/${uid}`
         );
@@ -37,15 +38,15 @@ export default function SettingsPage() {
         }
         const data = await res.json();
         setUserDetails(data);
-        setFormData({
+        const initialData = {
           first_name: data.first_name,
           last_name: data.last_name,
           email: data.email,
           phone: data.phone,
           gender: data.gender,
-          jobs: data.jobs,
-          business_id: data.business_id,
-        });
+        };
+        setFormData(initialData);
+        setInitialFormData(initialData);
         setLoading(false);
       } catch (err: any) {
         setError(err.message);
@@ -56,12 +57,72 @@ export default function SettingsPage() {
     fetchUserData();
   }, [uid]);
 
-  // Handle form field changes
+  // Handle form field changes - מנקה הודעת שגיאה עבור אותו שדה
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setFieldErrors((prev: any) => ({ ...prev, [name]: "" }));
+  };
+
+  // בדיקה האם הנתונים השתנו ביחס למקוריים
+  const isFormChanged = () => {
+    if (!initialFormData) return false;
+    return (
+      formData.first_name !== initialFormData.first_name ||
+      formData.last_name !== initialFormData.last_name ||
+      formData.email !== initialFormData.email ||
+      formData.phone !== initialFormData.phone ||
+      formData.gender !== initialFormData.gender
+    );
+  };
+
+  // פונקציה לוולידציות של השדות, מציבה הודעות שגיאה תחת כל שדה במידת הצורך
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+    const nameRegex = /^[A-Za-z]+$/;
+    // First Name
+    if (!formData.first_name.trim()) {
+      newErrors.first_name = "First name cannot be empty.";
+    } else if (!nameRegex.test(formData.first_name)) {
+      newErrors.first_name = "First name must contain only letters.";
+    }
+    // Last Name
+    if (!formData.last_name.trim()) {
+      newErrors.last_name = "Last name cannot be empty.";
+    } else if (!nameRegex.test(formData.last_name)) {
+      newErrors.last_name = "Last name must contain only letters.";
+    }
+    // Email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "Email cannot be empty.";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    // Phone
+    const phoneRegex = /^[0-9]+$/;
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number cannot be empty.";
+    } else if (!phoneRegex.test(formData.phone)) {
+      newErrors.phone = "Phone number must contain only digits.";
+    }
+    // Gender - אם שדה נבחר, צריך להיות אחד מהאפשרויות
+    if (
+      formData.gender &&
+      formData.gender !== "male" &&
+      formData.gender !== "female" &&
+      formData.gender !== "other"
+    ) {
+      newErrors.gender = "Invalid gender selection.";
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setFieldErrors(newErrors);
+      return false;
+    }
+    setFieldErrors({});
+    return true;
   };
 
   // Submit the updated settings to the backend
@@ -69,6 +130,10 @@ export default function SettingsPage() {
     e.preventDefault();
     if (!uid) {
       setError("User not found.");
+      return;
+    }
+    // הפעלת הוולידציות לפני השליחה
+    if (!validateForm()) {
       return;
     }
     try {
@@ -88,17 +153,38 @@ export default function SettingsPage() {
       }
       const updatedUser = await res.json();
       setUserDetails(updatedUser);
+      const updatedInitialData = {
+        first_name: updatedUser.first_name,
+        last_name: updatedUser.last_name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        gender: updatedUser.gender,
+      };
+      setInitialFormData(updatedInitialData);
       setMessage("Settings updated successfully!");
+      Swal.fire({
+        title: "Settings updated successfully",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     } catch (err: any) {
       setError(err.message);
+      Swal.fire({
+        title: err.message,
+        icon: "error",
+        timer: 2000,
+        showConfirmButton: false,
+      });
     }
   };
 
   if (loading) return <div className="p-4">Loading...</div>;
+  // הודעת שגיאה כללית (למשל מטעינת נתונים או מהשרת) תוצג בנפרד
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
+    <div className="p-4 max-w-3xl mx-auto max-h-[500px] overflow-y-auto">
       <h1 className="text-3xl font-bold mb-6">Settings</h1>
       {message && <p className="text-green-600 mb-4">{message}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -112,6 +198,11 @@ export default function SettingsPage() {
             onChange={handleChange}
             className="w-full border rounded p-2"
           />
+          {fieldErrors.first_name && (
+            <p className="text-red-500 text-sm mt-1">
+              {fieldErrors.first_name}
+            </p>
+          )}
         </div>
         {/* Last Name */}
         <div>
@@ -123,6 +214,9 @@ export default function SettingsPage() {
             onChange={handleChange}
             className="w-full border rounded p-2"
           />
+          {fieldErrors.last_name && (
+            <p className="text-red-500 text-sm mt-1">{fieldErrors.last_name}</p>
+          )}
         </div>
         {/* Email */}
         <div>
@@ -134,6 +228,9 @@ export default function SettingsPage() {
             onChange={handleChange}
             className="w-full border rounded p-2"
           />
+          {fieldErrors.email && (
+            <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
+          )}
         </div>
         {/* Phone */}
         <div>
@@ -145,6 +242,9 @@ export default function SettingsPage() {
             onChange={handleChange}
             className="w-full border rounded p-2"
           />
+          {fieldErrors.phone && (
+            <p className="text-red-500 text-sm mt-1">{fieldErrors.phone}</p>
+          )}
         </div>
         {/* Gender */}
         <div>
@@ -160,28 +260,9 @@ export default function SettingsPage() {
             <option value="female">Female</option>
             <option value="other">Other</option>
           </select>
-        </div>
-        {/* Jobs */}
-        <div>
-          <label className="block mb-1 font-medium">Jobs</label>
-          <input
-            type="text"
-            name="jobs"
-            value={formData.jobs}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          />
-        </div>
-        {/* Business */}
-        <div>
-          <label className="block mb-1 font-medium">Business</label>
-          <input
-            type="text"
-            name="business_id"
-            value={formData.business_id}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-          />
+          {fieldErrors.gender && (
+            <p className="text-red-500 text-sm mt-1">{fieldErrors.gender}</p>
+          )}
         </div>
         {/* Date of Joining (read-only) */}
         <div>
@@ -202,7 +283,12 @@ export default function SettingsPage() {
         </div>
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          disabled={!isFormChanged()}
+          className={`px-4 py-2 rounded ${
+            isFormChanged()
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-400 text-gray-800 cursor-not-allowed"
+          }`}
         >
           Update Settings
         </button>
