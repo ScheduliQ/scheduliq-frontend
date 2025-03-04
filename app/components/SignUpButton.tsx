@@ -223,8 +223,11 @@ export default function SignupButton() {
   return (
     <div className="font-sans">
       {/* Button to Open Modal */}
-      <button className="btn btn-primary" onClick={openModal}>
-        Sign Up
+      <button
+        className=" bg-blue-600 text-white px-4 py-2  hover:bg-blue-700"
+        onClick={openModal}
+      >
+        Add New Employee
       </button>
 
       {isSuccessModalOpen && (
