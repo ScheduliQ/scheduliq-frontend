@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import Link from "next/link";
 import { FC, ReactNode, MouseEvent } from "react";
 
 interface ModernButtonProps {
@@ -14,9 +14,6 @@ const ModernButton: FC<ModernButtonProps> = ({
   onClick,
   route,
 }) => {
-  // Initialize router only if route prop is provided
-  const router = useRouter();
-
   const getLighterColor = (hex: string): string => {
     hex = hex.replace("#", "");
     const r = parseInt(hex.substring(0, 2), 16);
@@ -35,12 +32,10 @@ const ModernButton: FC<ModernButtonProps> = ({
     if (onClick) {
       onClick(event);
     }
-    if (route) {
-      router.push(route);
-    }
   };
 
-  return (
+  // הכפתור עצמו
+  const buttonElement = (
     <button
       onClick={handleClick}
       style={
@@ -93,6 +88,9 @@ const ModernButton: FC<ModernButtonProps> = ({
       </span>
     </button>
   );
+
+  // אם מסופק route, עוטפים ב־Link כדי לבצע ניווט
+  return route ? <Link href={route}>{buttonElement}</Link> : buttonElement;
 };
 
 export default ModernButton;
