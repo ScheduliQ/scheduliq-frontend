@@ -15,7 +15,7 @@ const ModernButton: FC<ModernButtonProps> = ({
   route,
 }) => {
   // Initialize router only if route prop is provided
-  const router = route ? useRouter() : null;
+  const router = useRouter();
 
   const getLighterColor = (hex: string): string => {
     hex = hex.replace("#", "");
@@ -35,7 +35,7 @@ const ModernButton: FC<ModernButtonProps> = ({
     if (onClick) {
       onClick(event);
     }
-    if (route && router) {
+    if (route) {
       router.push(route);
     }
   };
