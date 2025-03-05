@@ -6,17 +6,8 @@ import { motion } from "framer-motion";
 export default function PrivacyPage() {
   return (
     <div className="py-2 h-screen w-screen overflow-x-hidden flex flex-col">
-      <div className="relative flex-1 flex items-center justify-center">
-        <Navbar />
-      </div>
-
       {/* עטיפת הרקע והתוכן */}
       <div className="py-7 relative flex-1 flex items-center justify-center px-6">
-        {/* רקע דינמי */}
-        <div className="absolute inset-0 -z-10">
-          <DynamicBackground />
-        </div>
-
         {/* תוכן ה-Privacy Policy */}
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.9 }}

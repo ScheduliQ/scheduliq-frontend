@@ -16,18 +16,26 @@ export default function Layout({
   // אם המשתמש נמצא ב-'/dashboard/contact', אל תשתמש ב-Layout הזה
   if (
     pathname.startsWith("/dashboard/contact") ||
-    pathname.startsWith("/dashboard/privacy-policy")
+    pathname.startsWith("/dashboard/privacy-policy") ||
+    pathname.startsWith("/dashboard/terms")
   ) {
     return (
       <div className="relative min-h-screen">
         <DynamicBackground /> {/* רקע דינמי */}
+        <div className="relative z-50 h-20 pt-1 flex items-center justify-center ">
+          <Navbar />
+        </div>
         <div className="relative">{children}</div> {/* תוכן הדף */}
       </div>
     );
-  } else if (pathname.startsWith("/dashboard/terms")) {
+  } else if (pathname.startsWith("/dashboard/manager/manager-settings")) {
     return (
-      <div className="relative min-h-screen">
-        <DynamicBackground /> {/* רקע דינמי */}
+      <div className="min-h-screen flex flex-col">
+        <DynamicBackground />
+        {/* Navbar */}
+        <div className="relative z-50 h-20 pt-1 flex items-center justify-center ">
+          <Navbar />
+        </div>{" "}
         <div className="relative">{children}</div> {/* תוכן הדף */}
       </div>
     );

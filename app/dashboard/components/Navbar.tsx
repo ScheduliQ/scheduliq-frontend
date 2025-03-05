@@ -23,6 +23,12 @@ export default function Navbar() {
       console.error("Error signing out:", error);
       alert("An error occurred while signing out. Please try again.");
     }
+    setTimeout(() => {
+      const activeElement = document.activeElement;
+      if (activeElement && activeElement instanceof HTMLElement) {
+        activeElement.blur();
+      }
+    }, 0);
   };
   const blurActiveElement = () =>
     setTimeout(() => {
@@ -104,7 +110,13 @@ export default function Navbar() {
               </li>
               {role === "manager" && (
                 <li>
-                  <a>Manager Settings</a>
+                  <Link
+                    href="/dashboard/manager/manager-settings"
+                    className="justify-between"
+                    onClick={blurActiveElement}
+                  >
+                    Manager Settings
+                  </Link>
                 </li>
               )}
               <li>
