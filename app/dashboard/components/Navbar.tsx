@@ -120,9 +120,6 @@ export default function Navbar() {
                 </li>
               )}
               <li>
-                <a>Help & Support</a>
-              </li>
-              <li>
                 <a onClick={handleSignOut}>Logout</a>
               </li>
             </ul>

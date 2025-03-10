@@ -34,11 +34,6 @@ interface ManagerInfo {
 export default function Sidebar() {
   // קבלת תפקיד המשתמש ו-UID מהקונטקסט
   const { role, uid } = useRole();
-
-  // ערכי גיבוי (במידה managerInfo לא נטען)
-  const defaultManagerUid = "defaultManagerUid";
-  const defaultBusinessId = "defaultBusinessId";
-
   // State לניהול ההודעות, טקסט ההודעה, מצב הצגת תיבת הקלט ופרטי המנהל
   const [messages, setMessages] = useState<ManagerMessage[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
@@ -120,11 +115,16 @@ export default function Sidebar() {
   // יצירת הודעה חדשה (POST)
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
+    // Check if managerInfo is loaded and has the required fields.
+    if (!uid || !managerInfo.uid || !managerInfo.business_id) {
+      console.error("Manager info is not fully loaded.");
+      return;
+    }
 
     // שימוש בערכים מ-managerInfo אם קיימים, אחרת fallback
     const newMessage: ManagerMessage = {
-      uid: managerInfo.uid || uid || defaultManagerUid,
-      business_id: managerInfo.business_id || defaultBusinessId,
+      uid: managerInfo.uid || uid,
+      business_id: managerInfo.business_id,
       text: inputValue.trim(),
       created_at: new Date().toISOString(),
     };
