@@ -312,7 +312,7 @@ export default function Sidebar() {
 
       {/* Message display area with auto-scroll */}
       <div className="flex-1 overflow-y-auto px-2">
-        <div className="space-y-6 bg-red-700">
+        <div className="space-y-6">
           {messages.map((msg, index) => (
             <div
               key={index}
