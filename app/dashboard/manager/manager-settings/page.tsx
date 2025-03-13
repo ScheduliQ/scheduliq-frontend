@@ -344,6 +344,45 @@ export default function ManagerSettingsPage() {
     );
   }
   async function saveSettings() {
+    for (const st of shiftTypes) {
+      const roles = rolesPerShift[st.name] || [];
+      if (roles.length === 0) {
+        Swal.fire({
+          title: "Invalid Settings",
+          text: `Please add at least one role for the "${st.name}" shift.`,
+          icon: "error",
+          timer: 5000,
+          showConfirmButton: false,
+          width: "300px",
+          position: "center",
+
+          customClass: {
+            popup: "rounded-lg shadow-md",
+            title: "text-2xl font-sans font-semibold",
+          },
+        });
+        return;
+      }
+      for (const req of roles) {
+        if (!req.role || req.role.trim() === "") {
+          Swal.fire({
+            title: "Invalid Settings",
+            text: `Please fill in the role for one of the requirements in the "${st.name}" shift.`,
+            icon: "error",
+            timer: 2000,
+            showConfirmButton: false,
+            width: "300px",
+            position: "center",
+            customClass: {
+              popup: "rounded-lg shadow-md",
+              title: "text-2xl font-sans font-semibold",
+            },
+          });
+          return;
+        }
+      }
+    }
+
     // Assume currentUserUid comes from your auth context
     const currentUserUid = "123"; // Replace with your actual UID
     const payload = {

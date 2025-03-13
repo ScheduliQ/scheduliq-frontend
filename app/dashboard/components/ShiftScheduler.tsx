@@ -22,6 +22,10 @@ interface Day {
   name: string;
   shifts: Shift[];
 }
+interface ManagerSettings {
+  work_days: string[];
+  shift_names: string[];
+}
 
 const basicSchedule = [
   {
@@ -232,6 +236,8 @@ const ShiftScheduler = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [days, setDays] = useState<Day[]>(basicSchedule);
+  const [managerSettings, setManagerSettings] =
+    useState<ManagerSettings | null>(null);
 
   useEffect(() => {
     if (scheduleData) {
@@ -244,6 +250,49 @@ const ShiftScheduler = ({
       setPublishDays(days);
     }
   }, [days]);
+
+  // Generates a basic schedule using manager settings
+  const generateBasicSchedule = (settings: {
+    work_days: string[];
+    shift_names: string[];
+  }) => {
+    return settings.work_days.map((day, dayIndex) => ({
+      id: `d${dayIndex}`,
+      name: day,
+      shifts: settings.shift_names.map((shift, shiftIndex) => ({
+        id: `s${dayIndex * settings.shift_names.length + shiftIndex}`,
+        time: shift,
+        employees: [], // Start with an empty list for employees
+      })),
+    }));
+  };
+
+  // Fetch the manager settings from your API
+  useEffect(() => {
+    const fetchManagerSettings = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/manager-settings/`
+        );
+        if (!response.ok) throw new Error("Failed to fetch manager settings");
+        const settings = await response.json();
+        setManagerSettings(settings);
+      } catch (error) {
+        console.error("Error fetching manager settings:", error);
+      }
+    };
+    fetchManagerSettings();
+  }, []);
+
+  // Generate basic schedule using manager settings
+  useEffect(() => {
+    if (scheduleData) {
+      setDays(scheduleData);
+    } else if (managerSettings) {
+      const basicSchedule = generateBasicSchedule(managerSettings);
+      setDays(basicSchedule);
+    }
+  }, [managerSettings, scheduleData]);
 
   // useEffect(() => {
   //   const fetchSchedule = async () => {

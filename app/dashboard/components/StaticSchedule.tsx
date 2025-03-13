@@ -74,7 +74,6 @@ const ShiftScheduler = () => {
 
   const updateSchedule = async () => {
     try {
-      // נניח שה-API מעדכן לפי ID של הסידור
       const scheduleId = daysId[currentIndex];
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/update/${scheduleId}`,
@@ -101,11 +100,10 @@ const ShiftScheduler = () => {
           title: "text-2xl font-sans font-semibold text-blue-700",
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       Swal.fire({
-        title: "Error!",
-        text: "Error updating schedule.",
-        icon: "error",
+        text: "Schedule not found or no changes made",
+        icon: "info",
         confirmButtonText: "OK",
         timer: 3000,
         showConfirmButton: false,
@@ -350,42 +348,44 @@ const ShiftScheduler = () => {
         )}
 
         <div className="flex  gap-x-1 ">
-          <button
-            onClick={goBack}
-            disabled={currentIndex >= schedules.length - 1}
-            className={`px-4 py-2 rounded ${
-              currentIndex >= schedules.length - 1
-                ? "bg-gray-300"
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            }`}
-          >
-            <FaArrowLeft />
-          </button>
-
-          <button
-            onClick={goToLatest}
-            disabled={currentIndex === 0}
-            className={`px-4 py-2 font-sans rounded ${
-              currentIndex === 0
-                ? "bg-gray-300"
-                : "bg-green-500 hover:bg-green-600 text-white"
-            }`}
-          >
-            Current
-          </button>
-
-          <button
-            onClick={goForward}
-            disabled={currentIndex === 0}
-            className={`px-4 py-2 rounded ${
-              currentIndex === 0
-                ? "bg-gray-300"
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            }`}
-          >
-            <FaArrowRight />
-          </button>
-          {role === "manager" && (
+          {!isEditing && (
+            <>
+              <button
+                onClick={goBack}
+                disabled={currentIndex >= schedules.length - 1}
+                className={`px-4 py-2 rounded ${
+                  currentIndex >= schedules.length - 1
+                    ? "bg-gray-300"
+                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                }`}
+              >
+                <FaArrowLeft />
+              </button>
+              <button
+                onClick={goToLatest}
+                disabled={currentIndex === 0}
+                className={`px-4 py-2 font-sans rounded ${
+                  currentIndex === 0
+                    ? "bg-gray-300"
+                    : "bg-green-500 hover:bg-green-600 text-white"
+                }`}
+              >
+                Current
+              </button>
+              <button
+                onClick={goForward}
+                disabled={currentIndex === 0}
+                className={`px-4 py-2 rounded ${
+                  currentIndex === 0
+                    ? "bg-gray-300"
+                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                }`}
+              >
+                <FaArrowRight />
+              </button>
+            </>
+          )}
+          {role === "manager" && currentIndex == 0 && (
             <button
               onClick={handleToggleEdit}
               className="bg-blue-500 hover:bg-blue-600 text-white ml-5 px-4 py-2 rounded-lg transition-colors"
