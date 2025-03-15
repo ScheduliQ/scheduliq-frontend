@@ -85,6 +85,7 @@ export default function ManagerDashboard() {
       if (!response.ok) throw new Error("Failed to fetch schedule");
       const result = await response.json();
       const parsedData = JSON.parse(result);
+      console.log("parsedData", parsedData);
       setScheduleData(parsedData);
       Swal.fire({
         title: "Schedule Generated!",

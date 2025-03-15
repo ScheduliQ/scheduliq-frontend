@@ -1,8 +1,9 @@
 "use client";
 import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
-import { useRole } from "../../../../hooks/RoleContext"; // ייבוא ה-Context
+import { useRole } from "../../../../hooks/RoleContext"; // Import Context
 
+// Fallback defaults (will be replaced if manager settings are fetched)
 const INITIAL_DAYS = [
   "Sunday",
   "Monday",
@@ -18,10 +19,16 @@ const MIN_SHIFTS_REQUIRED = 3; // Minimum shifts required to submit
 export default function DynamicScheduleTable() {
   const { uid, role } = useRole();
 
-  const [workDays, setWorkDays] = useState(6);
-  const [shiftsPerDay, setShiftsPerDay] = useState(3);
-  const [shiftNames, setShiftNames] = useState(INITIAL_SHIFTS);
-  const [availability, setAvailability] = useState(
+  // Manager settings state (null until fetched)
+  const [managerSettings, setManagerSettings] = useState<any>(null);
+
+  // Dynamic state variables—default to fallback values until updated
+  const [workDays, setWorkDays] = useState<number>(6);
+  const [shiftsPerDay, setShiftsPerDay] = useState<number>(3);
+  const [shiftNames, setShiftNames] = useState<string[]>(INITIAL_SHIFTS);
+
+  // Availability matrix of size: shiftsPerDay x workDays
+  const [availability, setAvailability] = useState<boolean[][]>(
     Array.from({ length: shiftsPerDay }, () =>
       Array.from({ length: workDays }, () => false)
     )
@@ -29,13 +36,43 @@ export default function DynamicScheduleTable() {
   const [constraints, setConstraints] = useState("");
   const [availableShiftsCount, setAvailableShiftsCount] = useState(0);
 
-  const displayedDays = INITIAL_DAYS.slice(0, workDays);
+  // Fetch manager settings from your backend and update states
+  useEffect(() => {
+    const fetchManagerSettings = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/manager-settings`
+        );
+        if (!response.ok) throw new Error("Failed to fetch manager settings");
+        const settings = await response.json();
+        setManagerSettings(settings);
+        // Assume settings.work_days is an array of days and settings.shift_names is an array of shift names
+        setWorkDays(settings.work_days.length);
+        setShiftsPerDay(settings.shift_names.length);
+        setShiftNames(settings.shift_names);
+        // Reinitialize availability matrix based on the new dimensions
+        setAvailability(
+          Array.from({ length: settings.shift_names.length }, () =>
+            Array.from({ length: settings.work_days.length }, () => false)
+          )
+        );
+      } catch (error) {
+        console.error("Error fetching manager settings:", error);
+      }
+    };
+    fetchManagerSettings();
+  }, []);
 
-  // Update available shifts count dynamically
+  // Compute available shifts count whenever availability changes
   useEffect(() => {
     const count = availability.flat().filter(Boolean).length;
     setAvailableShiftsCount(count);
   }, [availability]);
+
+  // Use dynamic work_days if available, otherwise fallback
+  const displayedDays = managerSettings
+    ? managerSettings.work_days
+    : INITIAL_DAYS.slice(0, workDays);
 
   const toggleAvailability = (shiftIndex: number, dayIndex: number) => {
     setAvailability((prev) => {
@@ -64,11 +101,7 @@ export default function DynamicScheduleTable() {
           row
             .map((isAvailable, dayIndex) =>
               isAvailable
-                ? {
-                    shift: shiftIndex,
-                    day: dayIndex,
-                    priority: 10,
-                  }
+                ? { shift: shiftIndex, day: dayIndex, priority: 10 }
                 : null
             )
             .filter(Boolean)
@@ -80,21 +113,18 @@ export default function DynamicScheduleTable() {
         `${process.env.NEXT_PUBLIC_BASE_URL}/constraints/save-draft`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(draftData),
         }
       );
       const result = await response.json();
-      // טיפול בתגובה מהשרת
       if (response.ok) {
         Swal.fire({
-          icon: "success", // מציג אייקון של הצלחה
-          title: "Success", // כותרת החלון
-          text: result.message, // הודעת ההצלחה
-          confirmButtonText: "OK", // כפתור סגירה
-          timer: 3000, // זמן בסימניות (3 שניות)
+          icon: "success",
+          title: "Success",
+          text: result.message,
+          confirmButtonText: "OK",
+          timer: 3000,
           timerProgressBar: true,
         });
       } else {
@@ -118,32 +148,30 @@ export default function DynamicScheduleTable() {
         const updatedAvailability = Array.from({ length: shiftsPerDay }, () =>
           Array.from({ length: workDays }, () => false)
         );
-
         result.draft.availability.forEach(
           ({ shift, day }: { shift: number; day: number }) => {
             updatedAvailability[shift][day] = true;
           }
         );
-
         setAvailability(updatedAvailability);
         setConstraints(result.draft.constraints || "");
       } else {
         if (result.message === "No draft found") {
           Swal.fire({
-            icon: "error", // מציג אייקון של שגיאה
-            title: "Error", // כותרת החלון
-            text: "No draft found, try saving one.", // הודעת השגיאה
-            confirmButtonText: "Close", // כפתור סגירה
-            timer: 3000, // זמן בסימניות (3 שניות)
+            icon: "error",
+            title: "Error",
+            text: "No draft found, try saving one.",
+            confirmButtonText: "Close",
+            timer: 3000,
             timerProgressBar: true,
           });
         } else {
           Swal.fire({
-            icon: "error", // מציג אייקון של שגיאה
-            title: "Error", // כותרת החלון
-            text: "Error loading draft!", // הודעת השגיאה
-            confirmButtonText: "Close", // כפתור סגירה
-            timer: 3000, // זמן בסימניות (3 שניות)
+            icon: "error",
+            title: "Error",
+            text: "Error loading draft!",
+            confirmButtonText: "Close",
+            timer: 3000,
             timerProgressBar: true,
           });
         }
@@ -151,10 +179,10 @@ export default function DynamicScheduleTable() {
     } catch (error: any) {
       console.error("Error loading draft:", error);
       Swal.fire({
-        icon: "error", // מציג אייקון של שגיאה
-        title: "Error", // כותרת החלון
-        text: error, // הודעת השגיאה
-        confirmButtonText: "Close", // כפתור סגירה
+        icon: "error",
+        title: "Error",
+        text: error,
+        confirmButtonText: "Close",
       });
     }
   };
@@ -166,49 +194,63 @@ export default function DynamicScheduleTable() {
       );
       return;
     }
-
-    // Collect indices as tuples [shiftIndex, dayIndex] where availability is true
     const submissionData = {
       uid,
       availability: availability.flatMap((row, shiftIndex) =>
         row
           .map((isAvailable, dayIndex) =>
             isAvailable
-              ? {
-                  shift: shiftIndex,
-                  day: dayIndex,
-                  priority: 10,
-                }
+              ? { shift: shiftIndex, day: dayIndex, priority: 10 }
               : null
           )
           .filter(Boolean)
       ),
       constraints,
     };
-
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/constraints/`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(submissionData),
         }
       );
-
       const result = await response.json();
-      console.log("Response from server:");
+      Swal.fire({
+        text: "Shift availability submitted successfully!",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+        width: "300px",
+        position: "center",
+        background: "#f0f9ff",
+        iconColor: "#014DAE",
+        customClass: {
+          popup: "rounded-lg shadow-md",
+          title: "text-2xl font-sans font-semibold text-blue-700",
+        },
+      });
     } catch (error) {
-      console.error("Error sending constraints:", error);
+      Swal.fire({
+        title: "Error!",
+        text: "Error sending constraints!",
+        icon: "error",
+        confirmButtonText: "OK",
+        timer: 3000,
+        showConfirmButton: false,
+        position: "center",
+        width: "300px",
+        background: "#fee2e2",
+        iconColor: "#dc2626",
+        customClass: {
+          popup: "rounded-lg shadow-md",
+          title: "text-2xl font-sans font-semibold text-red-700",
+          htmlContainer: "font-sans text-gray-700",
+        },
+      });
+      // console.error("Error sending constraints:", error);
     }
-    // console.log(
-    //   "Submitting JSON:",
-    //   JSON.stringify(submissionData, null, 2),
-    //   `uid:${uid},role:${role}`
-    // );
-    alert("Schedule submitted! Check the console for the JSON output.");
   };
 
   return (
@@ -219,12 +261,10 @@ export default function DynamicScheduleTable() {
           Dynamic Schedule Table
         </h1>
         <p className="mt-2 text-blue-100">
-          Select the desired shifts by cliking on them and add additional
-          constraints in the text box below if needed, finally click
-          &apos;Submit&apos;.
+          Select the desired shifts by clicking on them and add additional
+          constraints in the text box below if needed, then click 'Submit'.
         </p>
       </div>
-
       {/* Shift Counter */}
       <div className="mb-6 font-sans text-center">
         <p
@@ -238,7 +278,6 @@ export default function DynamicScheduleTable() {
           minimum required
         </p>
       </div>
-
       {/* Table */}
       <div className="overflow-auto rounded-xl font-sans border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200 bg-white">
@@ -249,7 +288,7 @@ export default function DynamicScheduleTable() {
                   <span>Shifts</span>
                 </div>
               </th>
-              {displayedDays.map((day, index) => (
+              {displayedDays.map((day: any, index: any) => (
                 <th
                   key={`day-${index}`}
                   className="px-6 py-4 text-center text-sm font-semibold text-gray-600 tracking-wider border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white"
@@ -261,7 +300,6 @@ export default function DynamicScheduleTable() {
               ))}
             </tr>
           </thead>
-
           <tbody className="bg-white divide-y divide-gray-200">
             {Array.from({ length: shiftsPerDay }).map((_, shiftIndex) => (
               <tr key={`shift-${shiftIndex}`}>
@@ -270,7 +308,7 @@ export default function DynamicScheduleTable() {
                     {shiftNames[shiftIndex] || `Shift ${shiftIndex + 1}`}
                   </div>
                 </td>
-                {displayedDays.map((_, dayIndex) => (
+                {displayedDays.map((_: any, dayIndex: any) => (
                   <td
                     key={`cell-${shiftIndex}-${dayIndex}`}
                     className="p-0 text-center border border-gray-100"
@@ -300,7 +338,6 @@ export default function DynamicScheduleTable() {
           </tbody>
         </table>
       </div>
-
       {/* Constraints Text Area */}
       <div className="mt-8">
         <label className="block mb-2 font-semibold text-gray-700">
@@ -314,7 +351,6 @@ export default function DynamicScheduleTable() {
           rows={4}
         ></textarea>
       </div>
-
       {/* Action Buttons */}
       <div className="flex gap-4 justify-end mt-6">
         <button
