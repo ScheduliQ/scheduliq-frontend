@@ -14,7 +14,6 @@ const INITIAL_DAYS = [
   "Saturday",
 ];
 const INITIAL_SHIFTS = ["Morning", "Afternoon", "Evening"];
-const MIN_SHIFTS_REQUIRED = 3; // Minimum shifts required to submit
 
 export default function DynamicScheduleTable() {
   const { uid, role } = useRole();
@@ -35,6 +34,7 @@ export default function DynamicScheduleTable() {
   );
   const [constraints, setConstraints] = useState("");
   const [availableShiftsCount, setAvailableShiftsCount] = useState(0);
+  const [requiredShifts, setrequiredShifts] = useState(0);
 
   // Fetch manager settings from your backend and update states
   useEffect(() => {
@@ -50,6 +50,7 @@ export default function DynamicScheduleTable() {
         setWorkDays(settings.work_days.length);
         setShiftsPerDay(settings.shift_names.length);
         setShiftNames(settings.shift_names);
+        setrequiredShifts(settings.required_shifts);
         // Reinitialize availability matrix based on the new dimensions
         setAvailability(
           Array.from({ length: settings.shift_names.length }, () =>
@@ -188,10 +189,8 @@ export default function DynamicScheduleTable() {
   };
 
   const submitAvailability = async () => {
-    if (availableShiftsCount < MIN_SHIFTS_REQUIRED) {
-      alert(
-        `You must select at least ${MIN_SHIFTS_REQUIRED} shifts to submit.`
-      );
+    if (availableShiftsCount < requiredShifts) {
+      alert(`You must select at least ${requiredShifts} shifts to submit.`);
       return;
     }
     const submissionData = {
@@ -269,13 +268,13 @@ export default function DynamicScheduleTable() {
       <div className="mb-6 font-sans text-center">
         <p
           className={`font-medium ${
-            availableShiftsCount < MIN_SHIFTS_REQUIRED
+            availableShiftsCount < requiredShifts
               ? "text-red-600"
               : "text-green-600"
           }`}
         >
-          Selected Shifts: {availableShiftsCount} / {MIN_SHIFTS_REQUIRED}{" "}
-          minimum required
+          Selected Shifts: {availableShiftsCount} / {requiredShifts} minimum
+          required
         </p>
       </div>
       {/* Table */}
@@ -373,9 +372,9 @@ export default function DynamicScheduleTable() {
         </button>
         <button
           onClick={submitAvailability}
-          disabled={availableShiftsCount < MIN_SHIFTS_REQUIRED}
+          disabled={availableShiftsCount < requiredShifts}
           className={`px-4 py-2 rounded text-white transition-colors ${
-            availableShiftsCount < MIN_SHIFTS_REQUIRED
+            availableShiftsCount < requiredShifts
               ? "bg-blue-300 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
           }`}

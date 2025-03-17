@@ -39,6 +39,7 @@ export default function ManagerSettingsPage() {
   // General Settings (max consecutive shifts; shifts per day is read-only and derived from shiftTypes)
   const [maxConsecutiveShifts, setMaxConsecutiveShifts] = useState(2);
   const [maxEmployees, setMaxEmployees] = useState(4);
+  const [requiredShifts, setrequiredShifts] = useState(0);
   const { uid } = useRole();
   const [firstName, setfirstName] = useState("");
   const [lastName, setlastName] = useState("");
@@ -62,6 +63,7 @@ export default function ManagerSettingsPage() {
           const data = await res.json();
           // Update max consecutive shifts
           setMaxConsecutiveShifts(data.max_consecutive_shifts);
+          setrequiredShifts(data.required_shifts);
           // Update max employees per shift from the document
           if (
             data.min_max_employees_per_shift &&
@@ -422,6 +424,7 @@ export default function ManagerSettingsPage() {
       role_importance: convertRoleTypes(roleTypes),
       work_days: sortDays(selectedDays),
       min_max_employees_per_shift: { min: 2, max: maxEmployees },
+      required_shifts: requiredShifts,
     };
 
     try {
@@ -497,6 +500,15 @@ export default function ManagerSettingsPage() {
               type="number"
               value={maxConsecutiveShifts}
               onChange={(e) => setMaxConsecutiveShifts(Number(e.target.value))}
+              className="border p-2 rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 font-medium">Minimum required shifts:</label>
+            <input
+              type="number"
+              value={requiredShifts}
+              onChange={(e) => setrequiredShifts(Number(e.target.value))}
               className="border p-2 rounded"
             />
           </div>
