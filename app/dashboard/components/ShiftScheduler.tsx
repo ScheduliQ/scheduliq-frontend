@@ -26,6 +26,12 @@ interface ManagerSettings {
   work_days: string[];
   shift_names: string[];
 }
+interface EmployeeDropdown {
+  id: string;
+  first_name: string;
+  last_name: string;
+  jobs: string[]; // מערך של תפקידים (מחרוזות)
+}
 
 const basicSchedule = [
   {
@@ -236,6 +242,14 @@ const ShiftScheduler = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [days, setDays] = useState<Day[]>(basicSchedule);
+  const [employeeDropdown, setEmployeeDropdown] = useState<EmployeeDropdown[]>(
+    []
+  );
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+  const [availableJobs, setAvailableJobs] = useState<string[]>([]);
+  const [editingAvailableJobs, setEditingAvailableJobs] = useState<string[]>(
+    []
+  );
   const [managerSettings, setManagerSettings] =
     useState<ManagerSettings | null>(null);
 
@@ -294,28 +308,47 @@ const ShiftScheduler = ({
     }
   }, [managerSettings, scheduleData]);
 
-  // useEffect(() => {
-  //   const fetchSchedule = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         `${process.env.NEXT_PUBLIC_BASE_URL}/csp/generate-schedule`
-  //       );
-  //       if (!response.ok) throw new Error("Failed to fetch schedule");
+  // useEffect לשליפת העובדים מה־API (/employees)
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/user/employees`
+        );
+        if (!response.ok) throw new Error("Failed to fetch employees");
+        const data = await response.json();
+        // וודא שלכל עובד יש מזהה ייחודי
+        const employeesWithId = data.map((emp: any, index: number) => ({
+          id: emp._id ? emp._id : `${emp.first_name}-${emp.last_name}-${index}`,
+          ...emp,
+        }));
+        setEmployeeDropdown(employeesWithId);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    };
+    fetchEmployees();
+  }, []);
 
-  //       const result = await response.json();
-  //       console.log("Fetched Data Type:", typeof result); // חייב להיות 'object' או 'array'
-
-  //       console.log(result);
-  //       const parsedData = JSON.parse(result);
-
-  //       setDays(parsedData); // השמה למשתנה days אם הפלט תקין
-  //     } catch (error) {
-  //       console.error("Error fetching schedule:", error);
-  //     }
-  //   };
-
-  //   fetchSchedule();
-  // }, []);
+  // עדכון availableJobs עבור הוספת עובד כאשר נבחר עובד
+  useEffect(() => {
+    if (selectedEmployeeId) {
+      const emp = employeeDropdown.find((emp) => emp.id === selectedEmployeeId);
+      if (emp) {
+        setAvailableJobs(emp.jobs || []);
+        setNewEmployee((prev) => ({
+          ...prev,
+          name: `${emp.first_name} ${emp.last_name}`,
+          role: "", // איפוס בחירת התפקיד
+        }));
+      } else {
+        setAvailableJobs([]);
+      }
+    } else {
+      setAvailableJobs([]);
+      setNewEmployee((prev) => ({ ...prev, role: "" }));
+    }
+  }, [selectedEmployeeId, employeeDropdown]);
 
   const [selectedShift, setSelectedShift] = useState<{
     dayId: string;
@@ -335,6 +368,19 @@ const ShiftScheduler = ({
     employeeId: string;
     employeeData: Employee;
   } | null>(null);
+
+  useEffect(() => {
+    if (editingEmployee) {
+      const emp = employeeDropdown.find(
+        (emp) => emp.id === editingEmployee.employeeData.id
+      );
+      if (emp) {
+        setEditingAvailableJobs(emp.jobs || []);
+      } else {
+        setEditingAvailableJobs([]);
+      }
+    }
+  }, [editingEmployee, employeeDropdown]);
 
   const handleEditEmployee = (
     dayId: string,
@@ -639,26 +685,38 @@ const ShiftScheduler = ({
       {selectedShift && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Add Shift</h2>
+            <h2 className="text-xl font-bold mb-4">Add Employee to Shift</h2>
             <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Employee Name"
-                value={newEmployee.name}
-                onChange={(e) =>
-                  setNewEmployee({ ...newEmployee, name: e.target.value })
-                }
+              {/* Dropdown לבחירת העובד */}
+              <select
+                value={selectedEmployeeId}
+                onChange={(e) => setSelectedEmployeeId(e.target.value)}
                 className="w-full p-2 border rounded"
-              />
-              <input
-                type="text"
-                placeholder="Role"
+              >
+                <option value="">Select Employee</option>
+                {employeeDropdown.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.first_name} {emp.last_name}
+                  </option>
+                ))}
+              </select>
+              {/* Dropdown לבחירת התפקיד, תלוי בעובד שנבחר */}
+              <select
                 value={newEmployee.role}
                 onChange={(e) =>
                   setNewEmployee({ ...newEmployee, role: e.target.value })
                 }
                 className="w-full p-2 border rounded"
-              />
+                disabled={!availableJobs.length}
+              >
+                <option value="">Select Role</option>
+                {availableJobs.map((job, index) => (
+                  <option key={`${job}-${index}`} value={job}>
+                    {job}
+                  </option>
+                ))}
+              </select>
+              {/* שדות זמן */}
               <div className="flex justify-between">
                 <label className="text-sm font-medium text-gray-700">
                   Start Time:
@@ -713,41 +771,73 @@ const ShiftScheduler = ({
           </div>
         </div>
       )}
+
       {editingEmployee && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Edit Employee</h2>
             <div className="space-y-4">
-              <input
-                type="text"
-                placeholder="Employee Name"
-                value={editingEmployee.employeeData.name}
-                onChange={(e) =>
-                  setEditingEmployee({
-                    ...editingEmployee,
-                    employeeData: {
-                      ...editingEmployee.employeeData,
-                      name: e.target.value,
-                    },
-                  })
-                }
+              {/* Dropdown לבחירת העובד */}
+              <select
+                value={editingEmployee.employeeData.id}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  const emp = employeeDropdown.find(
+                    (emp) => emp.id === selectedId
+                  );
+                  if (emp) {
+                    setEditingEmployee((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            employeeData: {
+                              ...prev.employeeData,
+                              id: selectedId,
+                              name: `${emp.first_name} ${emp.last_name}`,
+                              role: "", // איפוס תפקיד בעת שינוי העובד
+                            },
+                          }
+                        : null
+                    );
+                    setEditingAvailableJobs(emp.jobs || []);
+                  }
+                }}
                 className="w-full p-2 border rounded"
-              />
-              <input
-                type="text"
-                placeholder="Role"
+              >
+                <option value="">Select Employee</option>
+                {employeeDropdown.map((emp) => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.first_name} {emp.last_name}
+                  </option>
+                ))}
+              </select>
+              {/* Dropdown לבחירת התפקיד */}
+              <select
                 value={editingEmployee.employeeData.role}
                 onChange={(e) =>
-                  setEditingEmployee({
-                    ...editingEmployee,
-                    employeeData: {
-                      ...editingEmployee.employeeData,
-                      role: e.target.value,
-                    },
-                  })
+                  setEditingEmployee((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          employeeData: {
+                            ...prev.employeeData,
+                            role: e.target.value,
+                          },
+                        }
+                      : null
+                  )
                 }
                 className="w-full p-2 border rounded"
-              />
+                disabled={!editingAvailableJobs.length}
+              >
+                <option value="">Select Role</option>
+                {editingAvailableJobs.map((job, index) => (
+                  <option key={`${job}-${index}`} value={job}>
+                    {job}
+                  </option>
+                ))}
+              </select>
+              {/* שדות זמן */}
               <div className="flex justify-between">
                 <label className="text-sm font-medium text-gray-700">
                   Start Time:
@@ -756,15 +846,19 @@ const ShiftScheduler = ({
                   type="time"
                   value={editingEmployee.employeeData.hours.split("-")[0] || ""}
                   onChange={(e) =>
-                    setEditingEmployee({
-                      ...editingEmployee,
-                      employeeData: {
-                        ...editingEmployee.employeeData,
-                        hours: `${e.target.value}-${
-                          editingEmployee.employeeData.hours.split("-")[1] || ""
-                        }`,
-                      },
-                    })
+                    setEditingEmployee((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            employeeData: {
+                              ...prev.employeeData,
+                              hours: `${e.target.value}-${
+                                prev.employeeData.hours.split("-")[1] || ""
+                              }`,
+                            },
+                          }
+                        : null
+                    )
                   }
                   className="p-2 border rounded"
                 />
@@ -777,15 +871,19 @@ const ShiftScheduler = ({
                   type="time"
                   value={editingEmployee.employeeData.hours.split("-")[1] || ""}
                   onChange={(e) =>
-                    setEditingEmployee({
-                      ...editingEmployee,
-                      employeeData: {
-                        ...editingEmployee.employeeData,
-                        hours: `${
-                          editingEmployee.employeeData.hours.split("-")[0] || ""
-                        }-${e.target.value}`,
-                      },
-                    })
+                    setEditingEmployee((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            employeeData: {
+                              ...prev.employeeData,
+                              hours: `${
+                                prev.employeeData.hours.split("-")[0] || ""
+                              }-${e.target.value}`,
+                            },
+                          }
+                        : null
+                    )
                   }
                   className="p-2 border rounded"
                 />

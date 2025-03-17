@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRole } from "../../../../hooks/RoleContext";
 import ModernButton from "../../components/ModernButton";
 import ModernCard from "../../components/ModernCard";
 import SignupButton from "../../../components/SignUpButton";
@@ -38,7 +39,11 @@ export default function ManagerSettingsPage() {
   // General Settings (max consecutive shifts; shifts per day is read-only and derived from shiftTypes)
   const [maxConsecutiveShifts, setMaxConsecutiveShifts] = useState(2);
   const [maxEmployees, setMaxEmployees] = useState(4);
-
+  const [requiredShifts, setrequiredShifts] = useState(0);
+  const { uid } = useRole();
+  const [firstName, setfirstName] = useState("");
+  const [lastName, setlastName] = useState("");
+  const [lastUpdateUID, setlastUpdateUID] = useState("");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -58,6 +63,7 @@ export default function ManagerSettingsPage() {
           const data = await res.json();
           // Update max consecutive shifts
           setMaxConsecutiveShifts(data.max_consecutive_shifts);
+          setrequiredShifts(data.required_shifts);
           // Update max employees per shift from the document
           if (
             data.min_max_employees_per_shift &&
@@ -76,6 +82,7 @@ export default function ManagerSettingsPage() {
               colorOptions[index % colorOptions.length].value,
           }));
           setShiftTypes(newShiftTypes);
+          setlastUpdateUID(data.uid);
           // Update role types: convert role_importance object to an array, converting importance to number
           const roleImportance = data.role_importance || {};
           const newRoleTypes: RoleType[] = Object.entries(roleImportance).map(
@@ -110,6 +117,28 @@ export default function ManagerSettingsPage() {
     }
     fetchSettings();
   }, []);
+  useEffect(() => {
+    if (!lastUpdateUID) return; // Only run if UID exists.
+    async function fetchUserDetails() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/user/userdata/${lastUpdateUID}`
+        );
+        if (!res.ok) {
+          throw new Error("Error fetching user data.");
+        }
+        const userdata = await res.json();
+
+        if (userdata) {
+          setfirstName(userdata.first_name);
+          setlastName(userdata.last_name);
+        }
+      } catch (err: any) {
+        console.log(err.message);
+      }
+    }
+    fetchUserDetails();
+  }, [lastUpdateUID]); // This effect runs when `uid` changes
 
   const colorOptions = [
     { name: "Blue", value: "#AEDFF7" },
@@ -384,7 +413,7 @@ export default function ManagerSettingsPage() {
     }
 
     // Assume currentUserUid comes from your auth context
-    const currentUserUid = "123"; // Replace with your actual UID
+    const currentUserUid = uid; // Replace with your actual UID
     const payload = {
       uid: currentUserUid,
       shifts_per_day: shiftTypes.length, // computed from shiftTypes
@@ -395,6 +424,7 @@ export default function ManagerSettingsPage() {
       role_importance: convertRoleTypes(roleTypes),
       work_days: sortDays(selectedDays),
       min_max_employees_per_shift: { min: 2, max: maxEmployees },
+      required_shifts: requiredShifts,
     };
 
     try {
@@ -452,7 +482,10 @@ export default function ManagerSettingsPage() {
   }
   return (
     <div className="p-6 w-[70%] mx-auto font-sans">
-      <h1 className="text-3xl font-bold mb-6 text-center">Manager Settings</h1>
+      <h1 className="text-3xl font-bold mb-3 text-center">Manager Settings</h1>
+      <p className="text-sm text-gray-500 text-center mt-1 mb-2">
+        Last updated by {firstName} {lastName}
+      </p>
       <ModernCard title="General Settings" className="mb-8">
         <div className="flex flex-wrap gap-8">
           <div className="flex flex-col">
@@ -467,6 +500,15 @@ export default function ManagerSettingsPage() {
               type="number"
               value={maxConsecutiveShifts}
               onChange={(e) => setMaxConsecutiveShifts(Number(e.target.value))}
+              className="border p-2 rounded"
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 font-medium">Minimum required shifts:</label>
+            <input
+              type="number"
+              value={requiredShifts}
+              onChange={(e) => setrequiredShifts(Number(e.target.value))}
               className="border p-2 rounded"
             />
           </div>
