@@ -30,7 +30,6 @@ export default function ManagerDashboard() {
           />
           <RegularButton label="Reports" href="/reports" />
         </div>
-        <ChatBOT />
       </footer>
     </div>
   );

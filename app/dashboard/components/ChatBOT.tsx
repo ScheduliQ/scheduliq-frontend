@@ -11,7 +11,8 @@ const FloatingChatbot = () => {
     []
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [firstMessage, setFirstMessage] = useState(true);
+
+  // Scroll to the bottom when messages update
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -20,33 +21,56 @@ const FloatingChatbot = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (message.trim() === "") return;
-
-    // Add the user's message to the conversation
-    const newMessages = [
-      ...messages,
-      {
-        text: message,
-        sender: "user",
-      },
-    ];
-    setMessages(newMessages);
-    const currentMessage = message;
-    setMessage("");
-
+  // Function to initialize the conversation when chat is opened.
+  const initializeChat = async () => {
     try {
-      // Send the manager's message to the Flask /chat route
+      // Send a request to the /chatbot endpoint with a special "init" message.
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/chatbot`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "", first_message: true }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await response.json();
+      const botMessage = data.response;
+      // Append the bot's greeting message to the conversation
+      setMessages([{ text: botMessage, sender: "bot" }]);
+    } catch (error: any) {
+      setMessages([{ text: "Error: " + error.message, sender: "bot" }]);
+    }
+  };
+
+  // Trigger initialization when the chat window opens
+  useEffect(() => {
+    if (isOpen && messages.length === 0) {
+      initializeChat();
+    }
+  }, [isOpen, messages]);
+
+  const handleSendMessage = async () => {
+    if (message.trim() === "") return;
+
+    // Append the user's message to the conversation
+    setMessages((prev) => [...prev, { text: message, sender: "user" }]);
+    const currentMessage = message;
+    setMessage("");
+
+    try {
+      // Send the manager's message to the Flask /chatbot route
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/chatbot`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message: currentMessage,
-            first_message: firstMessage,
+            first_message: false,
           }),
         }
       );
@@ -58,15 +82,10 @@ const FloatingChatbot = () => {
       const botMessage = data.response;
 
       // Append the chatbot's reply to the conversation
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: botMessage, sender: "bot" },
-      ]);
-      if (firstMessage) setFirstMessage(false);
+      setMessages((prev) => [...prev, { text: botMessage, sender: "bot" }]);
     } catch (error: any) {
-      // In case of an error, display the error message
-      setMessages((prevMessages) => [
-        ...prevMessages,
+      setMessages((prev) => [
+        ...prev,
         { text: "Error: " + error.message, sender: "bot" },
       ]);
     }
@@ -79,11 +98,7 @@ const FloatingChatbot = () => {
         whileTap={{ scale: 0.9 }}
         animate={{
           rotate: [0, -10, 10, 0],
-          transition: {
-            duration: 0.5,
-            repeat: Infinity,
-            repeatDelay: 2,
-          },
+          transition: { duration: 0.5, repeat: Infinity, repeatDelay: 2 },
         }}
         onClick={() => setIsOpen(!isOpen)}
         className="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition-all"
@@ -100,26 +115,18 @@ const FloatingChatbot = () => {
               opacity: 1,
               scale: 1,
               y: 0,
-              transition: {
-                type: "spring",
-                stiffness: 300,
-                damping: 20,
-              },
+              transition: { type: "spring", stiffness: 300, damping: 20 },
             }}
             exit={{
               opacity: 0,
               scale: 0.5,
               y: 50,
-              transition: {
-                type: "spring",
-                stiffness: 300,
-                damping: 20,
-              },
+              transition: { type: "spring", stiffness: 300, damping: 20 },
             }}
             className="w-80 bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col"
           >
             <div className="bg-blue-500 text-white p-4 rounded-t-xl flex justify-between items-center">
-              <h3 className="font-semibold">Gemini Chatbot</h3>
+              <h3 className="font-semibold">SchedBot 🤖</h3>
               <motion.button
                 whileHover={{ rotate: 90 }}
                 onClick={() => setIsOpen(false)}
@@ -132,9 +139,9 @@ const FloatingChatbot = () => {
             <div className="p-4 h-64 overflow-y-auto flex flex-col">
               {messages.map((msg, index) => (
                 <motion.div
+                  key={index}
                   initial={{ opacity: 0, x: msg.sender === "user" ? 20 : -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  key={index}
                   className={`mb-2 p-2 rounded-lg max-w-[80%] ${
                     msg.sender === "user"
                       ? "bg-blue-100 text-blue-800 self-end ml-auto"
