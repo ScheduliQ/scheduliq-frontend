@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRole } from "../../../hooks/RoleContext"; // adjust path if needed
 import Swal from "sweetalert2";
 import Image from "next/image";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../../../config/firebase";
 
 export default function SettingsPage() {
   const { uid } = useRole();
@@ -21,8 +23,12 @@ export default function SettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resetLoading, setResetLoading] = useState(false);
+
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [forgotMessage, setForgotMessage] = useState("");
+  const [forgotError, setForgotError] = useState("");
 
   // Fetch user data on component mount
   // Modify the useEffect that fetches user data
@@ -72,6 +78,31 @@ export default function SettingsPage() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setFieldErrors((prev: any) => ({ ...prev, [name]: "" }));
+  };
+
+  // Forgot Password functionality
+  const handleForgotPassword = async () => {
+    setForgotMessage("");
+    setForgotError("");
+    setResetLoading(true);
+    try {
+      // setForgotLoading(true);
+      await sendPasswordResetEmail(auth, userDetails.email);
+      setForgotMessage("Password reset link has been sent to your email.");
+    } catch (err: any) {
+      if (err.code === "auth/invalid-email") {
+        setForgotError(
+          "Invalid email format. Something is wrong with your email."
+        );
+      } else if (err.code === "auth/user-not-found") {
+        setForgotError("This email is not registered.");
+      } else {
+        setForgotError(
+          "Failed to send password reset email. Please try again later."
+        );
+      }
+    }
+    setResetLoading(false);
   };
 
   // Handle file selection for profile picture
@@ -436,6 +467,7 @@ export default function SettingsPage() {
               Email
             </label>
             <input
+              disabled={true}
               type="email"
               name="email"
               value={formData.email}
@@ -484,6 +516,21 @@ export default function SettingsPage() {
             </select>
             {fieldErrors.gender && (
               <p className="text-red-500 text-sm mt-1">{fieldErrors.gender}</p>
+            )}
+          </div>
+          <div>
+            <button
+              onClick={handleForgotPassword}
+              disabled={resetLoading}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg  hover:bg-blue-700 transition-colors"
+            >
+              {resetLoading ? "Sending..." : "Reset Password"}
+            </button>
+            {forgotMessage && (
+              <p className="text-sm text-green-600 mt-2">{forgotMessage}</p>
+            )}
+            {forgotError && (
+              <p className="text-sm text-red-600 mt-2">{forgotError}</p>
             )}
           </div>
 
