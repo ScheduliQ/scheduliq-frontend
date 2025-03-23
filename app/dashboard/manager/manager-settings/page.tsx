@@ -30,7 +30,7 @@ type RolesPerShift = {
 };
 
 type Employee = {
-  id: number;
+  uid: string;
   name: string;
   roles: string[];
 };
@@ -139,7 +139,25 @@ export default function ManagerSettingsPage() {
     }
     fetchUserDetails();
   }, [lastUpdateUID]); // This effect runs when `uid` changes
-
+  useEffect(() => {
+    async function fetchEmployees() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/user/employees-management`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          // Assuming API returns an object with { employees: Employee[] }
+          setEmployees(data);
+        } else {
+          console.error("Failed to fetch employees:", res.status);
+        }
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+      }
+    }
+    fetchEmployees();
+  }, []);
   const colorOptions = [
     { name: "Blue", value: "#AEDFF7" },
     { name: "Light Green", value: "#B5EAD7" },
@@ -205,12 +223,8 @@ export default function ManagerSettingsPage() {
   ];
   const [selectedDays, setSelectedDays] = useState<string[]>([...weekDays]);
 
-  // Employee management state (simulate data from DB with multiple roles)
-  const [employees, setEmployees] = useState<Employee[]>([
-    { id: 1, name: "Alice", roles: ["manager"] },
-    { id: 2, name: "Bob", roles: ["waiter"] },
-    { id: 3, name: "Charlie", roles: ["bartender"] },
-  ]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [updatedEmployeeUids, setUpdatedEmployeeUids] = useState<string[]>([]);
 
   // Handlers for Shift Types
   const addShiftType = () => {
@@ -292,25 +306,32 @@ export default function ManagerSettingsPage() {
       setSelectedDays([...selectedDays, day]);
     }
   };
-
-  // Handlers for Employee Management (multiple roles per employee)
-  const updateEmployeeRoles = (id: number, newRoles: string[]) => {
+  ////////////////////////////////////
+  const updateEmployeeRoles = (uid: string, newRoles: string[]) => {
     setEmployees(
       employees.map((emp) =>
-        emp.id === id ? { ...emp, roles: newRoles } : emp
+        emp.uid === uid ? { ...emp, roles: newRoles } : emp
       )
     );
+    if (!updatedEmployeeUids.includes(uid)) {
+      setUpdatedEmployeeUids([...updatedEmployeeUids, uid]);
+    }
   };
 
-  const deleteEmployee = (id: number) => {
-    setEmployees(employees.filter((emp) => emp.id !== id));
+  const deleteEmployee = (uid: string) => {
+    setEmployees(employees.filter((emp) => emp.uid !== uid));
+    setUpdatedEmployeeUids(updatedEmployeeUids.filter((id) => id !== uid));
   };
 
-  const addEmployeeRole = (id: number, newRole: string) => {
+  const addEmployeeRole = (uid: string, newRole: string) => {
     if (!newRole) return;
     setEmployees(
       employees.map((emp) => {
-        if (emp.id === id && !emp.roles.includes(newRole)) {
+        if (emp.uid === uid && !emp.roles.includes(newRole)) {
+          // Mark employee as updated if not already marked
+          if (!updatedEmployeeUids.includes(uid)) {
+            setUpdatedEmployeeUids([...updatedEmployeeUids, uid]);
+          }
           return { ...emp, roles: [...emp.roles, newRole] };
         }
         return emp;
@@ -318,10 +339,11 @@ export default function ManagerSettingsPage() {
     );
   };
 
-  const removeEmployeeRole = (id: number, roleToRemove: string) => {
+  const removeEmployeeRole = (uid: string, roleToRemove: string) => {
+    // Update the employees state
     setEmployees(
       employees.map((emp) => {
-        if (emp.id === id) {
+        if (emp.uid === uid) {
           return {
             ...emp,
             roles: emp.roles.filter((role) => role !== roleToRemove),
@@ -330,7 +352,13 @@ export default function ManagerSettingsPage() {
         return emp;
       })
     );
+    // Mark the employee as updated if not already marked
+    if (!updatedEmployeeUids.includes(uid)) {
+      setUpdatedEmployeeUids([...updatedEmployeeUids, uid]);
+    }
   };
+  ///////////////////////////////////
+
   // Helper functions
   function convertRolesPerShift(rolesArray: RolesPerShift): {
     [shift: string]: { [role: string]: number };
@@ -439,6 +467,37 @@ export default function ManagerSettingsPage() {
         }
       );
       if (res.ok) {
+        if (updatedEmployeeUids.length > 0) {
+          // Build a payload with the updated employees (each containing uid and roles)
+          const updatedEmployeePayload = employees
+            .filter((emp) => updatedEmployeeUids.includes(emp.uid))
+            .map((emp) => ({
+              uid: emp.uid,
+              roles: emp.roles,
+            }));
+
+          try {
+            const empUpdateRes = await fetch(
+              `${process.env.NEXT_PUBLIC_BASE_URL}/user/employees-management`,
+              {
+                method: "PUT", // Or PATCH, depending on your backend implementation
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ employees: updatedEmployeePayload }),
+              }
+            );
+
+            if (empUpdateRes.ok) {
+              // If the update is successful, clear the tracking state.
+              setUpdatedEmployeeUids([]);
+            } else {
+              console.error("Employee update failed:", empUpdateRes.status);
+            }
+          } catch (error) {
+            console.error("Error updating employees:", error);
+          }
+        }
         const data = await res.json();
         Swal.fire({
           title: "Settings saved!",
@@ -751,7 +810,7 @@ export default function ManagerSettingsPage() {
           </thead>
           <tbody>
             {employees.map((emp) => (
-              <tr key={emp.id} className="text-center">
+              <tr key={emp.uid} className="text-center">
                 <td className="border p-2">{emp.name}</td>
                 <td className="border p-2 whitespace-normal">
                   <div className="flex flex-wrap gap-2 items-center">
@@ -759,7 +818,7 @@ export default function ManagerSettingsPage() {
                       <select
                         defaultValue=""
                         onChange={(e) => {
-                          addEmployeeRole(emp.id, e.target.value);
+                          addEmployeeRole(emp.uid, e.target.value);
                           e.target.selectedIndex = 0;
                         }}
                         className="border p-1 rounded"
@@ -781,7 +840,7 @@ export default function ManagerSettingsPage() {
                       >
                         <span>{role}</span>
                         <button
-                          onClick={() => removeEmployeeRole(emp.id, role)}
+                          onClick={() => removeEmployeeRole(emp.uid, role)}
                           className="ml-1 text-red-500"
                         >
                           x
@@ -792,7 +851,7 @@ export default function ManagerSettingsPage() {
                 </td>
                 <td className="border p-2">
                   <button
-                    onClick={() => deleteEmployee(emp.id)}
+                    onClick={() => deleteEmployee(emp.uid)}
                     className="text-red-500 font-medium"
                   >
                     <GoTrash />

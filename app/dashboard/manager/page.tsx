@@ -6,6 +6,7 @@ import MainColorButton from "../../components/MainColorButton";
 import RegularButton from "../../components/RegularButton";
 import ShiftScheduler from "../components/ShiftScheduler";
 import StaticSchedule from "../components/StaticSchedule";
+import ChatBOT from "../components/ChatBOT";
 export default function ManagerDashboard() {
   return (
     <div className="relative h-full flex flex-col">

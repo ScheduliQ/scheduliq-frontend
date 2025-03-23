@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { BsStars } from "react-icons/bs";
 import ShiftScheduler from "../../components/ShiftScheduler";
 import Swal from "sweetalert2";
+import ChatBOT from "../../components/ChatBOT";
 interface Employee {
   id: string;
   name: string;
@@ -156,6 +157,7 @@ export default function ManagerDashboard() {
             Publish
           </button>
         </div>
+        <ChatBOT />
       </footer>
     </div>
   );
