@@ -6,6 +6,8 @@ import { BsStars } from "react-icons/bs";
 import ShiftScheduler from "../../components/ShiftScheduler";
 import Swal from "sweetalert2";
 import ChatBOT from "../../components/ChatBOT";
+import CarouselSwal from "../../components/CarouselSwal"; // Adjust the import path as needed
+
 interface Employee {
   id: string;
   name: string;
@@ -28,10 +30,11 @@ interface Day {
 export default function ManagerDashboard() {
   const [scheduleData, setScheduleData] = useState(null);
   const [publishDays, setPublishDays] = useState<Day[]>([]);
+  const [solutionText, setSolutionText] = useState<[]>([]);
 
   const handlePublish = async () => {
     try {
-      console.log("publishDays", publishDays);
+      // console.log("publishDays", publishDays);
       // כאן days הוא המידע המעודכן שהגיע מהקומפוננטה ShiftScheduler
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/add`,
@@ -85,8 +88,11 @@ export default function ManagerDashboard() {
       );
       if (!response.ok) throw new Error("Failed to fetch schedule");
       const result = await response.json();
-      const parsedData = JSON.parse(result);
-      console.log("parsedData", parsedData);
+      const parsedData = JSON.parse(result.solution);
+      // const parsedData = result.solution;
+      setSolutionText(result.text);
+      console.log("solutionText", solutionText);
+      // console.log("parsedData", parsedData);
       setScheduleData(parsedData);
       Swal.fire({
         title: "Schedule Generated!",
@@ -156,6 +162,7 @@ export default function ManagerDashboard() {
           >
             Publish
           </button>
+          <CarouselSwal pages={solutionText} />
         </div>
         <ChatBOT />
       </footer>
