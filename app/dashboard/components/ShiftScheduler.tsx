@@ -2,6 +2,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { FaCheck } from "react-icons/fa6";
+import { FiAlertCircle } from "react-icons/fi";
 import { useRef } from "react";
 
 interface Employee {
@@ -15,6 +16,7 @@ interface Shift {
   id: string;
   time: string;
   employees: Employee[];
+  shortages?: { [role: string]: number };
 }
 
 interface Day {
@@ -671,6 +673,32 @@ const ShiftScheduler = ({
                           </Draggable>
                         ))}
                         {provided.placeholder}
+
+                        {Object.keys(shift.shortages ?? {}).length > 0 && (
+                          <div className="mt-2 p-3 bg-red-50 border border-red-300 rounded-lg shadow-sm">
+                            <div className="flex items-center mb-1">
+                              <FiAlertCircle
+                                className="text-red-600 mr-2"
+                                size={16}
+                              />
+                              <span className="text-sm font-semibold text-red-800">
+                                Shortages
+                              </span>
+                            </div>
+                            <ul className="list-disc ml-6">
+                              {Object.entries(shift.shortages ?? {}).map(
+                                ([role, count]) => (
+                                  <li
+                                    key={role}
+                                    className="text-xs text-red-700"
+                                  >
+                                    {role}: missing {count}
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
                   </Droppable>
