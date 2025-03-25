@@ -108,6 +108,12 @@ export default function ManagerSettingsPage() {
           setRolesPerShift(newRolesPerShift);
           // Update work days
           setSelectedDays(data.work_days || weekDays);
+          setSubmissionStart(
+            data.submissionStart ? new Date(data.submissionStart) : null
+          );
+          setSubmissionEnd(
+            data.submissionEnd ? new Date(data.submissionEnd) : null
+          );
         } else {
           console.error("Failed to fetch settings:", res.status);
         }
@@ -222,7 +228,8 @@ export default function ManagerSettingsPage() {
     "Saturday",
   ];
   const [selectedDays, setSelectedDays] = useState<string[]>([...weekDays]);
-
+  const [submissionStart, setSubmissionStart] = useState<Date | null>(null);
+  const [submissionEnd, setSubmissionEnd] = useState<Date | null>(null);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [updatedEmployeeUids, setUpdatedEmployeeUids] = useState<string[]>([]);
 
@@ -360,6 +367,17 @@ export default function ManagerSettingsPage() {
   ///////////////////////////////////
 
   // Helper functions
+  function generateRandomVersion(length = 8): string {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+    return result;
+  }
+
   function convertRolesPerShift(rolesArray: RolesPerShift): {
     [shift: string]: { [role: string]: number };
   } {
@@ -442,6 +460,7 @@ export default function ManagerSettingsPage() {
 
     // Assume currentUserUid comes from your auth context
     const currentUserUid = uid; // Replace with your actual UID
+    const newVersion = generateRandomVersion();
     const payload = {
       uid: currentUserUid,
       shifts_per_day: shiftTypes.length, // computed from shiftTypes
@@ -453,6 +472,9 @@ export default function ManagerSettingsPage() {
       work_days: sortDays(selectedDays),
       min_max_employees_per_shift: { min: 2, max: maxEmployees },
       required_shifts: requiredShifts,
+      activeVersion: newVersion,
+      submissionStart: submissionStart ? submissionStart.toISOString() : null,
+      submissionEnd: submissionEnd ? submissionEnd.toISOString() : null,
     };
 
     try {
@@ -577,6 +599,30 @@ export default function ManagerSettingsPage() {
               type="number"
               value={maxEmployees}
               onChange={(e) => setMaxEmployees(Number(e.target.value))}
+              className="border p-2 rounded"
+            />
+          </div>
+          <div className="flex flex-col mb-4">
+            <label className="mb-1 font-medium">Submission Start:</label>
+            <input
+              type="datetime-local"
+              value={
+                submissionStart
+                  ? submissionStart.toISOString().slice(0, 16)
+                  : ""
+              }
+              onChange={(e) => setSubmissionStart(new Date(e.target.value))}
+              className="border p-2 rounded"
+            />
+          </div>
+          <div className="flex flex-col mb-4">
+            <label className="mb-1 font-medium">Submission End:</label>
+            <input
+              type="datetime-local"
+              value={
+                submissionEnd ? submissionEnd.toISOString().slice(0, 16) : ""
+              }
+              onChange={(e) => setSubmissionEnd(new Date(e.target.value))}
               className="border p-2 rounded"
             />
           </div>
