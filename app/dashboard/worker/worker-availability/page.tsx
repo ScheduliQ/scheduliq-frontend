@@ -200,11 +200,11 @@ export default function DynamicScheduleTable() {
             timer: 3000,
             timerProgressBar: true,
           });
-        } else if (result.status === 403) {
+        } else if (response.status === 403) {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Draft version is outdated.",
+            text: result.error,
             confirmButtonText: "Close",
             timer: 3000,
             timerProgressBar: true,

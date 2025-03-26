@@ -367,6 +367,12 @@ export default function ManagerSettingsPage() {
   ///////////////////////////////////
 
   // Helper functions
+  function toLocalISOString(date: Date): string {
+    // Adjust the date by the local timezone offset
+    const tzOffset = date.getTimezoneOffset() * 60000;
+    const localDate = new Date(date.getTime() - tzOffset);
+    return localDate.toISOString().slice(0, 16);
+  }
   function generateRandomVersion(length = 8): string {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let result = "";
@@ -606,11 +612,7 @@ export default function ManagerSettingsPage() {
             <label className="mb-1 font-medium">Submission Start:</label>
             <input
               type="datetime-local"
-              value={
-                submissionStart
-                  ? submissionStart.toISOString().slice(0, 16)
-                  : ""
-              }
+              value={submissionStart ? toLocalISOString(submissionStart) : ""}
               onChange={(e) => setSubmissionStart(new Date(e.target.value))}
               className="border p-2 rounded"
             />
@@ -619,9 +621,7 @@ export default function ManagerSettingsPage() {
             <label className="mb-1 font-medium">Submission End:</label>
             <input
               type="datetime-local"
-              value={
-                submissionEnd ? submissionEnd.toISOString().slice(0, 16) : ""
-              }
+              value={submissionEnd ? toLocalISOString(submissionEnd) : ""}
               onChange={(e) => setSubmissionEnd(new Date(e.target.value))}
               className="border p-2 rounded"
             />
