@@ -191,16 +191,17 @@ export default function DynamicScheduleTable() {
         setAvailability(updatedAvailability);
         setConstraints(result.draft.constraints || "");
       } else {
-        if (result.message === "No draft found") {
+        if (response.status === 404 && result.errorType === "NOT_FOUND") {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "No draft found, try saving one.",
+            // text: "No draft found, try saving one.",
+            text: result.error,
             confirmButtonText: "Close",
             timer: 3000,
             timerProgressBar: true,
           });
-        } else if (response.status === 403) {
+        } else if (response.status === 403 && result.errorType === "OUTDATED") {
           Swal.fire({
             icon: "error",
             title: "Error",
@@ -213,7 +214,7 @@ export default function DynamicScheduleTable() {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Error loading draft!",
+            text: result.error || "Error loading draft!",
             confirmButtonText: "Close",
             timer: 3000,
             timerProgressBar: true,
@@ -225,7 +226,7 @@ export default function DynamicScheduleTable() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error,
+        text: error.message || String(error),
         confirmButtonText: "Close",
       });
     }
