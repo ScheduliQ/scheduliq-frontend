@@ -46,6 +46,29 @@ export default function ManagerSettingsPage() {
   const [lastUpdateUID, setlastUpdateUID] = useState("");
   const [mounted, setMounted] = useState(false);
 
+  // Define the options for days, hours, and minutes
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const hours = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
+  const minutes = [0, 15, 30, 45]; // quarter-hour intervals
+
+  // New state variables for Submission Start and End selections
+  const [submissionStartDay, setSubmissionStartDay] =
+    useState<string>("Sunday");
+  const [submissionStartHour, setSubmissionStartHour] = useState<number>(2); // default start hour (e.g., 2 AM)
+  const [submissionStartMinute, setSubmissionStartMinute] = useState<number>(0);
+
+  const [submissionEndDay, setSubmissionEndDay] = useState<string>("Wednesday");
+  const [submissionEndHour, setSubmissionEndHour] = useState<number>(23); // default end hour (e.g., 11 PM)
+  const [submissionEndMinute, setSubmissionEndMinute] = useState<number>(0);
+
   useEffect(() => {
     setMounted(true);
     async function fetchSettings() {
@@ -105,15 +128,34 @@ export default function ManagerSettingsPage() {
               required: Number(required), // explicit conversion to number
             }));
           }
+          if (data.submissionStart) {
+            const startDate = new Date(data.submissionStart); // This is in UTC
+            // Convert to local time:
+            // const localStart = new Date(
+            //   startDate.getTime() - startDate.getTimezoneOffset() * 60000
+            // );
+            setSubmissionStartDay(daysOfWeek[startDate.getDay()]);
+            setSubmissionStartHour(startDate.getHours());
+            setSubmissionStartMinute(startDate.getMinutes());
+          }
+          if (data.submissionEnd) {
+            const endDate = new Date(data.submissionEnd);
+            // const localEnd = new Date(
+            //   endDate.getTime() - endDate.getTimezoneOffset() * 60000
+            // );
+            setSubmissionEndDay(daysOfWeek[endDate.getDay()]);
+            setSubmissionEndHour(endDate.getHours());
+            setSubmissionEndMinute(endDate.getMinutes());
+          }
           setRolesPerShift(newRolesPerShift);
           // Update work days
           setSelectedDays(data.work_days || weekDays);
-          setSubmissionStart(
-            data.submissionStart ? new Date(data.submissionStart) : null
-          );
-          setSubmissionEnd(
-            data.submissionEnd ? new Date(data.submissionEnd) : null
-          );
+          // setSubmissionStart(
+          //   data.submissionStart ? new Date(data.submissionStart) : null
+          // );
+          // setSubmissionEnd(
+          //   data.submissionEnd ? new Date(data.submissionEnd) : null
+          // );
         } else {
           console.error("Failed to fetch settings:", res.status);
         }
@@ -313,7 +355,7 @@ export default function ManagerSettingsPage() {
       setSelectedDays([...selectedDays, day]);
     }
   };
-  ////////////////////////////////////
+
   const updateEmployeeRoles = (uid: string, newRoles: string[]) => {
     setEmployees(
       employees.map((emp) =>
@@ -364,9 +406,29 @@ export default function ManagerSettingsPage() {
       setUpdatedEmployeeUids([...updatedEmployeeUids, uid]);
     }
   };
-  ///////////////////////////////////
 
   // Helper functions
+  function getCurrentCycleOccurrence(
+    dayName: string,
+    hour: number,
+    minute: number
+  ): Date {
+    const dayIndex = daysOfWeek.indexOf(dayName);
+    if (dayIndex === -1) throw new Error("Invalid day name");
+
+    const now = new Date();
+    // Find the Sunday of the current week
+    const sunday = new Date(now);
+    sunday.setHours(0, 0, 0, 0);
+    sunday.setDate(now.getDate() - now.getDay());
+
+    // Compute the chosen day in this week by adding the day index to Sunday
+    const candidate = new Date(sunday);
+    candidate.setDate(sunday.getDate() + dayIndex);
+    candidate.setHours(hour, minute, 0, 0);
+    return candidate;
+  }
+
   function toLocalISOString(date: Date): string {
     // Adjust the date by the local timezone offset
     const tzOffset = date.getTimezoneOffset() * 60000;
@@ -464,6 +526,19 @@ export default function ManagerSettingsPage() {
       }
     }
 
+    // Compute the full datetime for submission start and end
+    const computedSubmissionStart = getCurrentCycleOccurrence(
+      submissionStartDay,
+      submissionStartHour,
+      submissionStartMinute
+      // true // isStart = true for start
+    );
+    const computedSubmissionEnd = getCurrentCycleOccurrence(
+      submissionEndDay,
+      submissionEndHour,
+      submissionEndMinute
+      // false // isStart = false for end
+    );
     // Assume currentUserUid comes from your auth context
     const currentUserUid = uid; // Replace with your actual UID
     const newVersion = generateRandomVersion();
@@ -479,8 +554,8 @@ export default function ManagerSettingsPage() {
       min_max_employees_per_shift: { min: 2, max: maxEmployees },
       required_shifts: requiredShifts,
       activeVersion: newVersion,
-      submissionStart: submissionStart ? submissionStart.toISOString() : null,
-      submissionEnd: submissionEnd ? submissionEnd.toISOString() : null,
+      submissionStart: computedSubmissionStart.toISOString(),
+      submissionEnd: computedSubmissionEnd.toISOString(),
     };
 
     try {
@@ -608,7 +683,92 @@ export default function ManagerSettingsPage() {
               className="border p-2 rounded"
             />
           </div>
+          {/* ////////////////////////////////////////////////////////////////// */}
+          {/* Submission Start Selection */}
           <div className="flex flex-col mb-4">
+            <label className="mb-1 font-medium">Submission Start:</label>
+            <div className="flex items-center space-x-2">
+              <select
+                value={submissionStartDay}
+                onChange={(e) => setSubmissionStartDay(e.target.value)}
+                className="border p-2 rounded"
+              >
+                {daysOfWeek.map((day) => (
+                  <option key={day} value={day}>
+                    {day}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={submissionStartHour}
+                onChange={(e) => setSubmissionStartHour(Number(e.target.value))}
+                className="border p-2 rounded"
+              >
+                {hours.map((h) => (
+                  <option key={h} value={h}>
+                    {h.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span>:</span>
+              <select
+                value={submissionStartMinute}
+                onChange={(e) =>
+                  setSubmissionStartMinute(Number(e.target.value))
+                }
+                className="border p-2 rounded"
+              >
+                {minutes.map((m) => (
+                  <option key={m} value={m}>
+                    {m.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Submission End Selection */}
+          <div className="flex flex-col mb-4">
+            <label className="mb-1 font-medium">Submission End:</label>
+            <div className="flex items-center space-x-2">
+              <select
+                value={submissionEndDay}
+                onChange={(e) => setSubmissionEndDay(e.target.value)}
+                className="border p-2 rounded"
+              >
+                {daysOfWeek.map((day) => (
+                  <option key={day} value={day}>
+                    {day}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={submissionEndHour}
+                onChange={(e) => setSubmissionEndHour(Number(e.target.value))}
+                className="border p-2 rounded"
+              >
+                {hours.map((h) => (
+                  <option key={h} value={h}>
+                    {h.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span>:</span>
+              <select
+                value={submissionEndMinute}
+                onChange={(e) => setSubmissionEndMinute(Number(e.target.value))}
+                className="border p-2 rounded"
+              >
+                {minutes.map((m) => (
+                  <option key={m} value={m}>
+                    {m.toString().padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* <div className="flex flex-col mb-4">
             <label className="mb-1 font-medium">Submission Start:</label>
             <input
               type="datetime-local"
@@ -625,7 +785,8 @@ export default function ManagerSettingsPage() {
               onChange={(e) => setSubmissionEnd(new Date(e.target.value))}
               className="border p-2 rounded"
             />
-          </div>
+          </div> */}
+          {/* ////////////////////////////////////////////////////////////////// */}
         </div>
       </ModernCard>
 

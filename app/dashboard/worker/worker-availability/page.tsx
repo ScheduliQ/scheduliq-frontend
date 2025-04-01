@@ -76,19 +76,17 @@ export default function DynamicScheduleTable() {
             // Format the date in a user-friendly way
             const options: Intl.DateTimeFormatOptions = {
               weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
               hour: "2-digit",
               minute: "2-digit",
             };
+            const formatted = submissionStartDate.toLocaleString(
+              "en-US",
+              options
+            ); // e.g. "Monday, 05:30 PM"
             setSubmissionOpenMessage(
-              `Submission opens on: ${submissionStartDate.toLocaleString(
-                "en-US",
-                options
-              )}`
+              `Submission opens on: ${formatted.replace(",", " at")}`
             );
-            console.log("submissionOpenMessage", submissionOpenMessage);
+            // console.log("submissionOpenMessage", submissionOpenMessage);
           }
         }
       } catch (error) {
