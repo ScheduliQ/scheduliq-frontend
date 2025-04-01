@@ -35,6 +35,8 @@ export default function DynamicScheduleTable() {
   const [constraints, setConstraints] = useState("");
   const [availableShiftsCount, setAvailableShiftsCount] = useState(0);
   const [requiredShifts, setrequiredShifts] = useState(0);
+  const [submissionOpenMessage, setSubmissionOpenMessage] = useState("");
+  const [isWithinWindow, setIsWithinWindow] = useState(false);
 
   // Fetch manager settings from your backend and update states
   useEffect(() => {
@@ -57,6 +59,36 @@ export default function DynamicScheduleTable() {
             Array.from({ length: settings.work_days.length }, () => false)
           )
         );
+        const now = new Date();
+        console.log("managerSettings", settings);
+        console.log("submissionStart", settings.submissionStart);
+        console.log("submissionEnd", settings.submissionEnd);
+
+        if (settings && settings.submissionStart && settings.submissionEnd) {
+          const submissionStartDate = new Date(settings.submissionStart);
+          const submissionEndDate = new Date(settings.submissionEnd);
+          setIsWithinWindow(
+            now >= submissionStartDate && now <= submissionEndDate
+          );
+          console.log("isWithinWindow", isWithinWindow);
+
+          if (!isWithinWindow) {
+            // Format the date in a user-friendly way
+            const options: Intl.DateTimeFormatOptions = {
+              weekday: "long",
+              hour: "2-digit",
+              minute: "2-digit",
+            };
+            const formatted = submissionStartDate.toLocaleString(
+              "en-US",
+              options
+            ); // e.g. "Monday, 05:30 PM"
+            setSubmissionOpenMessage(
+              `Submission opens on: ${formatted.replace(",", " at")}`
+            );
+            // console.log("submissionOpenMessage", submissionOpenMessage);
+          }
+        }
       } catch (error) {
         console.error("Error fetching manager settings:", error);
       }
@@ -157,11 +189,21 @@ export default function DynamicScheduleTable() {
         setAvailability(updatedAvailability);
         setConstraints(result.draft.constraints || "");
       } else {
-        if (result.message === "No draft found") {
+        if (response.status === 404 && result.errorType === "NOT_FOUND") {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "No draft found, try saving one.",
+            // text: "No draft found, try saving one.",
+            text: result.error,
+            confirmButtonText: "Close",
+            timer: 3000,
+            timerProgressBar: true,
+          });
+        } else if (response.status === 403 && result.errorType === "OUTDATED") {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: result.error,
             confirmButtonText: "Close",
             timer: 3000,
             timerProgressBar: true,
@@ -170,7 +212,7 @@ export default function DynamicScheduleTable() {
           Swal.fire({
             icon: "error",
             title: "Error",
-            text: "Error loading draft!",
+            text: result.error || "Error loading draft!",
             confirmButtonText: "Close",
             timer: 3000,
             timerProgressBar: true,
@@ -182,7 +224,7 @@ export default function DynamicScheduleTable() {
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: error,
+        text: error.message || String(error),
         confirmButtonText: "Close",
       });
     }
@@ -370,7 +412,7 @@ export default function DynamicScheduleTable() {
         >
           Load Draft
         </button>
-        <button
+        {/* <button
           onClick={submitAvailability}
           disabled={availableShiftsCount < requiredShifts}
           className={`px-4 py-2 rounded text-white transition-colors ${
@@ -380,7 +422,23 @@ export default function DynamicScheduleTable() {
           }`}
         >
           Submit
+        </button> */}
+        <button
+          onClick={submitAvailability}
+          disabled={!isWithinWindow || availableShiftsCount < requiredShifts}
+          className={`px-4 py-2 rounded text-white transition-colors ${
+            !isWithinWindow || availableShiftsCount < requiredShifts
+              ? "bg-blue-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+          }`}
+        >
+          Submit
         </button>
+        {!isWithinWindow && (
+          <label className="mt-2 text-sm text-gray-600">
+            {submissionOpenMessage}
+          </label>
+        )}
       </div>
     </div>
   );

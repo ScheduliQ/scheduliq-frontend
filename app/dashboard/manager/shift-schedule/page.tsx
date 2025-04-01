@@ -86,28 +86,48 @@ export default function ManagerDashboard() {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/csp/generate-schedule`
       );
-      if (!response.ok) throw new Error("Failed to fetch schedule");
       const result = await response.json();
-      const parsedData = JSON.parse(result.solution);
-      // const parsedData = result.solution;
-      setSolutionText(result.text);
-      console.log("solutionText", solutionText);
-      // console.log("parsedData", parsedData);
-      setScheduleData(parsedData);
-      Swal.fire({
-        title: "Schedule Generated!",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        width: "300px",
-        position: "center",
-        background: "#f0f9ff",
-        iconColor: "#014DAE",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-blue-700",
-        },
-      });
+      if (response.status === 400) {
+        Swal.fire({
+          title: "Error!",
+          text: result.error,
+          icon: "error",
+          confirmButtonText: "OK",
+          timer: 3000,
+          showConfirmButton: false,
+          position: "center",
+          width: "300px",
+          background: "#fee2e2",
+          iconColor: "#dc2626",
+          customClass: {
+            popup: "rounded-lg shadow-md",
+            title: "text-2xl font-sans font-semibold text-red-700",
+            htmlContainer: "font-sans text-gray-700",
+          },
+        });
+      } else if (response.status === 200) {
+        const parsedData = JSON.parse(result.solution);
+        // const parsedData = result.solution;
+        setSolutionText(result.text);
+        console.log("solutionText", solutionText);
+        setScheduleData(parsedData);
+        Swal.fire({
+          title: "Schedule Generated!",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+          width: "300px",
+          position: "center",
+          background: "#f0f9ff",
+          iconColor: "#014DAE",
+          customClass: {
+            popup: "rounded-lg shadow-md",
+            title: "text-2xl font-sans font-semibold text-blue-700",
+          },
+        });
+      } else {
+        throw new Error("Failed to fetch schedule");
+      }
     } catch (error) {
       Swal.fire({
         title: "Error!",
