@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRole } from "../../../../hooks/RoleContext";
 import ModernButton from "../../components/ModernButton";
 import ModernCard from "../../components/ModernCard";
@@ -7,6 +7,8 @@ import SignupButton from "../../../components/SignUpButton";
 import { GoTrash } from "react-icons/go";
 import Loading from "../../../components/Loading";
 import Swal from "sweetalert2";
+import { initiateSocketConnection } from "@/hooks/socket";
+import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
 
 type ShiftType = {
   id: number;
@@ -45,6 +47,7 @@ export default function ManagerSettingsPage() {
   const [lastName, setlastName] = useState("");
   const [lastUpdateUID, setlastUpdateUID] = useState("");
   const [mounted, setMounted] = useState(false);
+  const socketRef = useRef<Socket | null>(null);
 
   // Define the options for days, hours, and minutes
   const daysOfWeek = [
@@ -602,6 +605,20 @@ export default function ManagerSettingsPage() {
           }
         }
         const data = await res.json();
+        const socket = initiateSocketConnection(); // SOCKET: Initiate connection
+        socketRef.current = socket;
+        await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/create`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              uid: socketRef.current?.id,
+              message: "Manager settings have been updated123123",
+              data: `${firstName} ${lastName} updated the settings.`,
+            }),
+          }
+        );
         Swal.fire({
           title: "Settings saved!",
           timer: 2000,
