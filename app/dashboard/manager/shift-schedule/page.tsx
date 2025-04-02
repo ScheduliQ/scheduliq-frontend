@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { auth } from "../../../../config/firebase";
 import { useRouter } from "next/navigation";
 import { BsStars } from "react-icons/bs";
@@ -7,6 +7,8 @@ import ShiftScheduler from "../../components/ShiftScheduler";
 import Swal from "sweetalert2";
 import ChatBOT from "../../components/ChatBOT";
 import CarouselSwal from "../../components/CarouselSwal"; // Adjust the import path as needed
+import { initiateSocketConnection } from "@/hooks/socket";
+import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
 
 interface Employee {
   id: string;
@@ -31,6 +33,7 @@ export default function ManagerDashboard() {
   const [scheduleData, setScheduleData] = useState(null);
   const [publishDays, setPublishDays] = useState<Day[]>([]);
   const [solutionText, setSolutionText] = useState<[]>([]);
+  const socketRef = useRef<Socket | null>(null);
 
   const handlePublish = async () => {
     try {
@@ -45,6 +48,7 @@ export default function ManagerDashboard() {
         }
       );
       if (!response.ok) throw new Error("Failed to publish schedule");
+
       Swal.fire({
         title: "Published!",
         icon: "success",
@@ -58,6 +62,17 @@ export default function ManagerDashboard() {
           popup: "rounded-lg shadow-md",
           title: "text-2xl font-sans font-semibold text-blue-700",
         },
+      });
+      const socket = initiateSocketConnection(); // SOCKET: Initiate connection
+      socketRef.current = socket;
+      await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/notifications/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: socketRef.current?.id,
+          message: "Published new schedule!",
+          data: "",
+        }),
       });
     } catch (error) {
       Swal.fire({
