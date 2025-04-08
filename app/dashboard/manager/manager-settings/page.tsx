@@ -210,15 +210,15 @@ export default function ManagerSettingsPage() {
     fetchEmployees();
   }, []);
   const colorOptions = [
-    { name: "Blue", value: "#AEDFF7" },
-    { name: "Light Green", value: "#B5EAD7" },
-    { name: "Lavender", value: "#C9C6E3" },
-    { name: "Peach", value: "#FAD4C0" },
-    { name: "Pink", value: "#F7CAC9" },
-    { name: "Green", value: "#A8D5BA" },
-    { name: "Yellow", value: "#FCECC9" },
-    { name: "Turquoise", value: "#D1F0F0" },
-    { name: "Purple", value: "#D5C6E0" },
+    { name: "Blue", value: "#c5e9fa" },
+    { name: "Light Green", value: "#c3e8db" },
+    { name: "Lavender", value: "#d7d5e3" },
+    { name: "Peach", value: "#f7dfd2" },
+    { name: "Pink", value: "#f5e4f7" },
+    { name: "Green", value: "#b6d6c3" },
+    { name: "Yellow", value: "#fcf1d9" },
+    { name: "Turquoise", value: "#daf5f5" },
+    { name: "Purple", value: "#c4bacc" },
     { name: "Gray", value: "#E0E0E0" },
   ];
 

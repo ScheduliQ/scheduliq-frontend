@@ -38,7 +38,6 @@ export default function ManagerDashboard() {
   const handlePublish = async () => {
     try {
       // console.log("publishDays", publishDays);
-      // כאן days הוא המידע המעודכן שהגיע מהקומפוננטה ShiftScheduler
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/add`,
         {

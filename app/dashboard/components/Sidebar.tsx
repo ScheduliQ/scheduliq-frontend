@@ -338,6 +338,9 @@ export default function Sidebar() {
                       ? `${msg.first_name} ${msg.last_name}`
                       : "Loading..."}
                   </p>
+                  <p className="text-xs text-gray-500">
+                    {formatDate(msg.created_at)}
+                  </p>
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
                       msg.priority
@@ -345,9 +348,6 @@ export default function Sidebar() {
                   >
                     {msg.priority}
                   </span>
-                  <p className="text-xs text-gray-500">
-                    {formatDate(msg.created_at)}
-                  </p>
                 </div>
                 {/* Options dropdown trigger (three dots) */}
                 {role === "manager" && uid === msg.uid && (

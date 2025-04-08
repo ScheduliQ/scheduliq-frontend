@@ -27,6 +27,7 @@ interface Day {
 interface ManagerSettings {
   work_days: string[];
   shift_names: string[];
+  shift_colors: Record<string, string>;
 }
 interface EmployeeDropdown {
   id: string;
@@ -252,6 +253,7 @@ const ShiftScheduler = ({
   const [editingAvailableJobs, setEditingAvailableJobs] = useState<string[]>(
     []
   );
+  const [colors, setColors] = useState<Record<string, string>>({});
   const [managerSettings, setManagerSettings] =
     useState<ManagerSettings | null>(null);
 
@@ -267,6 +269,22 @@ const ShiftScheduler = ({
     }
   }, [days]);
 
+  // useEffect(() => {
+  //   if (managerSettings) {
+  //     console.log("im here;;;;;;;;;:");
+  //     setDays((prevDays) =>
+  //       prevDays.map((day) => ({
+  //         ...day,
+  //         shifts: day.shifts.map((shift) => ({
+  //           ...shift,
+  //           color: managerSettings.shift_colors[shift.time] || "white",
+  //         })),
+  //       }))
+  //     );
+  //     console.log("Updated days with manager settings:", days);
+  //   }
+  // }, [managerSettings]);
+
   // Generates a basic schedule using manager settings
   const generateBasicSchedule = (settings: {
     work_days: string[];
@@ -278,7 +296,7 @@ const ShiftScheduler = ({
       shifts: settings.shift_names.map((shift, shiftIndex) => ({
         id: `s${dayIndex * settings.shift_names.length + shiftIndex}`,
         time: shift,
-        employees: [], // Start with an empty list for employees
+        employees: [],
       })),
     }));
   };
@@ -293,6 +311,8 @@ const ShiftScheduler = ({
         if (!response.ok) throw new Error("Failed to fetch manager settings");
         const settings = await response.json();
         setManagerSettings(settings);
+        setColors(settings.shift_colors);
+        console.log("Manager settings:", settings);
       } catch (error) {
         console.error("Error fetching manager settings:", error);
       }
@@ -300,17 +320,35 @@ const ShiftScheduler = ({
     fetchManagerSettings();
   }, []);
 
-  // Generate basic schedule using manager settings
+  // // Generate basic schedule using manager settings
+  // useEffect(() => {
+  //   if (scheduleData) {
+  //     setDays(scheduleData);
+  //   } else if (managerSettings) {
+  //     const basicSchedule = generateBasicSchedule(managerSettings);
+  //     setDays(basicSchedule);
+  //   }
+  // }, [managerSettings, scheduleData]);
+
   useEffect(() => {
-    if (scheduleData) {
-      setDays(scheduleData);
-    } else if (managerSettings) {
+    if (managerSettings && scheduleData) {
+      // Update the fetched days with the color property from managerSettings.
+      const updatedDays = scheduleData.map((day: Day) => ({
+        ...day,
+        shifts: day.shifts.map((shift) => ({
+          ...shift,
+          color: managerSettings.shift_colors[shift.time] || "white",
+        })),
+      }));
+      setDays(updatedDays);
+      setPublishDays(updatedDays);
+    } else if (managerSettings && !scheduleData) {
       const basicSchedule = generateBasicSchedule(managerSettings);
       setDays(basicSchedule);
+      setPublishDays(basicSchedule);
     }
   }, [managerSettings, scheduleData]);
 
-  // useEffect לשליפת העובדים מה־API (/employees)
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -319,7 +357,6 @@ const ShiftScheduler = ({
         );
         if (!response.ok) throw new Error("Failed to fetch employees");
         const data = await response.json();
-        // וודא שלכל עובד יש מזהה ייחודי
         const employeesWithId = data.map((emp: any, index: number) => ({
           id: emp._id ? emp._id : `${emp.first_name}-${emp.last_name}-${index}`,
           ...emp,
@@ -341,7 +378,7 @@ const ShiftScheduler = ({
         setNewEmployee((prev) => ({
           ...prev,
           name: `${emp.first_name} ${emp.last_name}`,
-          role: "", // איפוס בחירת התפקיד
+          role: "",
         }));
       } else {
         setAvailableJobs([]);
@@ -585,6 +622,9 @@ const ShiftScheduler = ({
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
+                        style={{
+                          backgroundColor: colors[shift.time] || "white",
+                        }}
                         className={`bg-white p-2 rounded mb-2 shadow-sm min-h-[150px] ${
                           snapshot.isDraggingOver
                             ? "bg-blue-50 border-2 border-blue-200"
