@@ -17,6 +17,7 @@ interface Shift {
   id: string;
   time: string;
   employees: Employee[];
+  color?: string;
 }
 
 interface Day {
@@ -445,6 +446,9 @@ const ShiftScheduler = () => {
                       <div
                         ref={provided.innerRef}
                         {...provided.droppableProps}
+                        style={{
+                          backgroundColor: shift.color || "white",
+                        }}
                         className={`bg-white p-2 rounded mb-2 shadow-sm min-h-[150px] ${
                           snapshot.isDraggingOver
                             ? "bg-blue-50 border-2 border-blue-200"
