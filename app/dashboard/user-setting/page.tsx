@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import Image from "next/image";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../../config/firebase";
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 
 export default function SettingsPage() {
   const { uid } = useRole();
@@ -272,24 +273,27 @@ export default function SettingsPage() {
       setInitialFormData(updatedInitialData);
       setMessage("Settings updated successfully!");
 
-      Swal.fire({
-        title: "Settings updated successfully",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        willClose: () => {
-          // Refresh the page after the alert closes
-          window.location.reload();
-        },
-      });
+      // Swal.fire({
+      //   title: "Settings updated successfully",
+      //   icon: "success",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      //   willClose: () => {
+      //     // Refresh the page after the alert closes
+      //     window.location.reload();
+      //   },
+      // });
+      ShowSwalAlert("success", "Settings updated successfully!");
+      window.location.reload();
     } catch (err: any) {
       setError(err.message);
-      Swal.fire({
-        title: err.message,
-        icon: "error",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      // Swal.fire({
+      //   title: err.message,
+      //   icon: "error",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      // });
+      ShowSwalAlert("error", err.message);
     }
   };
 
@@ -318,14 +322,14 @@ export default function SettingsPage() {
     );
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow-md">
+    <div className="p-6 mx-auto bg-white rounded-lg ">
       {!uid && (
         <div className="text-center py-4">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
           <p className="text-gray-600">Loading user information...</p>
         </div>
       )}
-      <h1 className="text-3xl font-bold mb-6 text-gray-800">
+      <h1 className="text-3xl font-bold mb-20 text-gray-800">
         Account Settings
       </h1>
 
@@ -421,7 +425,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Form Section */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-3xl">
           <div className="grid gap-4 sm:grid-cols-2">
             {/* First Name */}
             <div>

@@ -1,6 +1,6 @@
 // app/components/DynamicBackground.tsx
 import React from "react";
-import "./DynamicBackground.css"; // מייבא את ה-CSS הייעודי
+import "./DynamicBackground.css";
 
 export default function DynamicBackground() {
   return (

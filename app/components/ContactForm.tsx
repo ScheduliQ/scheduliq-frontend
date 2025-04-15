@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Swal from "sweetalert2";
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -35,37 +36,45 @@ export default function ContactForm() {
       if (!response.ok) {
         throw new Error("Failed to send message");
       }
-      Swal.fire({
-        text: "Thank you for contacting us! We will get back to you soon.",
-        timer: 2000,
-        showConfirmButton: false,
-        width: "300px",
-        position: "center",
-        background: "#f0f9ff",
-        iconColor: "#014DAE",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-blue-700",
-        },
-      });
+      // Swal.fire({
+      //   text: "Thank you for contacting us! We will get back to you soon.",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      //   width: "300px",
+      //   position: "center",
+      //   background: "#f0f9ff",
+      //   iconColor: "#014DAE",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-blue-700",
+      //   },
+      // });
+      ShowSwalAlert(
+        "success",
+        "Thank you for contacting us! We will get back to you soon."
+      );
       setFormData({ name: "", email: "", message: "" }); // Optionally reset form
     } catch (error) {
       console.error("Error sending contact message:", error);
-      Swal.fire({
-        text: "There was an error sending your message. Please try again later.",
-        confirmButtonText: "OK",
-        timer: 3000,
-        showConfirmButton: false,
-        position: "top",
-        width: "300px",
-        background: "#fee2e2",
-        iconColor: "#dc2626",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-red-700",
-          htmlContainer: "font-sans text-gray-700",
-        },
-      });
+      // Swal.fire({
+      //   text: "There was an error sending your message. Please try again later.",
+      //   confirmButtonText: "OK",
+      //   timer: 3000,
+      //   showConfirmButton: false,
+      //   position: "top",
+      //   width: "300px",
+      //   background: "#fee2e2",
+      //   iconColor: "#dc2626",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-red-700",
+      //     htmlContainer: "font-sans text-gray-700",
+      //   },
+      // });
+      ShowSwalAlert(
+        "error",
+        "There was an error sending your message. Please try again later."
+      );
     }
   };
 

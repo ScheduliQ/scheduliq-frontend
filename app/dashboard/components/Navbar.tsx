@@ -17,18 +17,20 @@ export default function Navbar() {
     message: string;
     data: string;
   }
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [userData, setUserData] = useState<any>(null);
   const socketRef = useRef<Socket | null>(null);
   const userId = uid;
+  // const [hasMounted, setHasMounted] = useState(false);
 
-  // בעת טעינת הרכיב – טוענים את 5 ההתראות האחרונות וספירת ההתראות שלא נקראו
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        console.log("im here");
-        console.log("User ID:", userId);
+        // console.log("im here");
+        // console.log("User ID:", userId);
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/get_all/${userId}`
         );
@@ -36,9 +38,9 @@ export default function Navbar() {
         const data = await response.json();
         setNotifications(data.notifications);
         setUnreadCount(data.unread_count);
-        console.log("Unread Count:", data.unread_count);
+        // console.log("Unread Count:", data.unread_count);
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+        // console.error("Error fetching notifications:", error);
       }
     };
     if (userId) {
@@ -46,9 +48,25 @@ export default function Navbar() {
     }
   }, [userId]);
 
-  // מאזין לאירועי Socket.IO לקבלת התראות בזמן אמת
   useEffect(() => {
-    const socket = initiateSocketConnection(); // SOCKET: Initiate connection
+    const fetchUserData = async () => {
+      try {
+        const userResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/user/userdata/${userId}`
+        );
+        if (!userResponse.ok) throw new Error("Failed to user data");
+        const data = await userResponse.json();
+        setUserData(data);
+        // setHasMounted(true);
+      } catch (error) {}
+    };
+    if (userId) {
+      fetchUserData();
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const socket = initiateSocketConnection();
     socketRef.current = socket;
     if (!socket) {
       console.log("Socket not connected, initiating connection...");
@@ -117,10 +135,17 @@ export default function Navbar() {
       }
     }, 0);
 
+  // if (!hasMounted) {
+  //   return (
+  //     <div className="flex items-center justify-center h-full">
+  //       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+  //     </div>
+  //   );
+  // }
+
   return (
-    <div className="relative bg-[#F7FAFC]/70 z-10 backdrop-blur-md shadow-lg border border-gray-300 rounded-3xl w-full mx-4">
+    <div className="relative bg-white z-10  shadow-lg    w-full ">
       <div className="flex justify-between items-center px-6 py-2">
-        {/* לוגו */}
         <div className="flex items-center">
           <Link href="/dashboard">
             <Image src="/logo.png" alt="logo" width={150} height={60} />
@@ -131,7 +156,6 @@ export default function Navbar() {
         <div className="flex items-center space-x-4">
           {/* Dropdown התראות */}
           <div className="dropdown dropdown-end">
-            {/* לחיצה על האייקון מפעילה את markNotificationsRead */}
             <label
               tabIndex={0}
               className="btn btn-ghost btn-circle"
@@ -141,7 +165,7 @@ export default function Navbar() {
                 {/* אייקון ההתראות */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
+                  className="h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -153,9 +177,9 @@ export default function Navbar() {
                     d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                   />
                 </svg>
-                {/* אם יש התראות שלא נקראו – מציגים badge עם מספר */}
+
                 {unreadCount > 0 && (
-                  <span className="badge badge-xs badge-primary indicator-item">
+                  <span className="absolute top-0.5 right-0.5 translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full shadow-md">
                     {unreadCount}
                   </span>
                 )}
@@ -194,12 +218,22 @@ export default function Navbar() {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
+                {!isLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center ">
+                    <div className="animate-spin rounded-full h-7 w-7 border-t-2 border-b-2 border-[#014DAE]"></div>
+                  </div>
+                )}
                 <img
                   alt="Profile Picture"
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                />
+                  src={userData?.profile_picture}
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${
+                    isLoaded ? "opacity-100" : "opacity-0"
+                  }`}
+                  onLoad={() => setIsLoaded(true)}
+                />{" "}
               </div>
             </div>
+
             <ul
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-[#F7FAFC] backdrop-blur-md rounded-box z-[1] mt-3 w-52 p-2 shadow-md"

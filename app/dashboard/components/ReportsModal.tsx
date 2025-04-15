@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { Bar, Pie } from "react-chartjs-2";
+import InfoButton from "./InfoButton";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -47,6 +48,44 @@ interface ReportsModalProps {
   onRequestClose: () => void;
 }
 
+// // InfoButton component shows a tooltip when clicked
+// const InfoButton: React.FC<{ infoText: string }> = ({ infoText }) => {
+//   const [visible, setVisible] = useState(false);
+
+//   return (
+//     <div className="relative inline-block">
+//       <button
+//         onClick={() => setVisible(!visible)}
+//         className="ml-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+//         aria-label="More information"
+//       >
+//         <svg
+//           className="w-8 h-8"
+//           fill="none"
+//           stroke="currentColor"
+//           viewBox="0 0 24 24"
+//           xmlns="http://www.w3.org/2000/svg"
+//         >
+//           <path
+//             strokeLinecap="round"
+//             strokeLinejoin="round"
+//             strokeWidth={2}
+//             d="M13 16h-1v-4h-1m1-4h.01M12 12h.01"
+//           />
+//         </svg>
+//       </button>
+//       {visible && (
+//         <div
+//           className="absolute z-[9999] p-2 bg-gray-700 text-white text-xs rounded-md shadow-md top-full left-1/2 transform -translate-x-1/2 mt-2 max-w-md"
+//           style={{ whiteSpace: "normal" }}
+//         >
+//           {infoText}
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
 const ReportsModal: React.FC<ReportsModalProps> = ({
   isOpen,
   onRequestClose,
@@ -87,18 +126,15 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
     danger: ["rgba(220, 38, 38, 1)", "rgba(248, 113, 113, 1)"],
   };
 
-  // Generate an array of colors for charts - using more distinct colors
   const generateColors = (count: number) => {
     const colors = [];
     const colorKeys = Object.keys(colorPalette) as Array<
       keyof typeof colorPalette
     >;
-
     for (let i = 0; i < count; i++) {
       const colorKey = colorKeys[i % colorKeys.length];
       colors.push(colorPalette[colorKey][i % 2]); // Alternate between shades
     }
-
     return colors;
   };
 
@@ -119,7 +155,6 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
     ],
   };
 
-  // Calculate the total shifts for the shifts by type section
   const totalShifts = shiftTypeValues.reduce((sum, count) => sum + count, 0);
 
   // Sort employee shift count data by value (descending)
@@ -136,7 +171,6 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
     (label) => reports?.employee_shift_count[label] || 0
   );
 
-  // Prepare data for the "Employee Shift Count" horizontal bar chart
   const employeeShiftCountData = {
     labels: employeeLabels,
     datasets: [
@@ -149,7 +183,6 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
     ],
   };
 
-  // Prepare data for the "Role Coverage" bar chart (Actual vs. Required)
   const roleCoverageLabels = reports ? Object.keys(reports.role_coverage) : [];
   const roleCoverageActual = reports
     ? roleCoverageLabels.map((role) => reports.role_coverage[role].actual)
@@ -158,7 +191,6 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
     ? roleCoverageLabels.map((role) => reports.role_coverage[role].required)
     : [];
 
-  // Calculate fulfillment percentages for roles
   const roleFulfillmentPercentages = roleCoverageLabels.map((role, index) => {
     if (!reports) return 0;
     const actual = reports.role_coverage[role].actual;
@@ -189,21 +221,20 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
       ? reports.average_employees_per_shift.average.toFixed(1)
       : "0";
 
-  // Improved chart options for better readability
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "right" as const, // Changed from bottom to right for better label visibility
+        position: "right" as const,
         labels: {
           boxWidth: 15,
           padding: 15,
           font: {
-            size: 14, // Larger font
+            size: 14,
             weight: "bold" as const,
           },
-          color: "#333", // Darker color for better contrast
+          color: "#333",
         },
       },
       tooltip: {
@@ -212,55 +243,29 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
         bodyColor: "#333",
         padding: 12,
         cornerRadius: 8,
-        bodyFont: {
-          size: 14,
-        },
-        titleFont: {
-          size: 16,
-          weight: "bold" as const,
-        },
+        bodyFont: { size: 14 },
+        titleFont: { size: 16, weight: "bold" as const },
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
       },
     },
     scales: {
       x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          color: "#333",
-          font: {
-            weight: "bold" as const,
-          },
-        },
+        grid: { display: false },
+        ticks: { color: "#333", font: { weight: "bold" as const } },
       },
       y: {
-        grid: {
-          color: "rgba(226, 232, 240, 0.7)",
-        },
-        ticks: {
-          color: "#333",
-          font: {
-            weight: "bold" as const,
-          },
-        },
+        grid: { color: "rgba(226, 232, 240, 0.7)" },
+        ticks: { color: "#333", font: { weight: "bold" as const } },
       },
     },
   };
 
-  // Horizontal bar chart options
   const horizontalBarOptions = {
     ...chartOptions,
     indexAxis: "y" as const,
-    plugins: {
-      ...chartOptions.plugins,
-      legend: {
-        display: false,
-      },
-    },
+    plugins: { ...chartOptions.plugins, legend: { display: false } },
   };
 
-  // Simplified pie chart options
   const pieChartOptions = {
     ...chartOptions,
     plugins: {
@@ -268,10 +273,7 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
       legend: {
         position: "right" as const,
         labels: {
-          font: {
-            size: 14,
-            weight: "bold" as const,
-          },
+          font: { size: 14, weight: "bold" as const },
           color: "#333",
           padding: 20,
         },
@@ -279,7 +281,6 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
     },
   };
 
-  // Create a simplified shifts by type breakdown for the card-based display
   const shiftTypeBreakdown = shiftTypeLabels.map((label, index) => ({
     type: label,
     count: shiftTypeValues[index],
@@ -326,6 +327,7 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
               />
             </svg>
             Shift Analytics Dashboard
+            <InfoButton infoText="This dashboard gives you an overall view of key metrics and trends. 'Average Employees per Shift' shows the average number of staff assigned across all shifts. 'Total Shifts' is the total count of shifts available, while the other sections provide breakdowns by shift type and role coverage." />
           </h2>
           <button
             onClick={onRequestClose}
@@ -349,7 +351,7 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
           </button>
         </div>
 
-        {/* Tab Navigation - Fixed position with no overflow-x-auto to prevent scrolling */}
+        {/* Tab Navigation */}
         <div className="border-b border-gray-100 px-6 bg-white sticky top-0 z-10">
           <div className="flex space-x-6">
             <button
@@ -385,7 +387,7 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
           </div>
         </div>
 
-        {/* Modal Content - Each tab content is conditionally rendered but never unmounted */}
+        {/* Modal Content */}
         <div className="p-6 overflow-y-auto flex-1">
           {loading && (
             <div className="flex items-center justify-center h-64">
@@ -413,18 +415,19 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
             </div>
           )}
 
-          {/* Overview Tab Content - always mount but hide when not active */}
+          {/* Overview Tab Content */}
           <div className={activeTab === "overview" ? "block" : "hidden"}>
             {reports && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Key Metrics Cards - Made smaller */}
+                {/* Key Metrics Cards */}
                 <div className="grid grid-rows-1 sm:grid-rows-2 gap-4">
                   {/* Average Employees per Shift */}
                   <div className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 rounded-xl shadow-lg">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-sm font-medium opacity-90">
+                        <h3 className="text-sm font-medium opacity-90 flex items-center">
                           Average Employees per Shift
+                          <InfoButton infoText="This metric calculates the average number of employees assigned per shift across all schedules." />
                         </h3>
                         <p className="text-3xl font-bold mt-2">
                           {averageEmployees}
@@ -442,7 +445,7 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"
                           />
                         </svg>
                       </div>
@@ -453,8 +456,9 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
                   <div className="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-6 rounded-xl shadow-lg">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-sm font-medium opacity-90">
+                        <h3 className="text-sm font-medium opacity-90 flex items-center">
                           Total Shifts
+                          <InfoButton infoText="This shows the total number of shifts counted across all schedules." />
                         </h3>
                         <p className="text-3xl font-bold mt-2">{totalShifts}</p>
                       </div>
@@ -477,11 +481,15 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
                     </div>
                   </div>
                 </div>
-                {/* Shifts by Type - Card Format Instead of Chart */}
+
+                {/* Shifts by Type - Card Format */}
                 <div className="bg-white p-6 rounded-xl shadow border border-gray-100 flex flex-col">
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">
-                    Shift Type Count
-                  </h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      Shift Type Count
+                    </h3>
+                    <InfoButton infoText="This section breaks down shifts by type (e.g., morning, evening, night), showing count and percentage for each type." />
+                  </div>
                   <div className="grid grid-cols-1 gap-3">
                     {shiftTypeBreakdown.map((item) => (
                       <div
@@ -510,9 +518,12 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
 
                 {/* Role Coverage Overview */}
                 <div className="md:col-span-2 bg-white p-6 rounded-xl shadow border border-gray-100">
-                  <h3 className="text-lg font-medium text-gray-800 mb-6">
-                    Role Coverage Overview
-                  </h3>
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      Role Coverage Overview
+                    </h3>
+                    <InfoButton infoText="This section shows how well each role is covered. 'Actual' represents current assignments, 'Required' includes unfilled positions. The percentage indicates fulfillment, and the status indicates if any roles need attention." />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {roleCoverageLabels.map((role, index) => {
                       const percentage = roleFulfillmentPercentages[index];
@@ -526,11 +537,6 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
                             <h4 className="font-medium text-gray-700">
                               {role}
                             </h4>
-                            <span
-                              className={`px-2 py-1 text-xs text-white rounded-full ${colorClass}`}
-                            >
-                              {percentage}%
-                            </span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
@@ -551,15 +557,17 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
             )}
           </div>
 
-          {/* Employee Tab Content - always mount but hide when not active */}
+          {/* Employee Tab Content */}
           <div className={activeTab === "employees" ? "block" : "hidden"}>
             {reports && (
               <div className="space-y-6">
-                {/* Top Employees */}
                 <div className="bg-white p-6 rounded-xl shadow border border-gray-100">
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">
-                    Top 10 Employees by Shift Count
-                  </h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      Top 10 Employees by Shift Count
+                    </h3>
+                    <InfoButton infoText="This chart displays the top 10 employees based on the number of shifts they have been assigned. It helps identify the most frequently scheduled employees." />
+                  </div>
                   <div className="h-96">
                     <Bar
                       data={employeeShiftCountData}
@@ -568,12 +576,12 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
                   </div>
                 </div>
 
-                {/* Employee Shift Details Table */}
                 <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
                   <div className="p-6 border-b border-gray-100">
                     <h3 className="text-lg font-medium text-gray-800">
                       Employee Shift Details
                     </h3>
+                    <InfoButton infoText="This table provides detailed information on the number of shifts each employee has been assigned." />
                   </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -619,26 +627,28 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
             )}
           </div>
 
-          {/* Roles Tab Content - always mount but hide when not active */}
+          {/* Roles Tab Content */}
           <div className={activeTab === "roles" ? "block" : "hidden"}>
             {reports && (
               <div className="space-y-6">
-                {/* Role Coverage Chart */}
                 <div className="bg-white p-6 rounded-xl shadow border border-gray-100">
-                  <h3 className="text-lg font-medium text-gray-800 mb-4">
-                    Role Coverage (Actual vs Required)
-                  </h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      Role Coverage (Actual vs Required)
+                    </h3>
+                    <InfoButton infoText="This chart shows the difference between the actual assignments and the required staff for each role. It helps you see which roles are under-covered." />
+                  </div>
                   <div className="h-96">
                     <Bar data={roleCoverageData} options={chartOptions} />
                   </div>
                 </div>
 
-                {/* Role Coverage Detailed View */}
                 <div className="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
-                  <div className="p-6 border-b border-gray-100">
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                     <h3 className="text-lg font-medium text-gray-800">
                       Role Coverage Details
                     </h3>
+                    <InfoButton infoText="This table details the role coverage by comparing the actual number of assignments to the required number for each role, along with a coverage percentage and status indicator." />
                   </div>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">

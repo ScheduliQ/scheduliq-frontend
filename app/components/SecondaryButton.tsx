@@ -14,7 +14,7 @@ export default function SecondaryButton({
   return href ? (
     <Link href={href}>
       <button
-        className="whitespace-nowrap rounded-full bg-[#E6EDF7] px-8 py-3 text-lg font-semibold text-[#014DAE] shadow-md transition-all duration-300 hover:bg-[#85B4E1]"
+        className="px-6 py-3 rounded-lg text-[#014DAE] font-sans bg-white border border-[#014DAE] transition-colors duration-200 hover:bg-[#F0F5FF] hover:border-[#014DAE] hover:text-[#014DAE] active:bg-[#014DAE] active:text-white focus:outline-none disabled:bg-blue-200 disabled:text-blue-300 disabled:border-blue-200 disabled:cursor-not-allowed"
         onClick={onClick}
       >
         {label}
@@ -22,7 +22,7 @@ export default function SecondaryButton({
     </Link>
   ) : (
     <button
-      className="whitespace-nowrap rounded-full bg-[#E6EDF7] px-8 py-3 text-lg font-semibold text-[#014DAE] shadow-md transition-all duration-300 hover:bg-[#85B4E1]"
+      className="px-6 py-3 rounded-lg text-[#014DAE] font-sans bg-white border border-[#014DAE] transition-colors duration-200 hover:bg-[#F0F5FF] hover:border-[#014DAE] hover:text-[#014DAE] active:bg-[#014DAE] active:text-white focus:outline-none disabled:bg-blue-200 disabled:text-blue-300 disabled:border-blue-200 disabled:cursor-not-allowed"
       onClick={onClick}
     >
       {label}

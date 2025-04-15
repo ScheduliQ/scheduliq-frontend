@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import Swal from "sweetalert2";
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 
 interface CarouselSwalProps {
   pages: string[];
@@ -10,18 +11,22 @@ const CarouselSwal: FC<CarouselSwalProps> = ({ pages }) => {
 
   const showCarousel = (): void => {
     if (!pages || pages.length === 0) {
-      Swal.fire({
-        title: "No Schedule Generated",
-        text: "Please generate the schedule first.",
-        icon: "info",
-        timer: 2000,
-        showConfirmButton: false,
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-xl font-semibold",
-          htmlContainer: "text-base",
-        },
-      });
+      // Swal.fire({
+      //   title: "No Schedule Generated",
+      //   text: "Please generate the schedule first.",
+      //   icon: "info",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-xl font-semibold",
+      //     htmlContainer: "text-base",
+      //   },
+      // });
+      ShowSwalAlert(
+        "error",
+        "No Schedule Generated. Please generate the schedule first."
+      );
       return;
     }
     Swal.fire({
@@ -64,8 +69,8 @@ const CarouselSwal: FC<CarouselSwalProps> = ({ pages }) => {
 
   return (
     <button
+      className="px-6 py-3 rounded-lg text-[#014DAE] font-sans bg-white border border-[#014DAE] transition-colors duration-200 hover:bg-[#F0F5FF] hover:border-[#014DAE] hover:text-[#014DAE] active:bg-[#014DAE] active:text-white focus:outline-none disabled:bg-blue-200 disabled:text-blue-300 disabled:border-blue-200 disabled:cursor-not-allowed"
       onClick={showCarousel}
-      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out"
     >
       Show Schedule Details
     </button>

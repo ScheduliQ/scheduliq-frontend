@@ -6,7 +6,6 @@ import MainColorButton from "../../components/MainColorButton";
 import RegularButton from "../../components/RegularButton";
 import StaticSchedule from "../components/StaticSchedule";
 import ReportsModal from "../components/ReportsModal";
-import { BarChart2 } from "lucide-react";
 import { IoStatsChart } from "react-icons/io5";
 
 export default function ManagerDashboard() {
@@ -16,11 +15,10 @@ export default function ManagerDashboard() {
   const closeReports = () => setIsReportsOpen(false);
 
   return (
-    <div className="relative h-full flex flex-col">
-      <h1 className="text-xl font-bold font-sans  mb-4">Manager Dashboard</h1>
+    <div className="relative  h-full flex flex-col">
+      {/* <h1 className="text-xl font-bold font-sans  mb-4">Manager Dashboard</h1> */}
 
-      <div className=" w-full max-w-full h-[550px]">
-        {/* קבע גובה מקסימלי קבוע */}
+      <div className=" w-full max-w-full h-[700px]">
         <div className="w-full h-full overflow-auto rounded-lg  ">
           <div className=" min-w-[800px] h-full">
             <StaticSchedule />
@@ -28,19 +26,20 @@ export default function ManagerDashboard() {
         </div>
       </div>
       {/* Footer */}
-      <footer className=" mt-6">
+      <footer className="ml-5 mt-6">
         {/* Buttons Section */}
         <div className="mb-6 flex gap-4">
           <MainColorButton
-            label="New Schedule"
+            label="Create"
             href="/dashboard/manager/shift-schedule"
           />
+
           <button
             onClick={openReports}
-            className="bg-transparent p-2 rounded-md hover:bg-gray-100 flex items-center justify-center"
+            className="bg-transparent transition-all p-4 rounded-xl hover:bg-gray-100 active:scale-90  duration-200 flex items-center justify-center"
             aria-label="Open Reports"
           >
-            <IoStatsChart size={24} />
+            <IoStatsChart size={22} />
           </button>
         </div>
       </footer>

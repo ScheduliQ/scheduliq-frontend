@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Eye icons
 import MainColorButton from "./MainColorButton";
 import RegularButton from "./RegularButton";
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 
 export default function SignupButton() {
   // or via CommonJS
@@ -93,16 +94,17 @@ export default function SignupButton() {
     setFieldErrors(newFieldErrors);
 
     if (Object.values(newFieldErrors).some((error) => error)) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Please fill the required fields",
-        confirmButtonText: "Close",
-        customClass: {
-          confirmButton:
-            "bg-gray-300 text-white font-semibold px-4 py-2 rounded hover:bg-gray-500 focus:outline-none",
-        },
-      });
+      ShowSwalAlert("error", "Please fill the required fields!");
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "Oops...",
+      //   text: "Please fill the required fields",
+      //   confirmButtonText: "Close",
+      //   customClass: {
+      //     confirmButton:
+      //       "bg-gray-300 text-white font-semibold px-4 py-2 rounded hover:bg-gray-500 focus:outline-none",
+      //   },
+      // });
 
       return; // Stop submission if there are errors
     }
