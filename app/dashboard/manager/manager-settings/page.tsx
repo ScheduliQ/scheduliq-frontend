@@ -9,6 +9,7 @@ import Loading from "../../../components/Loading";
 import Swal from "sweetalert2";
 import { initiateSocketConnection } from "@/hooks/socket";
 import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 
 type ShiftType = {
   id: number;
@@ -493,37 +494,45 @@ export default function ManagerSettingsPage() {
     for (const st of shiftTypes) {
       const roles = rolesPerShift[st.name] || [];
       if (roles.length === 0) {
-        Swal.fire({
-          title: "Invalid Settings",
-          text: `Please add at least one role for the "${st.name}" shift.`,
-          icon: "error",
-          timer: 5000,
-          showConfirmButton: false,
-          width: "300px",
-          position: "center",
+        // Swal.fire({
+        //   title: "Invalid Settings",
+        //   text: `Please add at least one role for the "${st.name}" shift.`,
+        //   icon: "error",
+        //   timer: 5000,
+        //   showConfirmButton: false,
+        //   width: "300px",
+        //   position: "center",
 
-          customClass: {
-            popup: "rounded-lg shadow-md",
-            title: "text-2xl font-sans font-semibold",
-          },
-        });
+        //   customClass: {
+        //     popup: "rounded-lg shadow-md",
+        //     title: "text-2xl font-sans font-semibold",
+        //   },
+        // });
+        ShowSwalAlert(
+          "error",
+          `Please add at least one role for the "${st.name}" shift.`
+        );
         return;
       }
       for (const req of roles) {
         if (!req.role || req.role.trim() === "") {
-          Swal.fire({
-            title: "Invalid Settings",
-            text: `Please fill in the role for one of the requirements in the "${st.name}" shift.`,
-            icon: "error",
-            timer: 2000,
-            showConfirmButton: false,
-            width: "300px",
-            position: "center",
-            customClass: {
-              popup: "rounded-lg shadow-md",
-              title: "text-2xl font-sans font-semibold",
-            },
-          });
+          // Swal.fire({
+          //   title: "Invalid Settings",
+          //   text: `Please fill in the role for one of the requirements in the "${st.name}" shift.`,
+          //   icon: "error",
+          //   timer: 2000,
+          //   showConfirmButton: false,
+          //   width: "300px",
+          //   position: "center",
+          //   customClass: {
+          //     popup: "rounded-lg shadow-md",
+          //     title: "text-2xl font-sans font-semibold",
+          //   },
+          // });
+          ShowSwalAlert(
+            "error",
+            `Please fill in the role for one of the requirements in the "${st.name}" shift.`
+          );
           return;
         }
       }
@@ -574,7 +583,6 @@ export default function ManagerSettingsPage() {
       );
       if (res.ok) {
         if (updatedEmployeeUids.length > 0) {
-          // Build a payload with the updated employees (each containing uid and roles)
           const updatedEmployeePayload = employees
             .filter((emp) => updatedEmployeeUids.includes(emp.uid))
             .map((emp) => ({
@@ -586,7 +594,7 @@ export default function ManagerSettingsPage() {
             const empUpdateRes = await fetch(
               `${process.env.NEXT_PUBLIC_BASE_URL}/user/employees-management`,
               {
-                method: "PUT", // Or PATCH, depending on your backend implementation
+                method: "PUT",
                 headers: {
                   "Content-Type": "application/json",
                 },
@@ -595,7 +603,6 @@ export default function ManagerSettingsPage() {
             );
 
             if (empUpdateRes.ok) {
-              // If the update is successful, clear the tracking state.
               setUpdatedEmployeeUids([]);
             } else {
               console.error("Employee update failed:", empUpdateRes.status);
@@ -605,7 +612,7 @@ export default function ManagerSettingsPage() {
           }
         }
         const data = await res.json();
-        const socket = initiateSocketConnection(); // SOCKET: Initiate connection
+        const socket = initiateSocketConnection();
         socketRef.current = socket;
         await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/notifications/create`,
@@ -619,36 +626,38 @@ export default function ManagerSettingsPage() {
             }),
           }
         );
-        Swal.fire({
-          title: "Settings saved!",
-          timer: 2000,
-          showConfirmButton: false,
-          width: "300px",
-          position: "top",
-          background: "#f0f9ff",
-          iconColor: "#014DAE",
-          customClass: {
-            popup: "rounded-lg shadow-md",
-            title: "text-2xl font-sans font-semibold text-blue-700",
-          },
-        });
+        // Swal.fire({
+        //   title: "Settings saved!",
+        //   timer: 2000,
+        //   showConfirmButton: false,
+        //   width: "300px",
+        //   position: "top",
+        //   background: "#f0f9ff",
+        //   iconColor: "#014DAE",
+        //   customClass: {
+        //     popup: "rounded-lg shadow-md",
+        //     title: "text-2xl font-sans font-semibold text-blue-700",
+        //   },
+        // });
+        ShowSwalAlert("success", `Settings saved successfully!`);
       } else {
-        Swal.fire({
-          title: "Failed to save settings",
-          text: "",
-          confirmButtonText: "OK",
-          timer: 3000,
-          showConfirmButton: false,
-          position: "top",
-          width: "300px",
-          background: "#fee2e2",
-          iconColor: "#dc2626",
-          customClass: {
-            popup: "rounded-lg shadow-md",
-            title: "text-2xl font-sans font-semibold text-red-700",
-            htmlContainer: "font-sans text-gray-700",
-          },
-        });
+        // Swal.fire({
+        //   title: "Failed to save settings",
+        //   text: "",
+        //   confirmButtonText: "OK",
+        //   timer: 3000,
+        //   showConfirmButton: false,
+        //   position: "top",
+        //   width: "300px",
+        //   background: "#fee2e2",
+        //   iconColor: "#dc2626",
+        //   customClass: {
+        //     popup: "rounded-lg shadow-md",
+        //     title: "text-2xl font-sans font-semibold text-red-700",
+        //     htmlContainer: "font-sans text-gray-700",
+        //   },
+        // });
+        ShowSwalAlert("error", `Failed to save settings!`);
       }
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -656,441 +665,559 @@ export default function ManagerSettingsPage() {
   }
 
   if (!mounted) {
-    // עד שהקומפוננט עולה, מציגים תחליף או פשוט null
     return <Loading />;
   }
   return (
-    <div className="p-6 w-[70%] mx-auto font-sans">
-      <h1 className="text-3xl font-bold mb-3 text-center">Manager Settings</h1>
-      <p className="text-sm text-gray-500 text-center mt-1 mb-2">
-        Last updated by {firstName} {lastName}
-      </p>
-      <ModernCard title="General Settings" className="mb-8">
-        <div className="flex flex-wrap gap-8">
-          <div className="flex flex-col">
-            <label className="mb-1 font-medium">Shifts per Day:</label>
-            <div className="p-2 border rounded bg-white">
-              {shiftTypes.length}
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 font-medium">Max Consecutive Shifts:</label>
-            <input
-              type="number"
-              value={maxConsecutiveShifts}
-              onChange={(e) => setMaxConsecutiveShifts(Number(e.target.value))}
-              className="border p-2 rounded"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 font-medium">Minimum required shifts:</label>
-            <input
-              type="number"
-              value={requiredShifts}
-              onChange={(e) => setrequiredShifts(Number(e.target.value))}
-              className="border p-2 rounded"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 font-medium">Max Employees per Shift:</label>
-            <input
-              type="number"
-              value={maxEmployees}
-              onChange={(e) => setMaxEmployees(Number(e.target.value))}
-              className="border p-2 rounded"
-            />
-          </div>
-          {/* ////////////////////////////////////////////////////////////////// */}
-          {/* Submission Start Selection */}
-          <div className="flex flex-col mb-4">
-            <label className="mb-1 font-medium">Submission Start:</label>
-            <div className="flex items-center space-x-2">
-              <select
-                value={submissionStartDay}
-                onChange={(e) => setSubmissionStartDay(e.target.value)}
-                className="border p-2 rounded"
-              >
-                {daysOfWeek.map((day) => (
-                  <option key={day} value={day}>
-                    {day}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={submissionStartHour}
-                onChange={(e) => setSubmissionStartHour(Number(e.target.value))}
-                className="border p-2 rounded"
-              >
-                {hours.map((h) => (
-                  <option key={h} value={h}>
-                    {h.toString().padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-              <span>:</span>
-              <select
-                value={submissionStartMinute}
-                onChange={(e) =>
-                  setSubmissionStartMinute(Number(e.target.value))
-                }
-                className="border p-2 rounded"
-              >
-                {minutes.map((m) => (
-                  <option key={m} value={m}>
-                    {m.toString().padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Submission End Selection */}
-          <div className="flex flex-col mb-4">
-            <label className="mb-1 font-medium">Submission End:</label>
-            <div className="flex items-center space-x-2">
-              <select
-                value={submissionEndDay}
-                onChange={(e) => setSubmissionEndDay(e.target.value)}
-                className="border p-2 rounded"
-              >
-                {daysOfWeek.map((day) => (
-                  <option key={day} value={day}>
-                    {day}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={submissionEndHour}
-                onChange={(e) => setSubmissionEndHour(Number(e.target.value))}
-                className="border p-2 rounded"
-              >
-                {hours.map((h) => (
-                  <option key={h} value={h}>
-                    {h.toString().padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-              <span>:</span>
-              <select
-                value={submissionEndMinute}
-                onChange={(e) => setSubmissionEndMinute(Number(e.target.value))}
-                className="border p-2 rounded"
-              >
-                {minutes.map((m) => (
-                  <option key={m} value={m}>
-                    {m.toString().padStart(2, "0")}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* <div className="flex flex-col mb-4">
-            <label className="mb-1 font-medium">Submission Start:</label>
-            <input
-              type="datetime-local"
-              value={submissionStart ? toLocalISOString(submissionStart) : ""}
-              onChange={(e) => setSubmissionStart(new Date(e.target.value))}
-              className="border p-2 rounded"
-            />
-          </div>
-          <div className="flex flex-col mb-4">
-            <label className="mb-1 font-medium">Submission End:</label>
-            <input
-              type="datetime-local"
-              value={submissionEnd ? toLocalISOString(submissionEnd) : ""}
-              onChange={(e) => setSubmissionEnd(new Date(e.target.value))}
-              className="border p-2 rounded"
-            />
-          </div> */}
-          {/* ////////////////////////////////////////////////////////////////// */}
-        </div>
-      </ModernCard>
-
-      {/* Working Days Section */}
-      <ModernCard title="Working Days" className="mb-8">
-        <p className="mb-4 text-sm text-gray-700">
-          Selected: {selectedDays.length ? selectedDays.join(", ") : "None"}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-gray-50 min-h-screen">
+      <div className="mb-10 text-center">
+        <h1 className="text-4xl font-bold text-indigo-700 tracking-tight mb-2">
+          Manager Settings
+        </h1>
+        <p className="text-sm text-gray-500">
+          Last updated by {firstName} {lastName}
         </p>
-        <details className="border rounded">
-          <summary className="p-2 bg-gray-500 text-white cursor-pointer">
-            Select Working Days
-          </summary>
-          <div className="p-4 grid grid-cols-2 gap-2">
-            {weekDays.map((day) => (
-              <label key={day} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedDays.includes(day)}
-                  onChange={() => toggleDay(day)}
-                  className="form-checkbox"
-                />
-                <span>{day}</span>
+      </div>
+
+      {/* General Settings Card */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+          <h2 className="text-xl font-semibold text-white">General Settings</h2>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Shifts per Day:
               </label>
-            ))}
+              <div className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 font-medium">
+                {shiftTypes.length}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Max Consecutive Shifts:
+              </label>
+              <input
+                type="number"
+                value={maxConsecutiveShifts}
+                onChange={(e) =>
+                  setMaxConsecutiveShifts(Number(e.target.value))
+                }
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Minimum Required Shifts:
+              </label>
+              <input
+                type="number"
+                value={requiredShifts}
+                onChange={(e) => setrequiredShifts(Number(e.target.value))}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Max Employees per Shift:
+              </label>
+              <input
+                type="number"
+                value={maxEmployees}
+                onChange={(e) => setMaxEmployees(Number(e.target.value))}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm"
+              />
+            </div>
           </div>
-        </details>
-      </ModernCard>
 
-      {/* Shift Types */}
-      <ModernCard title="Shift Types" className="mb-8">
-        <table className="w-full bg-white border mt-2 rounded shadow mb-4">
-          <thead>
-            <tr className="bg-gray-500 text-white">
-              <th className="border p-3">Name</th>
-              <th className="border p-3">Color</th>
-              <th className="border p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {shiftTypes.map((shift) => (
-              <tr key={shift.id} className="text-center">
-                <td className="border p-2">
+          {/* Submission Settings */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Submission Start:
+              </label>
+              <div className="flex items-center space-x-2">
+                <select
+                  value={submissionStartDay}
+                  onChange={(e) => setSubmissionStartDay(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
+                >
+                  {daysOfWeek.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={submissionStartHour}
+                  onChange={(e) =>
+                    setSubmissionStartHour(Number(e.target.value))
+                  }
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
+                >
+                  {hours.map((h) => (
+                    <option key={h} value={h}>
+                      {h.toString().padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-gray-500">:</span>
+                <select
+                  value={submissionStartMinute}
+                  onChange={(e) =>
+                    setSubmissionStartMinute(Number(e.target.value))
+                  }
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
+                >
+                  {minutes.map((m) => (
+                    <option key={m} value={m}>
+                      {m.toString().padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Submission End:
+              </label>
+              <div className="flex items-center space-x-2">
+                <select
+                  value={submissionEndDay}
+                  onChange={(e) => setSubmissionEndDay(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
+                >
+                  {daysOfWeek.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={submissionEndHour}
+                  onChange={(e) => setSubmissionEndHour(Number(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
+                >
+                  {hours.map((h) => (
+                    <option key={h} value={h}>
+                      {h.toString().padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-gray-500">:</span>
+                <select
+                  value={submissionEndMinute}
+                  onChange={(e) =>
+                    setSubmissionEndMinute(Number(e.target.value))
+                  }
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
+                >
+                  {minutes.map((m) => (
+                    <option key={m} value={m}>
+                      {m.toString().padStart(2, "0")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Working Days Card */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+          <h2 className="text-xl font-semibold text-white">Working Days</h2>
+        </div>
+        <div className="p-6">
+          <p className="mb-4 text-sm text-gray-700">
+            Selected: {selectedDays.length ? selectedDays.join(", ") : "None"}
+          </p>
+          <details className="border border-gray-200 rounded-lg">
+            <summary className="p-4 bg-indigo-100 text-indigo-700 font-medium cursor-pointer hover:bg-indigo-200 transition-colors rounded-t-lg">
+              Select Working Days
+            </summary>
+            <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white rounded-b-lg">
+              {weekDays.map((day) => (
+                <label
+                  key={day}
+                  className="flex items-center gap-3 cursor-pointer"
+                >
                   <input
-                    type="text"
-                    value={shift.name}
-                    onChange={(e) =>
-                      updateShiftType(shift.id, "name", e.target.value)
-                    }
-                    className="border p-1 rounded w-full"
+                    type="checkbox"
+                    checked={selectedDays.includes(day)}
+                    onChange={() => toggleDay(day)}
+                    className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                   />
-                </td>
-                <td className="border p-2">
-                  <div className="flex items-center justify-center gap-2">
-                    <div
-                      style={{ backgroundColor: shift.color }}
-                      className="w-6 h-6 border rounded"
-                    ></div>
-                    <select
-                      value={shift.color}
-                      onChange={(e) =>
-                        updateShiftType(shift.id, "color", e.target.value)
-                      }
-                      className="border p-1 rounded"
-                    >
-                      {colorOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </td>
-                <td className="border p-2">
-                  <button
-                    onClick={() => deleteShiftType(shift.id)}
-                    className="text-red-500 font-medium"
-                  >
-                    <GoTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <ModernButton color={"#3b4fbf"} onClick={addShiftType}>
-          Add Shift Type
-        </ModernButton>
-      </ModernCard>
+                  <span className="text-gray-700">{day}</span>
+                </label>
+              ))}
+            </div>
+          </details>
+        </div>
+      </div>
 
-      {/* Role Types */}
-      <ModernCard title="Role Types" className="mb-8">
-        <table className="w-full bg-white border mt-2 mb-4 shadow">
-          <thead>
-            <tr className="bg-gray-500 text-white">
-              <th className="border p-3">Name</th>
-              <th className="border p-3">Importance</th>
-              <th className="border p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {roleTypes.map((role) => (
-              <tr key={role.id} className="text-center">
-                <td className="border p-2">
-                  <input
-                    type="text"
-                    value={role.name}
-                    onChange={(e) =>
-                      updateRoleType(role.id, "name", e.target.value)
-                    }
-                    className="border p-1  w-full"
-                  />
-                </td>
-                <td className="border p-2">
-                  <input
-                    type="number"
-                    value={role.importance}
-                    onChange={(e) =>
-                      updateRoleType(
-                        role.id,
-                        "importance",
-                        Number(e.target.value)
-                      )
-                    }
-                    className="border p-1  w-full"
-                  />
-                </td>
-                <td className="border p-2">
-                  <button
-                    onClick={() => deleteRoleType(role.id)}
-                    className="text-red-500 font-medium"
-                  >
-                    <GoTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <ModernButton onClick={addRoleType} color={"#3b4fbf"}>
-          Add Role Type
-        </ModernButton>
-      </ModernCard>
-
-      {/* Roles per Shift */}
-      <ModernCard title="Roles per Shift" className="mb-8">
-        {shiftTypes.map((shift) => (
-          <div key={shift.id} className="border p-4 mb-6 ">
-            <h3 className="text-xl font-bold mb-3">{shift.name} Roles</h3>
-            <table className="w-full bg-white border mt-2  shadow">
+      {/* Shift Types Card */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+          <h2 className="text-xl font-semibold text-white">Shift Types</h2>
+        </div>
+        <div className="p-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
               <thead>
-                <tr className="bg-gray-500 text-white">
-                  <th className="border p-3">Role</th>
-                  <th className="border p-3">Required Workers</th>
-                  <th className="border p-3">Actions</th>
+                <tr className="bg-gray-50">
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                    Color
+                  </th>
+                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider w-24">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody>
-                {(rolesPerShift[shift.name] || []).map((req, idx) => (
-                  <tr key={idx} className="text-center">
-                    <td className="border p-2">
-                      <select
-                        value={req.role}
-                        onChange={(e) =>
-                          updateRoleRequirement(
-                            shift.name,
-                            idx,
-                            "role",
-                            e.target.value
-                          )
-                        }
-                        className="border p-1  w-full"
-                      >
-                        <option value="">Select Role</option>
-                        {roleTypes.map((role) => (
-                          <option key={role.id} value={role.name}>
-                            {role.name}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="border p-2">
+              <tbody className="bg-white divide-y divide-gray-200">
+                {shiftTypes.map((shift) => (
+                  <tr key={shift.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
                       <input
-                        type="number"
-                        value={req.required}
+                        type="text"
+                        value={shift.name}
                         onChange={(e) =>
-                          updateRoleRequirement(
-                            shift.name,
-                            idx,
-                            "required",
-                            Number(e.target.value)
-                          )
+                          updateShiftType(shift.id, "name", e.target.value)
                         }
-                        className="border p-1  w-full"
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
                       />
                     </td>
-                    <td className="border p-2">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-3">
+                        <div
+                          style={{ backgroundColor: shift.color }}
+                          className="w-6 h-6 rounded-md shadow-inner border border-gray-200"
+                        ></div>
+                        <select
+                          value={shift.color}
+                          onChange={(e) =>
+                            updateShiftType(shift.id, "color", e.target.value)
+                          }
+                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm"
+                        >
+                          {colorOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
                       <button
-                        onClick={() => deleteRoleRequirement(shift.name, idx)}
-                        className="text-red-500 font-medium"
+                        onClick={() => deleteShiftType(shift.id)}
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
                       >
-                        <GoTrash />
+                        <GoTrash className="w-5 h-5" />
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <button
-              onClick={() => addRoleRequirement(shift.name)}
-              className="mt-4 bg-blue-600 text-white px-4 py-2  hover:bg-blue-700"
-            >
-              Add Role Requirement
-            </button>
           </div>
-        ))}
-      </ModernCard>
+          <button
+            onClick={addShiftType}
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Add Shift Type
+          </button>
+        </div>
+      </div>
 
-      {/* Employee Management Section */}
-      <ModernCard title="Employee Management" className="mb-8">
-        <table className="w-full table-fixed bg-white border mt-2 mb-4 rounded shadow">
-          <thead>
-            <tr className="bg-gray-500 text-white">
-              <th className="border p-3 w-[20%]">Name</th>
-              <th className="border p-3 w-[60%]">Roles</th>
-              <th className="border p-3 w-[20%]">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((emp) => (
-              <tr key={emp.uid} className="text-center">
-                <td className="border p-2">{emp.name}</td>
-                <td className="border p-2 whitespace-normal">
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <div>
-                      <select
-                        defaultValue=""
-                        onChange={(e) => {
-                          addEmployeeRole(emp.uid, e.target.value);
-                          e.target.selectedIndex = 0;
-                        }}
-                        className="border p-1 rounded"
+      {/* Role Types Card */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+          <h2 className="text-xl font-semibold text-white">Role Types</h2>
+        </div>
+        <div className="p-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                    Importance
+                  </th>
+                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider w-24">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {roleTypes.map((role) => (
+                  <tr key={role.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3">
+                      <input
+                        type="text"
+                        value={role.name}
+                        onChange={(e) =>
+                          updateRoleType(role.id, "name", e.target.value)
+                        }
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <input
+                        type="number"
+                        value={role.importance}
+                        onChange={(e) =>
+                          updateRoleType(
+                            role.id,
+                            "importance",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
+                      />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => deleteRoleType(role.id)}
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
                       >
-                        <option value="">Add Role</option>
-                        {roleTypes
-                          .filter((rt) => !emp.roles.includes(rt.name))
-                          .map((rt) => (
-                            <option key={rt.id} value={rt.name}>
-                              {rt.name}
-                            </option>
+                        <GoTrash className="w-5 h-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button
+            onClick={addRoleType}
+            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Add Role Type
+          </button>
+        </div>
+      </div>
+
+      {/* Roles per Shift Card */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+          <h2 className="text-xl font-semibold text-white">Roles per Shift</h2>
+        </div>
+        <div className="p-6 space-y-8">
+          {shiftTypes.map((shift) => (
+            <div
+              key={shift.id}
+              className="border border-gray-200 rounded-lg overflow-hidden shadow-sm"
+            >
+              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                <h3 className="text-lg font-medium text-gray-800">
+                  {shift.name} Roles
+                </h3>
+              </div>
+              <div className="p-4">
+                {/* This wrapper ensures the table will scroll horizontally on small screens */}
+                <div className="overflow-x-auto sm:overflow-visible md:overflow-visible lg:overflow-visible shadow rounded-lg">
+                  <div className="min-w-full inline-block align-middle">
+                    <div className="overflow-hidden">
+                      <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-fixed sm:table-auto">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th
+                              scope="col"
+                              className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-40 sm:w-auto"
+                            >
+                              Role
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-40 sm:w-auto"
+                            >
+                              Required Workers
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-24 sm:w-auto"
+                            >
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {(rolesPerShift[shift.name] || []).map((req, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-4 py-3">
+                                <select
+                                  value={req.role}
+                                  onChange={(e) =>
+                                    updateRoleRequirement(
+                                      shift.name,
+                                      idx,
+                                      "role",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
+                                >
+                                  <option value="">Select Role</option>
+                                  {roleTypes.map((role) => (
+                                    <option key={role.id} value={role.name}>
+                                      {role.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+                              <td className="px-4 py-3">
+                                <input
+                                  type="number"
+                                  value={req.required}
+                                  onChange={(e) =>
+                                    updateRoleRequirement(
+                                      shift.name,
+                                      idx,
+                                      "required",
+                                      Number(e.target.value)
+                                    )
+                                  }
+                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
+                                />
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  onClick={() =>
+                                    deleteRoleRequirement(shift.name, idx)
+                                  }
+                                  className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
+                                >
+                                  <GoTrash className="w-5 h-5" />
+                                </button>
+                              </td>
+                            </tr>
                           ))}
-                      </select>
+                        </tbody>
+                      </table>
                     </div>
-                    {emp.roles.map((role, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded"
-                      >
-                        <span>{role}</span>
-                        <button
-                          onClick={() => removeEmployeeRole(emp.uid, role)}
-                          className="ml-1 text-red-500"
-                        >
-                          x
-                        </button>
-                      </div>
-                    ))}
                   </div>
-                </td>
-                <td className="border p-2">
+                </div>
+                <div className="mt-4">
                   <button
-                    onClick={() => deleteEmployee(emp.uid)}
-                    className="text-red-500 font-medium"
+                    onClick={() => addRoleRequirement(shift.name)}
+                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
-                    <GoTrash />
+                    Add Role Requirement
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <SignupButton />
-      </ModernCard>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Employee Management Card */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+          <h2 className="text-xl font-semibold text-white">
+            Employee Management
+          </h2>
+        </div>
+        <div className="p-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider w-48">
+                    Name
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                    Roles
+                  </th>
+                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider w-24">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {employees.map((emp) => (
+                  <tr key={emp.uid} className="hover:bg-gray-50">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {emp.name}
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <select
+                          defaultValue=""
+                          onChange={(e) => {
+                            addEmployeeRole(emp.uid, e.target.value);
+                            e.target.selectedIndex = 0;
+                          }}
+                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm sm:text-sm"
+                        >
+                          <option value="">Add Role</option>
+                          {roleTypes
+                            .filter((rt) => !emp.roles.includes(rt.name))
+                            .map((rt) => (
+                              <option key={rt.id} value={rt.name}>
+                                {rt.name}
+                              </option>
+                            ))}
+                        </select>
+
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {emp.roles.map((role, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm"
+                            >
+                              <span>{role}</span>
+                              <button
+                                onClick={() =>
+                                  removeEmployeeRole(emp.uid, role)
+                                }
+                                className="ml-2 text-indigo-400 hover:text-indigo-600"
+                              >
+                                &times;
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 text-center">
+                      <button
+                        onClick={() => deleteEmployee(emp.uid)}
+                        className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
+                      >
+                        <GoTrash className="w-5 h-5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4">
+            <SignupButton />
+          </div>
+        </div>
+      </div>
 
       {/* Save Settings Button */}
-      <div className="text-center">
-        <ModernButton onClick={saveSettings}>Save Settings</ModernButton>
+      <div className="text-center mt-10">
+        <button
+          onClick={saveSettings}
+          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+        >
+          Save Settings
+        </button>
       </div>
     </div>
   );

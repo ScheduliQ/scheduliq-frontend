@@ -4,16 +4,21 @@ import { auth } from "../../../config/firebase";
 import { useRouter } from "next/navigation";
 import MainColorButton from "../../components/MainColorButton";
 import RegularButton from "../../components/RegularButton";
-import ShiftScheduler from "../components/ShiftScheduler";
 import StaticSchedule from "../components/StaticSchedule";
-import ChatBOT from "../components/ChatBOT";
-export default function ManagerDashboard() {
-  return (
-    <div className="relative h-full flex flex-col">
-      <h1 className="text-xl font-bold font-sans  mb-4">Manager Dashboard</h1>
+import ReportsModal from "../components/ReportsModal";
+import { IoStatsChart } from "react-icons/io5";
 
-      <div className=" w-full max-w-full h-[550px]">
-        {/* קבע גובה מקסימלי קבוע */}
+export default function ManagerDashboard() {
+  const [isReportsOpen, setIsReportsOpen] = useState<boolean>(false);
+
+  const openReports = () => setIsReportsOpen(true);
+  const closeReports = () => setIsReportsOpen(false);
+
+  return (
+    <div className="relative  h-full flex flex-col">
+      {/* <h1 className="text-xl font-bold font-sans  mb-4">Manager Dashboard</h1> */}
+
+      <div className=" w-full max-w-full h-[700px]">
         <div className="w-full h-full overflow-auto rounded-lg  ">
           <div className=" min-w-[800px] h-full">
             <StaticSchedule />
@@ -21,16 +26,26 @@ export default function ManagerDashboard() {
         </div>
       </div>
       {/* Footer */}
-      <footer className=" mt-6">
+      <footer className="ml-5 mt-6">
         {/* Buttons Section */}
         <div className="mb-6 flex gap-4">
           <MainColorButton
-            label="New Schedule"
+            label="Create"
             href="/dashboard/manager/shift-schedule"
           />
-          <RegularButton label="Reports" href="/reports" />
+
+          <button
+            onClick={openReports}
+            className="bg-transparent transition-all p-4 rounded-xl hover:bg-gray-100 active:scale-90  duration-200 flex items-center justify-center"
+            aria-label="Open Reports"
+          >
+            <IoStatsChart size={22} />
+          </button>
         </div>
       </footer>
+      {isReportsOpen && (
+        <ReportsModal isOpen={isReportsOpen} onRequestClose={closeReports} />
+      )}
     </div>
   );
 }

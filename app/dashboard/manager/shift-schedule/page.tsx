@@ -9,7 +9,7 @@ import ChatBOT from "../../components/ChatBOT";
 import CarouselSwal from "../../components/CarouselSwal"; // Adjust the import path as needed
 import { initiateSocketConnection } from "@/hooks/socket";
 import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
-
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 interface Employee {
   id: string;
   name: string;
@@ -47,21 +47,21 @@ export default function ManagerDashboard() {
         }
       );
       if (!response.ok) throw new Error("Failed to publish schedule");
-
-      Swal.fire({
-        title: "Published!",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        width: "300px",
-        position: "center",
-        background: "#f0f9ff",
-        iconColor: "#014DAE",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-blue-700",
-        },
-      });
+      ShowSwalAlert("success", "Schedule published successfully!");
+      // Swal.fire({
+      //   title: "Published!",
+      //   icon: "success",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      //   width: "300px",
+      //   position: "center",
+      //   background: "#f0f9ff",
+      //   iconColor: "#014DAE",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-blue-700",
+      //   },
+      // });
       const socket = initiateSocketConnection(); // SOCKET: Initiate connection
       socketRef.current = socket;
       await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/notifications/create`, {
@@ -74,23 +74,24 @@ export default function ManagerDashboard() {
         }),
       });
     } catch (error) {
-      Swal.fire({
-        title: "Error!",
-        text: "Could not publish schedule!",
-        icon: "error",
-        confirmButtonText: "OK",
-        timer: 3000,
-        showConfirmButton: false,
-        position: "center",
-        width: "300px",
-        background: "#fee2e2",
-        iconColor: "#dc2626",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-red-700",
-          htmlContainer: "font-sans text-gray-700",
-        },
-      });
+      ShowSwalAlert("error", "Could not publish schedule!");
+      // Swal.fire({
+      //   title: "Error!",
+      //   text: "Could not publish schedule!",
+      //   icon: "error",
+      //   confirmButtonText: "OK",
+      //   timer: 3000,
+      //   showConfirmButton: false,
+      //   position: "center",
+      //   width: "300px",
+      //   background: "#fee2e2",
+      //   iconColor: "#dc2626",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-red-700",
+      //     htmlContainer: "font-sans text-gray-700",
+      //   },
+      // });
       console.error("Error publishing schedule:", error);
     }
   };
@@ -102,70 +103,76 @@ export default function ManagerDashboard() {
       );
       const result = await response.json();
       if (response.status === 400) {
-        Swal.fire({
-          title: "Error!",
-          text: result.error,
-          icon: "error",
-          confirmButtonText: "OK",
-          timer: 3000,
-          showConfirmButton: false,
-          position: "center",
-          width: "300px",
-          background: "#fee2e2",
-          iconColor: "#dc2626",
-          customClass: {
-            popup: "rounded-lg shadow-md",
-            title: "text-2xl font-sans font-semibold text-red-700",
-            htmlContainer: "font-sans text-gray-700",
-          },
-        });
+        ShowSwalAlert("error", result.error);
+        // Swal.fire({
+        //   title: "Error!",
+        //   text: result.error,
+        //   icon: "error",
+        //   confirmButtonText: "OK",
+        //   timer: 3000,
+        //   showConfirmButton: false,
+        //   position: "center",
+        //   width: "300px",
+        //   background: "#fee2e2",
+        //   iconColor: "#dc2626",
+        //   customClass: {
+        //     popup: "rounded-lg shadow-md",
+        //     title: "text-2xl font-sans font-semibold text-red-700",
+        //     htmlContainer: "font-sans text-gray-700",
+        //   },
+        // });
       } else if (response.status === 200) {
         const parsedData = JSON.parse(result.solution);
         // const parsedData = result.solution;
         setSolutionText(result.text);
         console.log("solutionText", solutionText);
         setScheduleData(parsedData);
-        Swal.fire({
-          title: "Schedule Generated!",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-          width: "300px",
-          position: "center",
-          background: "#f0f9ff",
-          iconColor: "#014DAE",
-          customClass: {
-            popup: "rounded-lg shadow-md",
-            title: "text-2xl font-sans font-semibold text-blue-700",
-          },
-        });
+        // Swal.fire({
+        //   title: "Schedule Generated!",
+        //   icon: "success",
+        //   timer: 2000,
+        //   showConfirmButton: false,
+        //   width: "300px",
+        //   position: "center",
+        //   background: "#f0f9ff",
+        //   iconColor: "#014DAE",
+        //   customClass: {
+        //     popup: "rounded-lg shadow-md",
+        //     title: "text-2xl font-sans font-semibold text-blue-700",
+        //   },
+        // });
+        ShowSwalAlert("success", "Schedule Generated!");
       } else {
         throw new Error("Failed to fetch schedule");
       }
     } catch (error) {
-      Swal.fire({
-        title: "Error!",
-        text: "Failed to generate schedule. Please try again later.",
-        icon: "error",
-        confirmButtonText: "OK",
-        timer: 3000,
-        showConfirmButton: false,
-        position: "center",
-        width: "300px",
-        background: "#fee2e2",
-        iconColor: "#dc2626",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-red-700",
-          htmlContainer: "font-sans text-gray-700",
-        },
-      });
+      ShowSwalAlert(
+        "error",
+        "Failed to generate schedule. Please try again later."
+      );
+      // Swal.fire({
+      //   title: "Error!",
+      //   text: "Failed to generate schedule. Please try again later.",
+      //   icon: "error",
+      //   confirmButtonText: "OK",
+      //   timer: 3000,
+      //   showConfirmButton: false,
+      //   position: "center",
+      //   width: "300px",
+      //   background: "#fee2e2",
+      //   iconColor: "#dc2626",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-red-700",
+      //     htmlContainer: "font-sans text-gray-700",
+      //   },
+      // });
       console.error("Error fetching schedule:", error);
     }
   };
 
   return (
-    <div className="relative h-full flex flex-col">
+    <div className="relative p-4 h-full flex flex-col">
       <div className=" w-full max-w-full h-[550px]">
         {/* קבע גובה מקסימלי קבוע */}
         <div className="w-full h-full overflow-auto rounded-lg  ">
@@ -183,19 +190,51 @@ export default function ManagerDashboard() {
         {/* Buttons Section */}
         <div className="flex space-x-4">
           <button
-            className="flex items-center font-sans justify-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+            onClick={handleGeneratedSchedule}
+            className="
+        relative
+        px-6 py-3
+        rounded-lg
+        text-white
+        font-sans
+        bg-gradient-to-r
+        from-[#18c4f2]
+        to-[#a338e9]
+        transition-all
+        duration-200
+        hover:opacity-90
+        disabled:opacity-50
+        disabled:cursor-not-allowed
+      "
+          >
+            <span className="flex items-center">
+              <BsStars className="h-5 w-5 text-white animate-pulse mr-2" />
+              <span className="font-semibold">Generate</span>
+            </span>
+          </button>
+          {/* //second button!!!!! */}
+          {/* <button className="px-6 py-3 rounded-lg text-[#014DAE] font-sans bg-white border border-[#014DAE] transition-colors duration-200 hover:bg-[#F0F5FF] hover:border-[#014DAE] hover:text-[#014DAE] active:bg-[#014DAE] active:text-white focus:outline-none disabled:bg-blue-200 disabled:text-blue-300 disabled:border-blue-200 disabled:cursor-not-allowed">
+            Generate
+          </button> */}
+          {/* <button
+            className="group flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-sans font-medium py-2.5 px-5 rounded-xl shadow-lg shadow-blue-400/20 hover:shadow-blue-500/30 transition-all duration-300 ease-out relative overflow-hidden"
             onClick={handleGeneratedSchedule}
           >
-            <span className="mr-2">Generate</span>
-            {/* Star Icon */}
-            <BsStars className="h-5 w-5" />
-          </button>
+            <span className="relative z-10 flex items-center">
+              <span className="mr-2.5">Generate Schedule</span>
+              <BsStars className="h-5 w-5 text-yellow-200 animate-pulse" />
+            </span>
+            <span className="absolute inset-0 bg-gradient-to-tr from-blue-500 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+            <span className="absolute top-0 left-0 w-full h-full bg-white/10 opacity-0 group-hover:opacity-100 group-active:opacity-0 transition-opacity duration-300"></span>
+            <span className="absolute -inset-px rounded-xl border border-blue-400/30 group-hover:border-blue-300/50 group-active:border-blue-400/80"></span>
+          </button> */}
           <button
             onClick={handlePublish}
-            className="bg-green-600 hover:bg-green-700 text-white font-sans font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105"
+            className="px-6 py-3 rounded-lg text-white font-sans bg-[#0B8A59] border border-transparent transition-colors duration-200 hover:bg-[#086C45] active:bg-white active:text-[#0B8A59] active:border-[#0B8A59] focus:outline-none disabled:bg-green-200 disabled:text-green-300 disabled:cursor-not-allowed"
           >
             Publish
           </button>
+
           <CarouselSwal pages={solutionText} />
         </div>
         <ChatBOT />

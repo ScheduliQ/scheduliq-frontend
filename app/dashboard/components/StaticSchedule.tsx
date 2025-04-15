@@ -2,9 +2,10 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useRole } from "../../../hooks/RoleContext";
-import { FaArrowLeft } from "react-icons/fa6";
+import { FaArrowLeft, FaCalendarCheck } from "react-icons/fa6";
 import { FaArrowRight } from "react-icons/fa6";
 import Swal from "sweetalert2";
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 
 interface Employee {
   id: string;
@@ -170,37 +171,39 @@ const ShiftScheduler = () => {
         }
       );
       if (!response.ok) throw new Error("Failed to update schedule");
-      Swal.fire({
-        title: "Schedule Updated!",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        width: "300px",
-        position: "center",
-        background: "#f0f9ff",
-        iconColor: "#014DAE",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-blue-700",
-        },
-      });
+      // Swal.fire({
+      //   title: "Schedule Updated!",
+      //   icon: "success",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      //   width: "300px",
+      //   position: "center",
+      //   background: "#f0f9ff",
+      //   iconColor: "#014DAE",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-blue-700",
+      //   },
+      // });
+      ShowSwalAlert("success", "Schedule updated successfully!");
     } catch (error: any) {
-      Swal.fire({
-        text: "Schedule not found or no changes made",
-        icon: "info",
-        confirmButtonText: "OK",
-        timer: 3000,
-        showConfirmButton: false,
-        position: "center",
-        width: "300px",
-        background: "#fee2e2",
-        iconColor: "#dc2626",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-red-700",
-          htmlContainer: "font-sans text-gray-700",
-        },
-      });
+      // Swal.fire({
+      //   text: "Schedule not found or no changes made",
+      //   icon: "info",
+      //   confirmButtonText: "OK",
+      //   timer: 3000,
+      //   showConfirmButton: false,
+      //   position: "center",
+      //   width: "300px",
+      //   background: "#fee2e2",
+      //   iconColor: "#dc2626",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-red-700",
+      //     htmlContainer: "font-sans text-gray-700",
+      //   },
+      // });
+      ShowSwalAlert("error", "No changes made or schedule not found!");
     }
   };
 
@@ -373,61 +376,76 @@ const ShiftScheduler = () => {
 
   return (
     <div
-      className={`p-4 ${
+      className={` p-7 width-full ${
         isEditing ? "border-2 border-dashed border-blue-700 rounded-3xl" : ""
       }`}
     >
-      <div className="flex justify-between mb-4">
-        <h1 className="text-2xl font-bold">Shift Schedule</h1>
+      {/* <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4 width-full">
+        <h1 className="text-2xl font-semibold text-gray-800">Shift Schedule</h1>
+      </div> */}
+      <div className="flex flex-col  sm:flex-row justify-between  items-center mb-6 gap-4">
+        <h1 className="text-2xl font-semibold text-gray-800">Shift Schedule</h1>
+
         {isEditing && (
-          <div className="text-center text-blue-500 font-semibold mb-4">
-            ✎ You are in edit mode. Drag and drop to rearrange shifts.
+          <div className="text-indigo-600 font-medium text-sm px-3 py-1 bg-indigo-100 rounded-full">
+            <span className="flex items-center gap-2">
+              <span>✎</span> Edit mode: Drag and drop to rearrange
+            </span>
           </div>
         )}
         <div className="flex gap-x-1">
           {!isEditing && (
-            <>
+            <div className="flex items-center space-x-3 mr-3">
               <button
                 onClick={goBack}
                 disabled={currentIndex >= schedules.length - 1}
-                className={`px-4 py-2 rounded ${
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 ${
                   currentIndex >= schedules.length - 1
-                    ? "bg-gray-300"
-                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:shadow-sm active:scale-95"
                 }`}
+                aria-label="Go back"
               >
-                <FaArrowLeft />
+                <FaArrowLeft size={14} />
               </button>
+
               <button
                 onClick={goToLatest}
                 disabled={currentIndex === 0}
-                className={`px-4 py-2 font-sans rounded ${
+                className={`px-5 py-2 rounded-full font-medium text-sm transition-all duration-200 flex items-center gap-1 ${
                   currentIndex === 0
-                    ? "bg-gray-300"
-                    : "bg-green-500 hover:bg-green-600 text-white"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-green-50 text-green-600 hover:bg-green-100 hover:shadow-sm active:scale-95"
                 }`}
               >
-                Current
+                <FaCalendarCheck size={12} />
+                <span>Latest</span>
               </button>
+
               <button
                 onClick={goForward}
                 disabled={currentIndex === 0}
-                className={`px-4 py-2 rounded ${
+                className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-200 ${
                   currentIndex === 0
-                    ? "bg-gray-300"
-                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 hover:shadow-sm active:scale-95"
                 }`}
+                aria-label="Go forward"
               >
-                <FaArrowRight />
+                <FaArrowRight size={14} />
               </button>
-            </>
+            </div>
           )}
           {role === "manager" && currentIndex == 0 && (
             <button
               onClick={handleToggleEdit}
-              className="bg-blue-500 hover:bg-blue-600 text-white ml-5 px-4 py-2 rounded-lg transition-colors"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                isEditing
+                  ? "bg-green-100 text-green-700 hover:bg-green-200"
+                  : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+              }`}
             >
-              {isEditing ? "Done ✔" : "Edit ✎"}
+              {isEditing ? "✓" : "✎"}
             </button>
           )}
         </div>
@@ -437,7 +455,7 @@ const ShiftScheduler = () => {
           <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 max-w-[calc(200px*7+1.5rem*6)] mx-auto">
             {days.map((day) => (
               <div key={day.id} className="bg-gray-50 p-2 rounded-lg shadow-sm">
-                <h3 className="text-center font-semibold mb-2 text-gray-700">
+                <h3 className="text-center font-medium py-3 bg-gray-200 text-gray-700 mb-3 rounded-md">
                   {day.name}
                 </h3>
                 {day.shifts.map((shift) => (
@@ -449,14 +467,14 @@ const ShiftScheduler = () => {
                         style={{
                           backgroundColor: shift.color || "white",
                         }}
-                        className={`bg-white p-2 rounded mb-2 shadow-sm min-h-[150px] ${
+                        className={`bg-white p-2 rounded-lg mb-2 shadow-sm min-h-[150px] ${
                           snapshot.isDraggingOver
                             ? "bg-blue-50 border-2 border-blue-200"
                             : ""
                         }`}
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <div className="text-sm text-gray-500 font-medium">
+                          <div className="text-sm text-gray-500 font-medium ">
                             {shift.time}
                           </div>
                           {isEditing && (
@@ -464,7 +482,7 @@ const ShiftScheduler = () => {
                               onClick={() =>
                                 handleAddEmployee(day.id, shift.id)
                               }
-                              className="text-green-500 hover:text-green-700 text-xl"
+                              className="w-6 h-6 flex items-center justify-center rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
                             >
                               +
                             </button>
@@ -486,7 +504,7 @@ const ShiftScheduler = () => {
                                   snapshot.isDragging,
                                   provided.draggableProps.style
                                 )}
-                                className={`p-2 mb-1 rounded border cursor-move ${
+                                className={`p-2 mb-1 rounded-xl border cursor-move ${
                                   snapshot.isDragging
                                     ? "border-blue-300 bg-blue-100 shadow-lg transform scale-105"
                                     : "border-gray-200 bg-white hover:bg-gray-50"
@@ -513,7 +531,7 @@ const ShiftScheduler = () => {
                                             employee.id
                                           )
                                         }
-                                        className="text-blue-500 hover:text-blue-700 mr-2"
+                                        className="p-1 text-indigo-500 mr-1 hover:text-indigo-700 hover:bg-indigo-50 rounded"
                                       >
                                         ✎
                                       </button>
@@ -525,7 +543,7 @@ const ShiftScheduler = () => {
                                             employee.id
                                           )
                                         }
-                                        className="text-red-500 hover:text-red-700"
+                                        className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
                                       >
                                         ✕
                                       </button>
@@ -548,86 +566,100 @@ const ShiftScheduler = () => {
       </DragDropContext>
       {/* Modal להוספת עובד ידנית עם dropdown */}
       {selectedShift && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Add Employee to Shift</h2>
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm rounded-3xl flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-5 text-gray-800">
+              Add Employee to Shift
+            </h2>
             <div className="space-y-4">
-              {/* Dropdown לבחירת עובד */}
-              <select
-                value={selectedEmployeeId}
-                onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                className="w-full p-2 border rounded"
-              >
-                <option value="">Select Employee</option>
-                {employeeDropdown.map((emp) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.first_name} {emp.last_name}
-                  </option>
-                ))}
-              </select>
-              {/* Dropdown לבחירת תפקיד, תלוי בעובד שנבחר */}
-              <select
-                value={newEmployee.role}
-                onChange={(e) =>
-                  setNewEmployee({ ...newEmployee, role: e.target.value })
-                }
-                className="w-full p-2 border rounded"
-                disabled={!availableJobs.length}
-              >
-                <option value="">Select Role</option>
-                {availableJobs.map((job, index) => (
-                  <option key={`${job}-${index}`} value={job}>
-                    {job}
-                  </option>
-                ))}
-              </select>
-              {/* Time inputs */}
-              <div className="flex justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  Start Time:
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Employee
                 </label>
-                <input
-                  type="time"
-                  value={newEmployee.hours.split("-")[0] || ""}
-                  onChange={(e) =>
-                    setNewEmployee({
-                      ...newEmployee,
-                      hours: `${e.target.value}-${
-                        newEmployee.hours.split("-")[1] || ""
-                      }`,
-                    })
-                  }
-                  className="p-2 border rounded"
-                />
+                <select
+                  value={selectedEmployeeId}
+                  onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                  className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                >
+                  <option value="">Select Employee</option>
+                  {employeeDropdown.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.first_name} {emp.last_name}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="flex justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  End Time:
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role
                 </label>
-                <input
-                  type="time"
-                  value={newEmployee.hours.split("-")[1] || ""}
+                <select
+                  value={newEmployee.role}
                   onChange={(e) =>
-                    setNewEmployee({
-                      ...newEmployee,
-                      hours: `${newEmployee.hours.split("-")[0] || ""}-${
-                        e.target.value
-                      }`,
-                    })
+                    setNewEmployee({ ...newEmployee, role: e.target.value })
                   }
-                  className="p-2 border rounded"
-                />
+                  className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                  disabled={!availableJobs.length}
+                >
+                  <option value="">Select Role</option>
+                  {availableJobs.map((job, index) => (
+                    <option key={`${job}-${index}`} value={job}>
+                      {job}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="flex justify-end space-x-2">
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Start Time
+                  </label>
+                  <input
+                    type="time"
+                    value={newEmployee.hours.split("-")[0] || ""}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        hours: `${e.target.value}-${
+                          newEmployee.hours.split("-")[1] || ""
+                        }`,
+                      })
+                    }
+                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Time
+                  </label>
+                  <input
+                    type="time"
+                    value={newEmployee.hours.split("-")[1] || ""}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        hours: `${newEmployee.hours.split("-")[0] || ""}-${
+                          e.target.value
+                        }`,
+                      })
+                    }
+                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => setSelectedShift(null)}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEmployee}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   Save
                 </button>
@@ -636,82 +668,59 @@ const ShiftScheduler = () => {
           </div>
         </div>
       )}
-      {/* Modal לעריכת עובד */}
+
       {editingEmployee && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">Edit Employee</h2>
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-30 backdrop-blur-sm rounded-3xl flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-5 text-gray-800">
+              Edit Employee
+            </h2>
             <div className="space-y-4">
-              {/* Dropdown לבחירת העובד */}
-              <select
-                value={editingEmployee.employeeData.id}
-                onChange={(e) => {
-                  const selectedId = e.target.value;
-                  const emp = employeeDropdown.find(
-                    (emp) => emp.id === selectedId
-                  );
-                  if (emp) {
-                    setEditingEmployee((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            employeeData: {
-                              ...prev.employeeData,
-                              id: selectedId,
-                              name: `${emp.first_name} ${emp.last_name}`,
-                              role: "", // איפוס תפקיד בעת שינוי העובד
-                            },
-                          }
-                        : null
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Employee
+                </label>
+                <select
+                  value={editingEmployee.employeeData.id}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    const emp = employeeDropdown.find(
+                      (emp) => emp.id === selectedId
                     );
-                    setEditingAvailableJobs(emp.jobs || []);
-                  }
-                }}
-                className="w-full p-2 border rounded"
-              >
-                <option value="">Select Employee</option>
-                {employeeDropdown.map((emp) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.first_name} {emp.last_name}
-                  </option>
-                ))}
-              </select>
+                    if (emp) {
+                      setEditingEmployee((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              employeeData: {
+                                ...prev.employeeData,
+                                id: selectedId,
+                                name: `${emp.first_name} ${emp.last_name}`,
+                                role: "",
+                              },
+                            }
+                          : null
+                      );
+                      setEditingAvailableJobs(emp.jobs || []);
+                    }
+                  }}
+                  className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                >
+                  <option value="">Select Employee</option>
+                  {employeeDropdown.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.first_name} {emp.last_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              {/* Dropdown לבחירת התפקיד, תלוי בעובד שנבחר */}
-              <select
-                value={editingEmployee.employeeData.role}
-                onChange={(e) =>
-                  setEditingEmployee((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          employeeData: {
-                            ...prev.employeeData,
-                            role: e.target.value,
-                          },
-                        }
-                      : null
-                  )
-                }
-                className="w-full p-2 border rounded"
-                disabled={!editingAvailableJobs.length}
-              >
-                <option value="">Select Role</option>
-                {editingAvailableJobs.map((job, index) => (
-                  <option key={`${job}-${index}`} value={job}>
-                    {job}
-                  </option>
-                ))}
-              </select>
-
-              {/* Time Inputs */}
-              <div className="flex justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  Start Time:
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Role
                 </label>
-                <input
-                  type="time"
-                  value={editingEmployee.employeeData.hours.split("-")[0] || ""}
+                <select
+                  value={editingEmployee.employeeData.role}
                   onChange={(e) =>
                     setEditingEmployee((prev) =>
                       prev
@@ -719,52 +728,91 @@ const ShiftScheduler = () => {
                             ...prev,
                             employeeData: {
                               ...prev.employeeData,
-                              hours: `${e.target.value}-${
-                                prev.employeeData.hours.split("-")[1] || ""
-                              }`,
+                              role: e.target.value,
                             },
                           }
                         : null
                     )
                   }
-                  className="p-2 border rounded"
-                />
+                  className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                  disabled={!editingAvailableJobs.length}
+                >
+                  <option value="">Select Role</option>
+                  {editingAvailableJobs.map((job, index) => (
+                    <option key={`${job}-${index}`} value={job}>
+                      {job}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="flex justify-between">
-                <label className="text-sm font-medium text-gray-700">
-                  End Time:
-                </label>
-                <input
-                  type="time"
-                  value={editingEmployee.employeeData.hours.split("-")[1] || ""}
-                  onChange={(e) =>
-                    setEditingEmployee((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            employeeData: {
-                              ...prev.employeeData,
-                              hours: `${
-                                prev.employeeData.hours.split("-")[0] || ""
-                              }-${e.target.value}`,
-                            },
-                          }
-                        : null
-                    )
-                  }
-                  className="p-2 border rounded"
-                />
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Start Time
+                  </label>
+                  <input
+                    type="time"
+                    value={
+                      editingEmployee.employeeData.hours.split("-")[0] || ""
+                    }
+                    onChange={(e) =>
+                      setEditingEmployee((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              employeeData: {
+                                ...prev.employeeData,
+                                hours: `${e.target.value}-${
+                                  prev.employeeData.hours.split("-")[1] || ""
+                                }`,
+                              },
+                            }
+                          : null
+                      )
+                    }
+                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Time
+                  </label>
+                  <input
+                    type="time"
+                    value={
+                      editingEmployee.employeeData.hours.split("-")[1] || ""
+                    }
+                    onChange={(e) =>
+                      setEditingEmployee((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              employeeData: {
+                                ...prev.employeeData,
+                                hours: `${
+                                  prev.employeeData.hours.split("-")[0] || ""
+                                }-${e.target.value}`,
+                              },
+                            }
+                          : null
+                      )
+                    }
+                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 outline-none transition-all"
+                  />
+                </div>
               </div>
-              <div className="flex justify-end space-x-2">
+
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   onClick={() => setEditingEmployee(null)}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEditedEmployee}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   Save
                 </button>

@@ -2,6 +2,7 @@
 import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
 import { useRole } from "../../../../hooks/RoleContext"; // Import Context
+import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 
 // Fallback defaults (will be replaced if manager settings are fetched)
 const INITIAL_DAYS = [
@@ -152,14 +153,15 @@ export default function DynamicScheduleTable() {
       );
       const result = await response.json();
       if (response.ok) {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: result.message,
-          confirmButtonText: "OK",
-          timer: 3000,
-          timerProgressBar: true,
-        });
+        // Swal.fire({
+        //   icon: "success",
+        //   title: "Success",
+        //   text: result.message,
+        //   confirmButtonText: "OK",
+        //   timer: 3000,
+        //   timerProgressBar: true,
+        // });
+        ShowSwalAlert("success", result.message);
       } else {
         alert(`Failed to save draft: ${result.error || "Unknown error"}`);
         console.error("Error from server:", result);
@@ -190,43 +192,47 @@ export default function DynamicScheduleTable() {
         setConstraints(result.draft.constraints || "");
       } else {
         if (response.status === 404 && result.errorType === "NOT_FOUND") {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            // text: "No draft found, try saving one.",
-            text: result.error,
-            confirmButtonText: "Close",
-            timer: 3000,
-            timerProgressBar: true,
-          });
+          // Swal.fire({
+          //   icon: "error",
+          //   title: "Error",
+          //   // text: "No draft found, try saving one.",
+          //   text: result.error,
+          //   confirmButtonText: "Close",
+          //   timer: 3000,
+          //   timerProgressBar: true,
+          // });
+          ShowSwalAlert("error", result.error);
         } else if (response.status === 403 && result.errorType === "OUTDATED") {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: result.error,
-            confirmButtonText: "Close",
-            timer: 3000,
-            timerProgressBar: true,
-          });
+          // Swal.fire({
+          //   icon: "error",
+          //   title: "Error",
+          //   text: result.error,
+          //   confirmButtonText: "Close",
+          //   timer: 3000,
+          //   timerProgressBar: true,
+          // });
+          ShowSwalAlert("error", result.error);
         } else {
-          Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: result.error || "Error loading draft!",
-            confirmButtonText: "Close",
-            timer: 3000,
-            timerProgressBar: true,
-          });
+          // Swal.fire({
+          //   icon: "error",
+          //   title: "Error",
+          //   text: result.error || "Error loading draft!",
+          //   confirmButtonText: "Close",
+          //   timer: 3000,
+          //   timerProgressBar: true,
+          // });
+          ShowSwalAlert("error", result.error || "Error loading draft!");
         }
       }
     } catch (error: any) {
       console.error("Error loading draft:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: error.message || String(error),
-        confirmButtonText: "Close",
-      });
+      // Swal.fire({
+      //   icon: "error",
+      //   title: "Error",
+      //   text: error.message || String(error),
+      //   confirmButtonText: "Close",
+      // });
+      ShowSwalAlert("error", error.message || String(error));
     }
   };
 
@@ -258,39 +264,40 @@ export default function DynamicScheduleTable() {
         }
       );
       const result = await response.json();
-      Swal.fire({
-        text: "Shift availability submitted successfully!",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        width: "300px",
-        position: "center",
-        background: "#f0f9ff",
-        iconColor: "#014DAE",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-blue-700",
-        },
-      });
+      // Swal.fire({
+      //   text: "Shift availability submitted successfully!",
+      //   icon: "success",
+      //   timer: 2000,
+      //   showConfirmButton: false,
+      //   width: "300px",
+      //   position: "center",
+      //   background: "#f0f9ff",
+      //   iconColor: "#014DAE",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-blue-700",
+      //   },
+      // });
+      ShowSwalAlert("success", "Shift availability submitted successfully!");
     } catch (error) {
-      Swal.fire({
-        title: "Error!",
-        text: "Error sending constraints!",
-        icon: "error",
-        confirmButtonText: "OK",
-        timer: 3000,
-        showConfirmButton: false,
-        position: "center",
-        width: "300px",
-        background: "#fee2e2",
-        iconColor: "#dc2626",
-        customClass: {
-          popup: "rounded-lg shadow-md",
-          title: "text-2xl font-sans font-semibold text-red-700",
-          htmlContainer: "font-sans text-gray-700",
-        },
-      });
-      // console.error("Error sending constraints:", error);
+      // Swal.fire({
+      //   title: "Error!",
+      //   text: "Error sending constraints!",
+      //   icon: "error",
+      //   confirmButtonText: "OK",
+      //   timer: 3000,
+      //   showConfirmButton: false,
+      //   position: "center",
+      //   width: "300px",
+      //   background: "#fee2e2",
+      //   iconColor: "#dc2626",
+      //   customClass: {
+      //     popup: "rounded-lg shadow-md",
+      //     title: "text-2xl font-sans font-semibold text-red-700",
+      //     htmlContainer: "font-sans text-gray-700",
+      //   },
+      // });
+      ShowSwalAlert("error", "Error sending constraints!");
     }
   };
 

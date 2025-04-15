@@ -127,10 +127,6 @@ export default function Sidebar() {
     }
   };
 
-  // ----------------------
-  // useEffect Calls
-  // ----------------------
-
   // Fetch messages on component mount
   useEffect(() => {
     fetchMessages();
@@ -300,11 +296,8 @@ export default function Sidebar() {
     string | null
   >(null);
 
-  // ----------------------
-  // JSX Render
-  // ----------------------
   return (
-    <aside className="h-[calc(100vh-8rem-2rem)] bg-white flex flex-col border border-gray-200 rounded-xl p-4 shadow-lg">
+    <aside className="h-[calc(100vh-8rem-2rem)] bg-white flex flex-col  rounded-3xl  ">
       {/* Fixed header */}
       <div className="text-xl font-bold mb-4 text-center border-b border-gray-200 pb-3 text-blue-700">
         System message

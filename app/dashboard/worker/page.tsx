@@ -6,7 +6,7 @@ import StaticSchedule from "../components/StaticSchedule";
 export default function WorkerDashboard() {
   return (
     <div className="relative  h-full flex flex-col">
-      <h1 className="text-xl font-bold font-sans mb-4">Worker Dashboard</h1>
+      {/* <h1 className="text-xl font-bold font-sans mb-4">Worker Dashboard</h1> */}
 
       <div className="w-full max-w-full h-[550px]">
         <div className="w-full h-full overflow-auto rounded-lg  ">
