@@ -156,7 +156,12 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
   };
 
   const totalShifts = shiftTypeValues.reduce((sum, count) => sum + count, 0);
-
+  const handleExportToPDF = () => {
+    window.open(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/reports/export_pdf`,
+      "_blank"
+    );
+  };
   // Sort employee shift count data by value (descending)
   const employeeLabels = reports
     ? Object.keys(reports.employee_shift_count)
@@ -329,26 +334,35 @@ const ReportsModal: React.FC<ReportsModalProps> = ({
             Shift Analytics Dashboard
             <InfoButton infoText="This dashboard gives you an overall view of key metrics and trends. 'Average Employees per Shift' shows the average number of staff assigned across all shifts. 'Total Shifts' is the total count of shifts available, while the other sections provide breakdowns by shift type and role coverage." />
           </h2>
-          <button
-            onClick={onRequestClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-            aria-label="Close modal"
-          >
-            <svg
-              className="w-5 h-5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+          <div className="flex items-center gap-2">
+            {/* Export to PDF Button */}
+            <button
+              onClick={handleExportToPDF}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              Generate PDF Report
+            </button>
+            <button
+              onClick={onRequestClose}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              aria-label="Close modal"
+            >
+              <svg
+                className="w-5 h-5 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Tab Navigation */}
