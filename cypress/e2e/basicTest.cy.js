@@ -7,7 +7,7 @@ describe("Login and Dashboard Test", () => {
     cy.get('input[type="email"]').type("kobialen77@gmail.com"); // Replace with test email
 
     // Enter password
-    cy.get('input[type="password"]').type("123456"); // Replace with test password
+    cy.get('input[type="password"]').type("admin123456"); // Replace with test password
 
     // Click the login button
     cy.get('button[type="submit"]').click();
