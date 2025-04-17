@@ -1,63 +1,68 @@
-name: Frontend CI Pipeline
+# .github/workflows/frontend-ci.yml
+name: Frontend_CI_Pipeline
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
+    branches: # run automatically for all shared‑development work
+      - development
+  pull_request: # protect the production (main) branch with PR checks
     branches:
       - main
 
 jobs:
-  build-and-test:
+  build_and_test:
     runs-on: ubuntu-latest
 
-    steps:
-      # Step 1: Check out the Frontend code
-      - name: Checkout Frontend code
-        uses: actions/checkout@v3
+    services:
+      # Spin up MongoDB so the backend can connect during the tests
+      mongo:
+        image: mongo:7
+        ports: ["27017:27017"]
 
-      # Step 2: Clone Backend repository
-      - name: Clone Backend repository
+    steps:
+      # 1 – Checkout the frontend repository
+      - name: Checkout Frontend
+        uses: actions/checkout@v4
+
+      # 2 – Clone the backend repository (read‑only token)
+      - name: Clone Backend
         run: |
           git clone https://x-access-token:${{ secrets.ORGANIZATION_TOKEN }}@github.com/ScheduliQ/scheduliq-backend.git backend
         env:
           GIT_TERMINAL_PROMPT: "0"
 
-      # Step 3: Set up Python for Backend
+      # 3 – Set up Python & install backend dependencies
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.9
+          python-version: "3.9"
 
-      # Step 4: Install Backend dependencies
       - name: Install Backend dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
           pip install -r backend/requirements.txt
 
-      # Step 5: Start Backend
-      - name: Start Backend
+      # 4 – Start the Flask 3 backend **(production mode by default)**
+      - name: Start Backend server
         run: |
           source venv/bin/activate
-          python backend/app.py &
+          python backend/run.py &
         env:
-          MONGO_URI: ${{ secrets.MONGO_URI }}
-          CI: true
+          MONGO_URI: ${{ secrets.MONGO_URI }} # ← real DB in CI
+          CI: "true"
 
-      # Step 6: Set up Node.js for Frontend
+      # 5 – Set up Node & install frontend deps with **npm ci**
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18.18.0
+          node-version: 20
 
-      # Step 7: Install Frontend dependencies
       - name: Install Frontend dependencies
-        run: npm install
+        run: npm ci
 
-      # Step 8: Build Frontend
-      - name: Build application
+      # 6 – Build the Next.js app
+      - name: Build Frontend
         run: npm run build
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
@@ -68,10 +73,12 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
 
-      # Step 9: Start Frontend
-      - name: Start Frontend
-        run: npm run start &
+      # 7 – Start the built frontend in the background
+      - name: Start Frontend server
+        run: npm run start & # defaults to port 3000
         env:
+          PORT: 3000
+          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }} # backend proxy
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
@@ -80,17 +87,14 @@ jobs:
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
 
-      # Step 10: Run Cypress tests
-      # - name: Run Cypress tests
-      #   uses: cypress-io/github-action@v4
-      #   with:
-      #     record: false
-      #   env:
-      #     CYPRESS_BASE_URL: http://localhost:3000
-      #     NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
-      #     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
-      #     NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-      #     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
-      #     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
-      #     NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
-      #     NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+      # 8 – Wait until both servers are healthy
+      - name: Wait for servers
+        run: sleep 25
+
+      # 9 – Run Cypress end‑to‑end tests
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: "" # empty means “don’t start anything”
+          wait-on: http://localhost:3000
+          wait-on-timeout: 120
