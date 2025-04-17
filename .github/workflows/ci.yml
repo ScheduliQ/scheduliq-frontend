@@ -89,11 +89,7 @@ jobs:
 
       # 8 – Wait until both servers are healthy
       - name: Wait for servers
-        uses: jakejarvis/wait-action@v0.2.0
-        with:
-          urls: |
-            http://localhost:5000/health        # you can expose a simple GET /health
-            http://localhost:3000
+        run: sleep 25
 
       # 9 – Run Cypress end‑to‑end tests
       - name: Cypress test suite
