@@ -92,11 +92,9 @@ jobs:
         run: sleep 25
 
       # 9 – Run Cypress end‑to‑end tests
-      - name: Cypress test suite
+      - name: Run Cypress tests
         uses: cypress-io/github-action@v6
         with:
-          start: npm run start # Already running, but Cypress uses this for logging
-          wait-on: "http://localhost:3000"
-          record: false # set to true if you use the Cypress Dashboard
-        env:
-          CYPRESS_BASE_URL: http://localhost:3000
+          start: "" # empty means “don’t start anything”
+          wait-on: http://localhost:3000
+          wait-on-timeout: 120
