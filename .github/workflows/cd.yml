@@ -1,30 +1,34 @@
-name: Frontend CD – Deploy(production)
+name: Frontend CD
 
 on:
-  # Automatic deploy whenever production branch receives a new commit
+  # מונע פריסה אוטומטית רק כש‑main מתעדכן
   push:
-    branches:
-      - main
+    branches: [main]
 
-  # Optional: allow a manual “Run workflow” button in the GitHub UI
-  workflow_dispatch:
+#   # מאפשר להריץ ידנית מה‑UI
+#   workflow_dispatch: {}
 
 jobs:
   deploy:
-    name: Deploy Frontend to Render
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repo at the commit we want to deploy
-      - name: Checkout code
+      # 1. משיכת הקוד
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2) Optionally do a light smoke build to fail fast if something is broken
-      #    (Render will also rebuild, but this avoids pushing a bad commit)
-      - name: Install deps & build
-        run: |
-          npm ci
-          npm run build
+      # 2. סביבת Node יציבה (20 LTS)
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. התקנת חבילות Production‑only
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. Build – אם זה לא עובר, אין טעם לפרוס
+      - name: Build project
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
@@ -33,12 +37,4 @@ jobs:
           NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
           NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
-
-      # 3) Trigger the Render deploy‑hook for the production service
-      #    Store the full hook URL in a GitHub secret called RENDER_DEPLOY_HOOK
-      - name: Kick off Render deploy
-        run: |
-          curl -X POST \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: npm run build
