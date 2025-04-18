@@ -1,11 +1,9 @@
 name: Frontend CD
 
 on:
-  # מונע פריסה אוטומטית רק כש‑main מתעדכן
   push:
     branches: [main]
 
-#   # מאפשר להריץ ידנית מה‑UI
 #   workflow_dispatch: {}
 
 jobs:
@@ -13,21 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. משיכת הקוד
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. סביבת Node יציבה (20 LTS)
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3. התקנת חבילות Production‑only
       - name: Install dependencies
         run: npm ci
 
-      # 4. Build – אם זה לא עובר, אין טעם לפרוס
       - name: Build project
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
