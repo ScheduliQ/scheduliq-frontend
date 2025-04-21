@@ -49,6 +49,7 @@ jobs:
           source venv/bin/activate
           python backend/run.py &
         env:
+          FLASK_ENV: testing
           MONGO_URI: ${{ secrets.MONGO_URI }} # ← real DB in CI
           CI: "true"
 
