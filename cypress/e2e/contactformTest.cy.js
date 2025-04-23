@@ -1,7 +1,11 @@
 describe("Contact Form", () => {
+  beforeEach(() => {
+    // מדמה שיש token תקף
+    cy.setCookie("token", "fake-jwt-token");
+  });
   it("sends a message and shows confirmation", () => {
     // Stub the contact endpoint
-    cy.intercept("POST", "/user/contact", { statusCode: 200 }).as(
+    cy.intercept("POST", "**/user/contact", { statusCode: 200 }).as(
       "sendContact"
     );
 
