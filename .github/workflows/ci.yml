@@ -8,6 +8,7 @@ on:
   pull_request: # protect the production (main) branch with PR checks
     branches:
       - main
+      - development
 
 jobs:
   build_and_test:
