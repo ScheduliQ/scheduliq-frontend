@@ -22,7 +22,7 @@ describe("Contact Form", () => {
     cy.contains("Thank you for contacting us!").should("be.visible");
   });
   it("shows an error alert when the server returns 500", () => {
-    cy.intercept("POST", "/user/contact", { statusCode: 500 }).as(
+    cy.intercept("POST", "**/user/contact", { statusCode: 500 }).as(
       "sendContactFail"
     );
     cy.visit("/dashboard/contact");
