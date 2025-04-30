@@ -97,77 +97,49 @@ export default function ManagerDashboard() {
   };
 
   const handleGeneratedSchedule = async () => {
+    // 1. Get your socket
+    const socket = initiateSocketConnection();
+
+    // 2. Wait for it to actually connect, if not already
+    if (!socket.connected) {
+      await new Promise<void>((resolve) => {
+        socket.once("connect", () => {
+          resolve();
+        });
+      });
+    }
+
     try {
+      // 3. Enqueue the job
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/csp/generate-schedule`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/csp/generate-schedule`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ socket_id: socket.id }),
+        }
       );
-      const result = await response.json();
-      if (response.status === 400) {
-        ShowSwalAlert("error", result.error);
-        // Swal.fire({
-        //   title: "Error!",
-        //   text: result.error,
-        //   icon: "error",
-        //   confirmButtonText: "OK",
-        //   timer: 3000,
-        //   showConfirmButton: false,
-        //   position: "center",
-        //   width: "300px",
-        //   background: "#fee2e2",
-        //   iconColor: "#dc2626",
-        //   customClass: {
-        //     popup: "rounded-lg shadow-md",
-        //     title: "text-2xl font-sans font-semibold text-red-700",
-        //     htmlContainer: "font-sans text-gray-700",
-        //   },
-        // });
-      } else if (response.status === 200) {
-        const parsedData = JSON.parse(result.solution);
-        // const parsedData = result.solution;
-        setSolutionText(result.text);
-        console.log("solutionText", solutionText);
-        setScheduleData(parsedData);
-        // Swal.fire({
-        //   title: "Schedule Generated!",
-        //   icon: "success",
-        //   timer: 2000,
-        //   showConfirmButton: false,
-        //   width: "300px",
-        //   position: "center",
-        //   background: "#f0f9ff",
-        //   iconColor: "#014DAE",
-        //   customClass: {
-        //     popup: "rounded-lg shadow-md",
-        //     title: "text-2xl font-sans font-semibold text-blue-700",
-        //   },
-        // });
-        ShowSwalAlert("success", "Schedule Generated!");
+
+      if (response.status === 202) {
+        ShowSwalAlert("success", "Schedule is being generated…");
+
+        // 4. Listen once for the real result
+        socket.once("schedule_ready", ({ solution, text }) => {
+          const parsedData = JSON.parse(solution);
+          setSolutionText(text);
+          setScheduleData(parsedData);
+          ShowSwalAlert("success", "Schedule Generated!");
+        });
       } else {
-        throw new Error("Failed to fetch schedule");
+        const err = await response.json();
+        ShowSwalAlert("error", err.error || "Failed to queue schedule");
       }
     } catch (error) {
       ShowSwalAlert(
         "error",
         "Failed to generate schedule. Please try again later."
       );
-      // Swal.fire({
-      //   title: "Error!",
-      //   text: "Failed to generate schedule. Please try again later.",
-      //   icon: "error",
-      //   confirmButtonText: "OK",
-      //   timer: 3000,
-      //   showConfirmButton: false,
-      //   position: "center",
-      //   width: "300px",
-      //   background: "#fee2e2",
-      //   iconColor: "#dc2626",
-      //   customClass: {
-      //     popup: "rounded-lg shadow-md",
-      //     title: "text-2xl font-sans font-semibold text-red-700",
-      //     htmlContainer: "font-sans text-gray-700",
-      //   },
-      // });
-      console.error("Error fetching schedule:", error);
+      console.error("Error queuing schedule:", error);
     }
   };
 
