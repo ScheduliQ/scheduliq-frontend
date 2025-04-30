@@ -106,7 +106,7 @@ export default function ManagerDashboard() {
     ShowSwalAlert("success", "Generating schedule…");
 
     // 3. Register listener *first*
-    socket.once("schedule_ready", ({ solution, text }) => {
+    socket.on("schedule_ready", ({ solution, text }) => {
       const parsed = JSON.parse(solution);
       setSolutionText(text);
       setScheduleData(parsed);
