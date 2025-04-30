@@ -95,22 +95,26 @@ export default function ManagerDashboard() {
       console.error("Error publishing schedule:", error);
     }
   };
-
   const handleGeneratedSchedule = async () => {
-    // 1. Get your socket
+    // 1. Get socket & await connection
     const socket = initiateSocketConnection();
-
-    // 2. Wait for it to actually connect, if not already
     if (!socket.connected) {
-      await new Promise<void>((resolve) => {
-        socket.once("connect", () => {
-          resolve();
-        });
-      });
+      await new Promise<void>((res) => socket.once("connect", res));
     }
 
+    // 2. Tell user we’re working
+    ShowSwalAlert("success", "Generating schedule…");
+
+    // 3. Register listener *first*
+    socket.once("schedule_ready", ({ solution, text }) => {
+      const parsed = JSON.parse(solution);
+      setSolutionText(text);
+      setScheduleData(parsed);
+      ShowSwalAlert("success", "Schedule ready!");
+    });
+
+    // 4. Now enqueue the job
     try {
-      // 3. Enqueue the job
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/csp/generate-schedule`,
         {
@@ -119,29 +123,73 @@ export default function ManagerDashboard() {
           body: JSON.stringify({ socket_id: socket.id }),
         }
       );
-
       if (response.status === 202) {
-        ShowSwalAlert("success", "Schedule is being generated…");
-
-        // 4. Listen once for the real result
-        socket.on("schedule_ready", ({ solution, text }) => {
-          const parsedData = JSON.parse(solution);
-          setSolutionText(text);
-          setScheduleData(parsedData);
-          ShowSwalAlert("success", "Schedule Generated!");
-        });
+        // in prod we just wait for the socket event
+        return;
+      }
+      // *** in dev, if you ever choose to return 200+payload, you can handle it here ***
+      if (response.status === 200) {
+        const result = await response.json();
+        const parsed = JSON.parse(result.solution);
+        setSolutionText(result.text);
+        setScheduleData(parsed);
+        ShowSwalAlert("success", "Schedule ready!");
       } else {
         const err = await response.json();
-        ShowSwalAlert("error", err.error || "Failed to queue schedule");
+        ShowSwalAlert("error", err.error || "Queue error");
       }
-    } catch (error) {
-      ShowSwalAlert(
-        "error",
-        "Failed to generate schedule. Please try again later."
-      );
-      console.error("Error queuing schedule:", error);
+    } catch (e) {
+      ShowSwalAlert("error", "Network error");
+      console.error(e);
     }
   };
+
+  // const handleGeneratedSchedule = async () => {
+  //   // 1. Get your socket
+  //   const socket = initiateSocketConnection();
+
+  //   // 2. Wait for it to actually connect, if not already
+  //   if (!socket.connected) {
+  //     await new Promise<void>((resolve) => {
+  //       socket.once("connect", () => {
+  //         resolve();
+  //       });
+  //     });
+  //   }
+
+  //   try {
+  //     // 3. Enqueue the job
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_BASE_URL}/csp/generate-schedule`,
+  //       {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ socket_id: socket.id }),
+  //       }
+  //     );
+
+  //     if (response.status === 202) {
+  //       ShowSwalAlert("success", "Schedule is being generated…");
+
+  //       // 4. Listen once for the real result
+  //       socket.on("schedule_ready", ({ solution, text }) => {
+  //         const parsedData = JSON.parse(solution);
+  //         setSolutionText(text);
+  //         setScheduleData(parsedData);
+  //         ShowSwalAlert("success", "Schedule Generated!");
+  //       });
+  //     } else {
+  //       const err = await response.json();
+  //       ShowSwalAlert("error", err.error || "Failed to queue schedule");
+  //     }
+  //   } catch (error) {
+  //     ShowSwalAlert(
+  //       "error",
+  //       "Failed to generate schedule. Please try again later."
+  //     );
+  //     console.error("Error queuing schedule:", error);
+  //   }
+  // };
 
   return (
     <div className="relative p-4 h-full flex flex-col">
