@@ -12,7 +12,7 @@ const InfoButton: React.FC<InfoButtonProps> = ({ infoText }) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipStyle, setTooltipStyle] = useState<CSSProperties>({});
 
-  // Close tooltip when clicking outside
+  //    Close tooltip when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
