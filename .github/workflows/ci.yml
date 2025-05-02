@@ -8,6 +8,7 @@ on:
   pull_request: # protect the production (main) branch with PR checks
     branches:
       - main
+      - development
 
 jobs:
   build_and_test:
@@ -49,6 +50,7 @@ jobs:
           source venv/bin/activate
           python backend/run.py &
         env:
+          FLASK_ENV: testing
           MONGO_URI: ${{ secrets.MONGO_URI }} # ← real DB in CI
           CI: "true"
 
