@@ -668,19 +668,19 @@ export default function ManagerSettingsPage() {
     return <Loading />;
   }
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 bg-gray-50 min-h-screen">
-      <div className="mb-10 text-center">
-        <h1 className="text-4xl font-bold text-indigo-700 tracking-tight mb-2">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-blue-700 mb-2">
           Manager Settings
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 font-medium">
           Last updated by {firstName} {lastName}
         </p>
       </div>
 
       {/* General Settings Card */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
           <h2 className="text-xl font-semibold text-white">General Settings</h2>
         </div>
         <div className="p-6">
@@ -704,7 +704,7 @@ export default function ManagerSettingsPage() {
                 onChange={(e) =>
                   setMaxConsecutiveShifts(Number(e.target.value))
                 }
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm transition-all duration-200"
               />
             </div>
 
@@ -716,7 +716,7 @@ export default function ManagerSettingsPage() {
                 type="number"
                 value={requiredShifts}
                 onChange={(e) => setrequiredShifts(Number(e.target.value))}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm transition-all duration-200"
               />
             </div>
 
@@ -728,100 +728,110 @@ export default function ManagerSettingsPage() {
                 type="number"
                 value={maxEmployees}
                 onChange={(e) => setMaxEmployees(Number(e.target.value))}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm transition-all duration-200"
               />
             </div>
           </div>
 
           {/* Submission Settings */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Submission Start:
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700 flex items-center">
+                Submission Start Time
               </label>
-              <div className="flex items-center space-x-2">
-                <select
-                  value={submissionStartDay}
-                  onChange={(e) => setSubmissionStartDay(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
-                >
-                  {daysOfWeek.map((day) => (
-                    <option key={day} value={day}>
-                      {day}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={submissionStartHour}
-                  onChange={(e) =>
-                    setSubmissionStartHour(Number(e.target.value))
-                  }
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
-                >
-                  {hours.map((h) => (
-                    <option key={h} value={h}>
-                      {h.toString().padStart(2, "0")}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-gray-500">:</span>
-                <select
-                  value={submissionStartMinute}
-                  onChange={(e) =>
-                    setSubmissionStartMinute(Number(e.target.value))
-                  }
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
-                >
-                  {minutes.map((m) => (
-                    <option key={m} value={m}>
-                      {m.toString().padStart(2, "0")}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="w-full sm:w-auto overflow-x-auto">
+                  <select
+                    value={submissionStartDay}
+                    onChange={(e) => setSubmissionStartDay(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700 bg-white transition-all duration-200 w-full"
+                  >
+                    {daysOfWeek.map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center w-full sm:w-auto">
+                  <select
+                    value={submissionStartHour}
+                    onChange={(e) =>
+                      setSubmissionStartHour(Number(e.target.value))
+                    }
+                    className="w-24 min-w-[6rem] px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700 bg-white transition-all duration-200"
+                  >
+                    {hours.map((h) => (
+                      <option key={h} value={h}>
+                        {h.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-gray-500 px-1">:</span>
+                  <select
+                    value={submissionStartMinute}
+                    onChange={(e) =>
+                      setSubmissionStartMinute(Number(e.target.value))
+                    }
+                    className="w-24 min-w-[6rem] px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700 bg-white transition-all duration-200"
+                  >
+                    {minutes.map((m) => (
+                      <option key={m} value={m}>
+                        {m.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Submission End:
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700 flex items-center">
+                Submission End Time
               </label>
-              <div className="flex items-center space-x-2">
-                <select
-                  value={submissionEndDay}
-                  onChange={(e) => setSubmissionEndDay(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
-                >
-                  {daysOfWeek.map((day) => (
-                    <option key={day} value={day}>
-                      {day}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={submissionEndHour}
-                  onChange={(e) => setSubmissionEndHour(Number(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
-                >
-                  {hours.map((h) => (
-                    <option key={h} value={h}>
-                      {h.toString().padStart(2, "0")}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-gray-500">:</span>
-                <select
-                  value={submissionEndMinute}
-                  onChange={(e) =>
-                    setSubmissionEndMinute(Number(e.target.value))
-                  }
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm"
-                >
-                  {minutes.map((m) => (
-                    <option key={m} value={m}>
-                      {m.toString().padStart(2, "0")}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="w-full sm:w-auto overflow-x-auto">
+                  <select
+                    value={submissionEndDay}
+                    onChange={(e) => setSubmissionEndDay(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700 bg-white transition-all duration-200 w-full"
+                  >
+                    {daysOfWeek.map((day) => (
+                      <option key={day} value={day}>
+                        {day}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center w-full sm:w-auto">
+                  <select
+                    value={submissionEndHour}
+                    onChange={(e) =>
+                      setSubmissionEndHour(Number(e.target.value))
+                    }
+                    className="w-24 min-w-[6rem] px-3 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700 bg-white transition-all duration-200"
+                  >
+                    {hours.map((h) => (
+                      <option key={h} value={h}>
+                        {h.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-gray-500 px-1">:</span>
+                  <select
+                    value={submissionEndMinute}
+                    onChange={(e) =>
+                      setSubmissionEndMinute(Number(e.target.value))
+                    }
+                    className="w-24 min-w-[6rem] px-3 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-gray-700 bg-white transition-all duration-200"
+                  >
+                    {minutes.map((m) => (
+                      <option key={m} value={m}>
+                        {m.toString().padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -829,62 +839,71 @@ export default function ManagerSettingsPage() {
       </div>
 
       {/* Working Days Card */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
           <h2 className="text-xl font-semibold text-white">Working Days</h2>
         </div>
         <div className="p-6">
-          <p className="mb-4 text-sm text-gray-700">
-            Selected: {selectedDays.length ? selectedDays.join(", ") : "None"}
-          </p>
-          <details className="border border-gray-200 rounded-lg">
-            <summary className="p-4 bg-indigo-100 text-indigo-700 font-medium cursor-pointer hover:bg-indigo-200 transition-colors rounded-t-lg">
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+            <p className="text-sm text-blue-800 font-medium">
+              Working days:{" "}
+              {selectedDays.length ? selectedDays.join(", ") : "None"}
+            </p>
+          </div>
+          <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <div className="p-4 bg-gray-50 text-blue-700 font-medium border-b border-gray-200">
               Select Working Days
-            </summary>
-            <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white rounded-b-lg">
+            </div>
+            <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white">
               {weekDays.map((day) => (
                 <label
                   key={day}
-                  className="flex items-center gap-3 cursor-pointer"
+                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-md transition-colors"
                 >
                   <input
                     type="checkbox"
                     checked={selectedDays.includes(day)}
                     onChange={() => toggleDay(day)}
-                    className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                    className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <span className="text-gray-700">{day}</span>
                 </label>
               ))}
             </div>
-          </details>
+          </div>
         </div>
       </div>
 
       {/* Shift Types Card */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
           <h2 className="text-xl font-semibold text-white">Shift Types</h2>
         </div>
         <div className="p-6">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
+          <div
+            className="overflow-x-auto"
+            style={{ minWidth: "100%", WebkitOverflowScrolling: "touch" }}
+          >
+            <table className="w-full table-fixed divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-1/2 md:w-2/5">
                     Name
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-2/5">
                     Color
                   </th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider w-24">
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-1/10">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {shiftTypes.map((shift) => (
-                  <tr key={shift.id} className="hover:bg-gray-50">
+                  <tr
+                    key={shift.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-4 py-3">
                       <input
                         type="text"
@@ -892,21 +911,22 @@ export default function ManagerSettingsPage() {
                         onChange={(e) =>
                           updateShiftType(shift.id, "name", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm text-sm transition-all duration-200"
+                        placeholder="Shift name"
                       />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-3">
                         <div
                           style={{ backgroundColor: shift.color }}
-                          className="w-6 h-6 rounded-md shadow-inner border border-gray-200"
+                          className="w-6 h-6 rounded-md shadow-inner border border-gray-200 flex-shrink-0"
                         ></div>
                         <select
                           value={shift.color}
                           onChange={(e) =>
                             updateShiftType(shift.id, "color", e.target.value)
                           }
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block shadow-sm sm:text-sm"
+                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block shadow-sm text-sm w-full transition-all duration-200 text-ellipsis whitespace-nowrap"
                         >
                           {colorOptions.map((option) => (
                             <option key={option.value} value={option.value}>
@@ -919,7 +939,8 @@ export default function ManagerSettingsPage() {
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => deleteShiftType(shift.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
+                        className="text-red-500 hover:text-red-700 transition-colors p-2 rounded-full hover:bg-red-50"
+                        title="Delete shift type"
                       >
                         <GoTrash className="w-5 h-5" />
                       </button>
@@ -931,7 +952,7 @@ export default function ManagerSettingsPage() {
           </div>
           <button
             onClick={addShiftType}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
           >
             Add Shift Type
           </button>
@@ -939,29 +960,35 @@ export default function ManagerSettingsPage() {
       </div>
 
       {/* Role Types Card */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
           <h2 className="text-xl font-semibold text-white">Role Types</h2>
         </div>
         <div className="p-6">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
+          <div
+            className="overflow-x-auto"
+            style={{ minWidth: "100%", WebkitOverflowScrolling: "touch" }}
+          >
+            <table className="w-full table-fixed divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-3/5">
                     Name
                   </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-1/4">
                     Importance
                   </th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider w-24">
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-1/10">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {roleTypes.map((role) => (
-                  <tr key={role.id} className="hover:bg-gray-50">
+                  <tr
+                    key={role.id}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
                     <td className="px-4 py-3">
                       <input
                         type="text"
@@ -969,7 +996,8 @@ export default function ManagerSettingsPage() {
                         onChange={(e) =>
                           updateRoleType(role.id, "name", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
+                        placeholder="Role name"
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm text-sm transition-all duration-200"
                       />
                     </td>
                     <td className="px-4 py-3">
@@ -983,13 +1011,16 @@ export default function ManagerSettingsPage() {
                             Number(e.target.value)
                           )
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
+                        min="1"
+                        max="10"
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm text-sm transition-all duration-200"
                       />
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => deleteRoleType(role.id)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
+                        className="text-red-500 hover:text-red-700 transition-colors p-2 rounded-full hover:bg-red-50"
+                        title="Delete role type"
                       >
                         <GoTrash className="w-5 h-5" />
                       </button>
@@ -1001,7 +1032,7 @@ export default function ManagerSettingsPage() {
           </div>
           <button
             onClick={addRoleType}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
           >
             Add Role Type
           </button>
@@ -1009,109 +1040,129 @@ export default function ManagerSettingsPage() {
       </div>
 
       {/* Roles per Shift Card */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
           <h2 className="text-xl font-semibold text-white">Roles per Shift</h2>
         </div>
-        <div className="p-6 space-y-8">
+        <div className="p-6 space-y-6">
           {shiftTypes.map((shift) => (
             <div
               key={shift.id}
-              className="border border-gray-200 rounded-lg overflow-hidden shadow-sm"
+              className="border border-gray-200 rounded-lg overflow-hidden shadow-sm transition-all hover:shadow-md"
             >
-              <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-800">
-                  {shift.name} Roles
+              <div
+                className="px-4 py-3 border-b border-gray-200"
+                style={{ backgroundColor: shift.color + "40" }} // Add transparency to the color
+              >
+                <h3 className="text-base font-medium text-gray-800 flex items-center">
+                  <div
+                    className="w-3 h-3 rounded-full mr-2"
+                    style={{ backgroundColor: shift.color }}
+                  ></div>
+                  {shift.name || "Unnamed Shift"} Roles
                 </h3>
               </div>
               <div className="p-4">
-                {/* This wrapper ensures the table will scroll horizontally on small screens */}
-                <div className="overflow-x-auto sm:overflow-visible md:overflow-visible lg:overflow-visible shadow rounded-lg">
-                  <div className="min-w-full inline-block align-middle">
-                    <div className="overflow-hidden">
-                      <table className="min-w-full divide-y divide-gray-200 border border-gray-200 table-fixed sm:table-auto">
-                        <thead>
-                          <tr className="bg-gray-50">
-                            <th
-                              scope="col"
-                              className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-40 sm:w-auto"
+                <div
+                  className="overflow-x-auto"
+                  style={{ minWidth: "100%", WebkitOverflowScrolling: "touch" }}
+                >
+                  <table className="w-full table-fixed divide-y divide-gray-200">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th
+                          scope="col"
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-2/5"
+                        >
+                          Role
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-2/5"
+                        >
+                          Required Workers
+                        </th>
+                        <th
+                          scope="col"
+                          className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-1/5"
+                        >
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {(rolesPerShift[shift.name] || []).map((req, idx) => (
+                        <tr
+                          key={idx}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
+                          <td className="px-4 py-3">
+                            <select
+                              value={req.role}
+                              onChange={(e) =>
+                                updateRoleRequirement(
+                                  shift.name,
+                                  idx,
+                                  "role",
+                                  e.target.value
+                                )
+                              }
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm text-sm transition-all duration-200 text-ellipsis"
                             >
-                              Role
-                            </th>
-                            <th
-                              scope="col"
-                              className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-40 sm:w-auto"
+                              <option value="">Select Role</option>
+                              {roleTypes.map((role) => (
+                                <option key={role.id} value={role.name}>
+                                  {role.name}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                          <td className="px-4 py-3">
+                            <input
+                              type="number"
+                              value={req.required}
+                              min="1"
+                              onChange={(e) =>
+                                updateRoleRequirement(
+                                  shift.name,
+                                  idx,
+                                  "required",
+                                  Number(e.target.value)
+                                )
+                              }
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm text-sm transition-all duration-200"
+                            />
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <button
+                              onClick={() =>
+                                deleteRoleRequirement(shift.name, idx)
+                              }
+                              className="text-red-500 hover:text-red-700 transition-colors p-2 rounded-full hover:bg-red-50"
+                              title="Delete requirement"
                             >
-                              Required Workers
-                            </th>
-                            <th
-                              scope="col"
-                              className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-24 sm:w-auto"
-                            >
-                              Actions
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {(rolesPerShift[shift.name] || []).map((req, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-4 py-3">
-                                <select
-                                  value={req.role}
-                                  onChange={(e) =>
-                                    updateRoleRequirement(
-                                      shift.name,
-                                      idx,
-                                      "role",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
-                                >
-                                  <option value="">Select Role</option>
-                                  {roleTypes.map((role) => (
-                                    <option key={role.id} value={role.name}>
-                                      {role.name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </td>
-                              <td className="px-4 py-3">
-                                <input
-                                  type="number"
-                                  value={req.required}
-                                  onChange={(e) =>
-                                    updateRoleRequirement(
-                                      shift.name,
-                                      idx,
-                                      "required",
-                                      Number(e.target.value)
-                                    )
-                                  }
-                                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm"
-                                />
-                              </td>
-                              <td className="px-4 py-3 text-center">
-                                <button
-                                  onClick={() =>
-                                    deleteRoleRequirement(shift.name, idx)
-                                  }
-                                  className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
-                                >
-                                  <GoTrash className="w-5 h-5" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                              <GoTrash className="w-5 h-5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {(rolesPerShift[shift.name] || []).length === 0 && (
+                        <tr>
+                          <td
+                            colSpan={3}
+                            className="px-4 py-3 text-center text-sm text-gray-500"
+                          >
+                            No roles assigned to this shift
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
                 <div className="mt-4">
                   <button
                     onClick={() => addRoleRequirement(shift.name)}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
                   >
                     Add Role Requirement
                   </button>
@@ -1121,88 +1172,119 @@ export default function ManagerSettingsPage() {
           ))}
         </div>
       </div>
-
       {/* Employee Management Card */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 border border-gray-100">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
           <h2 className="text-xl font-semibold text-white">
             Employee Management
           </h2>
         </div>
         <div className="p-6">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm mb-6">
-              <thead>
-                <tr className="bg-gray-50">
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider w-48">
-                    Name
-                  </th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 uppercase tracking-wider">
-                    Roles
-                  </th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider w-24">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {employees.map((emp) => (
-                  <tr key={emp.uid} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {emp.name}
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <select
-                          defaultValue=""
-                          onChange={(e) => {
-                            addEmployeeRole(emp.uid, e.target.value);
-                            e.target.selectedIndex = 0;
-                          }}
-                          className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm sm:text-sm"
-                        >
-                          <option value="">Add Role</option>
-                          {roleTypes
-                            .filter((rt) => !emp.roles.includes(rt.name))
-                            .map((rt) => (
-                              <option key={rt.id} value={rt.name}>
-                                {rt.name}
-                              </option>
-                            ))}
-                        </select>
-
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {emp.roles.map((role, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm"
-                            >
-                              <span>{role}</span>
-                              <button
-                                onClick={() =>
-                                  removeEmployeeRole(emp.uid, role)
-                                }
-                                className="ml-2 text-indigo-400 hover:text-indigo-600"
-                              >
-                                &times;
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 text-center">
-                      <button
-                        onClick={() => deleteEmployee(emp.uid)}
-                        className="text-red-500 hover:text-red-700 transition-colors p-1 rounded-full hover:bg-red-50"
-                      >
-                        <GoTrash className="w-5 h-5" />
-                      </button>
-                    </td>
+          <div
+            className="overflow-x-auto"
+            style={{ minWidth: "100%", WebkitOverflowScrolling: "touch" }}
+          >
+            <div
+              style={{ maxHeight: "400px", overflowY: "auto" }}
+              className="border border-gray-200 rounded-lg shadow-sm"
+            >
+              <table className="w-full table-fixed divide-y divide-gray-200">
+                <thead className="bg-gray-50 sticky top-0 z-10">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-1/4">
+                      Name
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider w-3/5">
+                      Roles
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider w-1/10">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {employees.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={3}
+                        className="px-6 py-4 text-center text-sm text-gray-500"
+                      >
+                        No employees found
+                      </td>
+                    </tr>
+                  ) : (
+                    employees.map((emp) => (
+                      <tr
+                        key={emp.uid}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {emp.name}
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex flex-col gap-2">
+                            <select
+                              defaultValue=""
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  addEmployeeRole(emp.uid, e.target.value);
+                                  e.target.selectedIndex = 0;
+                                }
+                              }}
+                              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm text-sm w-full md:w-auto transition-all duration-200 text-ellipsis"
+                            >
+                              <option value="">Add Role</option>
+                              {roleTypes
+                                .filter((rt) => !emp.roles.includes(rt.name))
+                                .map((rt) => (
+                                  <option key={rt.id} value={rt.name}>
+                                    {rt.name}
+                                  </option>
+                                ))}
+                            </select>
+
+                            <div className="flex flex-wrap gap-2">
+                              {emp.roles.length === 0 ? (
+                                <span className="text-sm text-gray-500 italic">
+                                  No roles assigned
+                                </span>
+                              ) : (
+                                emp.roles.map((role, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm"
+                                  >
+                                    <span>{role}</span>
+                                    <button
+                                      onClick={() =>
+                                        removeEmployeeRole(emp.uid, role)
+                                      }
+                                      className="ml-2 text-blue-400 hover:text-blue-600 transition-colors"
+                                      aria-label={`Remove ${role} role`}
+                                    >
+                                      &times;
+                                    </button>
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 text-center">
+                          <button
+                            onClick={() => deleteEmployee(emp.uid)}
+                            className="text-red-500 hover:text-red-700 transition-colors p-2 rounded-full hover:bg-red-50"
+                            title="Remove employee"
+                          >
+                            <GoTrash className="w-5 h-5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
           <div className="mt-4">
             <SignupButton />
@@ -1211,10 +1293,10 @@ export default function ManagerSettingsPage() {
       </div>
 
       {/* Save Settings Button */}
-      <div className="text-center mt-10">
+      <div className="text-center mt-8 mb-10">
         <button
           onClick={saveSettings}
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
+          className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 active:scale-95"
         >
           Save Settings
         </button>

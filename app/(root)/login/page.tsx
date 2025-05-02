@@ -74,102 +74,131 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen bg-none  px-4">
+    <main className="flex items-center justify-center min-h-screen  px-4 sm:px-6">
       {loginLoading && <Loading />}
 
-      {/* Container for both sections */}
-      <div className="flex flex-col lg:flex-row items-center justify-center w-full max-w-4xl">
-        {/* Left Section - Image */}
-        <div
-          className="w-full lg:w-1/2 h-[300px] lg:h-[550px] flex items-center justify-center bg-cover bg-bottom rounded-l-lg shadow-lg"
-          style={{ backgroundImage: "url('/leftside2.jpg')" }}
-        >
-          {/* Optional content inside the div */}
-        </div>
+      <div className="w-full  max-w-md relative">
+        <div className=" rounded-2xl bg-[#f9fafb]  shadow-2xl overflow-hidden p-8 sm:p-10 border border-gray-100">
+          <div className="flex justify-center mb-8">
+            <Image
+              src="/logo.png"
+              alt="logo"
+              width={180}
+              height={80}
+              className="h-auto"
+              priority
+            />
+          </div>
 
-        {/* Right Section - Login */}
-        <div className="w-full lg:w-1/2 h-auto lg:h-[550px] flex flex-col items-center justify-center bg-white/8 backdrop-blur-md rounded-r-lg shadow-lg p-6">
-          <Image
-            src="/logo.png"
-            alt="logo"
-            width={200}
-            height={100}
-            className="mb-6"
-          />
-          {loginError && <p className="text-red-500 mb-4">{loginError}</p>}
-          <form
-            className="flex flex-col space-y-4 w-full"
-            onSubmit={handleLogin}
-          >
-            <div className="space-y-4 w-full">
-              {/* Email Input */}
+          {loginError && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-6 rounded">
+              <p className="text-red-500 text-sm">{loginError}</p>
+            </div>
+          )}
+
+          <form className="space-y-5" onSubmit={handleLogin}>
+            <div className="relative">
               <input
+                id="email"
                 type="email"
-                placeholder="Enter your email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                className="block w-full px-4 py-4 bg-[#F3F6FA] border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#014DAE] focus:border-[#014DAE] peer placeholder-transparent transition-all duration-200"
+                placeholder="Email Address"
                 required
               />
+              <label
+                htmlFor="email"
+                className="absolute text-xs font-medium text-gray-500 duration-150 transform -translate-y-3 bg-[#f9fafb] px-1 left-3 top-0 z-10 origin-[0] peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-placeholder-shown:bg-transparent peer-focus:top-0 peer-focus:-translate-y-3 peer-focus:text-[#014DAE] peer-focus:text-xs peer-focus:bg-[#f9fafb] peer-focus:px-1 peer-focus:font-medium peer-focus:z-10"
+              >
+                Email Address
+              </label>
+            </div>
 
-              {/* Password Input */}
+            <div className="relative">
               <input
+                id="password"
                 type="password"
-                placeholder="Enter your password"
                 value={loginPassword}
                 onChange={(e) => setLoginPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent"
+                className="block w-full px-4 py-4 bg-[#F3F6FA] border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#014DAE] focus:border-[#014DAE] peer placeholder-transparent transition-all duration-200"
+                placeholder="Password"
                 required
               />
-
-              {/* Forgot Password Link */}
+              <label
+                htmlFor="password"
+                className="absolute text-xs font-medium text-gray-500 duration-150 transform -translate-y-3 bg-[#f9fafb] px-1 left-3 top-0 z-10 origin-[0] peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-placeholder-shown:bg-transparent peer-focus:top-0 peer-focus:-translate-y-3 peer-focus:text-[#014DAE] peer-focus:text-xs peer-focus:bg-[#f9fafb] peer-focus:px-1 peer-focus:font-medium peer-focus:z-10"
+              >
+                Password
+              </label>
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#014DAE] text-sm font-medium hover:text-[#012F70] transition-colors"
+                onClick={() => setShowModal(true)}
+              >
+                Forgot?
+              </button>
             </div>
+
             <button
               type="submit"
-              className={`px-6 py-3 text-white rounded-md font-bold ${
+              className={`w-full px-6 py-3.5 text-white rounded-lg font-bold text-base transition-all duration-200 ${
                 loginLoading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-[#014DAE] hover:bg-[#012F70]"
+                  : "bg-[#014DAE] hover:bg-[#012F70] shadow-md hover:shadow-lg"
               }`}
               disabled={loginLoading}
             >
-              {loginLoading ? "Logging in..." : "Sign in"}
+              {loginLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
-          <div className="text-right">
-            <button
-              className="text-[#014DAE] underline text-sm"
-              onClick={() => setShowModal(true)}
-            >
-              Forgot password?
-            </button>
-          </div>
         </div>
       </div>
-      {showModal && (
-        <div className="modal modal-open">
-          <div className="modal-box bg-[#F7FAFC]">
-            <h3 className="text-[#666666] font-sans font-bold text-lg">
-              Forgot Password
-            </h3>
-            {forgotMessage && (
-              <p className="text-green-500 mt-2">{forgotMessage}</p>
-            )}
-            {forgotError && <p className="text-red-500 mt-2">{forgotError}</p>}
 
-            <form onSubmit={handleForgotPassword} className="mt-4">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-[#F3F6FA] border border-gray-300 rounded-lg shadow-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#014DAE] focus:border-transparent mb-4"
-                required
-              />
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 sm:p-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              Reset Password
+            </h3>
+
+            {forgotMessage && (
+              <div className="bg-green-50 border-l-4 border-green-500 p-3 mb-6 rounded">
+                <p className="text-green-600 text-sm">{forgotMessage}</p>
+              </div>
+            )}
+
+            {forgotError && (
+              <div className="bg-red-50 border-l-4 border-red-500 p-3 mb-6 rounded">
+                <p className="text-red-500 text-sm">{forgotError}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleForgotPassword} className="space-y-4">
+              <div className="relative">
+                <input
+                  id="reset-email"
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  className="block w-full px-4 py-4 bg-[#F3F6FA] border border-gray-200 rounded-lg text-gray-700 focus:outline-none focus:ring-1 focus:ring-[#014DAE] focus:border-[#014DAE] peer placeholder-transparent transition-all duration-200"
+                  placeholder="Email Address"
+                  required
+                />
+                <label
+                  htmlFor="reset-email"
+                  className="absolute text-xs font-medium text-gray-500 duration-150 transform -translate-y-3 bg-[#f9fafb] px-1 left-3 top-0 z-10 origin-[0] peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-placeholder-shown:bg-transparent peer-focus:top-0 peer-focus:-translate-y-3 peer-focus:text-[#014DAE] peer-focus:text-xs peer-focus:bg-[#f9fafb] peer-focus:px-1 peer-focus:font-medium peer-focus:z-10"
+                >
+                  Email Address
+                </label>
+              </div>
+
               <button
                 type="submit"
-                className={`btn border-none  text-white text-bold w-full bg-[#014DAE] hover:bg-[#012F70] ${
-                  forgotLoading ? "loading" : ""
+                className={`w-full px-6 py-3 text-white font-bold rounded-lg transition-all duration-200 ${
+                  forgotLoading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-[#014DAE] hover:bg-[#012F70] shadow-md hover:shadow-lg"
                 }`}
                 disabled={forgotLoading}
               >
@@ -177,9 +206,9 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="modal-action">
+            <div className="mt-6 flex justify-end">
               <SecondaryButton
-                label="Close"
+                label="Cancel"
                 onClick={() => setShowModal(false)}
               />
             </div>

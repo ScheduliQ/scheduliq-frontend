@@ -8,6 +8,7 @@ import { auth } from "../../../config/firebase";
 import { useRole } from "../../../hooks/RoleContext";
 import { initiateSocketConnection } from "../../../hooks/socket"; // SOCKET: Import socket functions
 import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
+import { motion } from "framer-motion";
 
 export default function Navbar() {
   const router = useRouter();
@@ -158,14 +159,14 @@ export default function Navbar() {
           <div className="dropdown dropdown-end">
             <label
               tabIndex={0}
-              className="btn btn-ghost btn-circle"
+              className="btn btn-ghost btn-circle relative group"
               onClick={markNotificationsRead}
             >
               <div className="indicator">
                 {/* אייקון ההתראות */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
+                  className="h-6 w-6 group-hover:text-blue-500 transition-colors duration-200"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -179,33 +180,153 @@ export default function Navbar() {
                 </svg>
 
                 {unreadCount > 0 && (
-                  <span className="absolute top-0.5 right-0.5 translate-x-1/2 -translate-y-1/2 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-600 rounded-full shadow-md">
-                    {unreadCount}
+                  <span className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="inline-flex items-center justify-center min-w-4 h-4 px-1 text-xs font-bold text-white bg-red-500 rounded-full shadow-lg">
+                      {unreadCount}
+                    </span>
                   </span>
                 )}
               </div>
             </label>
             <div
               tabIndex={0}
-              className="mt-3 card card-compact dropdown-content w-72 bg-[#F7FAFC] backdrop-blur-md shadow-md"
+              className="dropdown-content mt-3 w-80 overflow-hidden z-50 rounded-xl shadow-2xl border border-gray-100"
             >
-              <div className="card-body">
-                <span className="font-bold text-lg">Notifications</span>
-                <ul>
-                  {notifications.length > 0 ? (
-                    notifications.map((notif: any) => (
-                      <li
-                        key={notif._id}
-                        className="py-1 border-b border-gray-200"
+              <div className="bg-white backdrop-blur-md">
+                <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3 text-white">
+                  <h3 className="font-semibold flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-2"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                      />
+                    </svg>
+                    Notifications {unreadCount > 0 && `(${unreadCount})`}
+                  </h3>
+                  {notifications.length > 0 && (
+                    <button
+                      className="text-xs hover:text-blue-100 transition-colors flex items-center"
+                      onClick={markNotificationsRead}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                       >
-                        <p className="text-md">{notif.message}</p>
-                        <p className="text-sm">{notif.data}</p>
-                      </li>
-                    ))
-                  ) : (
-                    <li className="py-1 text-sm">Empty</li>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Mark all as read
+                    </button>
                   )}
-                </ul>
+                </div>
+
+                <div
+                  className={`max-h-[320px] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent`}
+                >
+                  {notifications.length > 0 ? (
+                    <ul className="divide-y divide-gray-100">
+                      {notifications.map((notif: any, index) => (
+                        <motion.li
+                          key={notif._id}
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2, delay: index * 0.05 }}
+                          className="hover:bg-blue-50 transition-colors duration-150"
+                        >
+                          <div className="p-4">
+                            <div className="flex items-start">
+                              <div className="flex-shrink-0 mr-3">
+                                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 text-blue-500"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
+                                  </svg>
+                                </div>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-gray-800">
+                                  {notif.message}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  {notif.data}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-6 text-center text-gray-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-12 w-12 text-gray-300 mb-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                          d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                        />
+                      </svg>
+                      <p className="text-sm">No notifications yet</p>
+                    </div>
+                  )}
+                </div>
+
+                {notifications.length > 0 && (
+                  <div className="p-3 border-t border-gray-100 bg-gray-50">
+                    <button
+                      className="text-xs text-blue-500 hover:text-blue-700 transition-colors flex items-center justify-center w-full"
+                      onClick={() => router.push("/dashboard/notifications")}
+                    >
+                      View all notifications
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-3 w-3 ml-1"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
