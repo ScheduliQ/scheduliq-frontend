@@ -17,6 +17,7 @@ export default function Navbar() {
     _id: string;
     message: string;
     data: string;
+    read?: boolean;
   }
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -25,6 +26,8 @@ export default function Navbar() {
   const [userData, setUserData] = useState<any>(null);
   const socketRef = useRef<Socket | null>(null);
   const userId = uid;
+  const [notificationDropdownOpen, setNotificationDropdownOpen] =
+    useState(false);
   // const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
@@ -37,7 +40,14 @@ export default function Navbar() {
         );
         if (!response.ok) throw new Error("Failed to fetch notifications");
         const data = await response.json();
-        setNotifications(data.notifications);
+        // Mark notifications with read status based on server data
+        const processedNotifications = data.notifications.map(
+          (notification: Notification, index: number) => ({
+            ...notification,
+            read: index >= data.unread_count, // Mark only notifications beyond unread_count as read
+          })
+        );
+        setNotifications(processedNotifications);
         setUnreadCount(data.unread_count);
         // console.log("Unread Count:", data.unread_count);
       } catch (error) {
@@ -75,7 +85,10 @@ export default function Navbar() {
       console.log("Socket connection established");
       const handleNewNotification = (payload: any) => {
         // payload יכול להכיל את ההתראה החדשה וגם את הספירה המעודכנת (אם השרת שולח unread_count)
-        setNotifications((prev) => [payload.notification, ...prev]);
+        setNotifications((prev) => [
+          { ...payload.notification, read: false }, // Explicitly mark new notifications as unread
+          ...prev,
+        ]);
         if (payload.unread_count !== undefined) {
           setUnreadCount(payload.unread_count);
         } else {
@@ -105,9 +118,34 @@ export default function Navbar() {
       if (!response.ok) throw new Error("Failed to mark notifications as read");
       await response.json();
       setUnreadCount(0);
+
+      // We no longer mark notifications as read in the UI here
+      // This only clears the server-side count
     } catch (error) {
       console.error("Error marking notifications as read:", error);
     }
+  };
+
+  // Set a notification as read on hover
+  const handleNotificationHover = (id: string) => {
+    setNotifications((prevNotifications) =>
+      prevNotifications.map((notification) =>
+        notification._id === id ? { ...notification, read: true } : notification
+      )
+    );
+  };
+
+  // Set all notifications as read when closing the dropdown
+  const handleDropdownClose = () => {
+    if (notificationDropdownOpen) {
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) => ({
+          ...notification,
+          read: true,
+        }))
+      );
+    }
+    setNotificationDropdownOpen(false);
   };
 
   const handleSignOut = async () => {
@@ -160,7 +198,11 @@ export default function Navbar() {
             <label
               tabIndex={0}
               className="btn btn-ghost btn-circle relative group"
-              onClick={markNotificationsRead}
+              onClick={() => {
+                markNotificationsRead(); // This only clears the unread count on server
+                setNotificationDropdownOpen(true);
+                // We don't mark notifications as read visually here
+              }}
             >
               <div className="indicator">
                 {/* אייקון ההתראות */}
@@ -180,9 +222,9 @@ export default function Navbar() {
                 </svg>
                 {/* ספירת ההתראות שאינן נקראות */}
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 h-4 w-4 flex items-center justify-center">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span className="inline-flex items-center justify-center min-w-4 h-4 px-1 text-xs font-bold text-white bg-red-500 rounded-full shadow-lg">
+                  <span className="absolute -top-1 -right-1 flex items-center justify-center">
+                    <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-red-400 opacity-75"></span>
+                    <span className="inline-flex items-center justify-center min-w-3 h-3 px-1 text-[10px] font-bold text-white bg-red-500 rounded-full shadow-sm">
                       {unreadCount}
                     </span>
                   </span>
@@ -192,6 +234,7 @@ export default function Navbar() {
             <div
               tabIndex={0}
               className="dropdown-content mt-3 w-80 overflow-hidden z-50 rounded-xl shadow-2xl border border-gray-100"
+              onBlur={handleDropdownClose}
             >
               <div className="bg-white backdrop-blur-md">
                 <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3 text-white">
@@ -212,28 +255,6 @@ export default function Navbar() {
                     </svg>
                     Notifications {unreadCount > 0 && `(${unreadCount})`}
                   </h3>
-                  {notifications.length > 0 && (
-                    <button
-                      className="text-xs hover:text-blue-100 transition-colors flex items-center"
-                      onClick={markNotificationsRead}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 mr-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                      Mark all as read
-                    </button>
-                  )}
                 </div>
 
                 <div
@@ -248,6 +269,9 @@ export default function Navbar() {
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.2, delay: index * 0.05 }}
                           className="hover:bg-blue-50 transition-colors duration-150"
+                          onMouseEnter={() =>
+                            handleNotificationHover(notif._id)
+                          }
                         >
                           <div className="p-4">
                             <div className="flex items-start">
@@ -270,7 +294,11 @@ export default function Navbar() {
                                 </div>
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-gray-800">
+                                <p
+                                  className={`text-sm ${
+                                    !notif.read ? "font-bold" : "font-medium"
+                                  } text-gray-800`}
+                                >
                                   {notif.message}
                                 </p>
                                 <p className="text-xs text-gray-500 mt-1">
@@ -302,31 +330,6 @@ export default function Navbar() {
                     </div>
                   )}
                 </div>
-
-                {notifications.length > 0 && (
-                  <div className="p-3 border-t border-gray-100 bg-gray-50">
-                    <button
-                      className="text-xs text-blue-500 hover:text-blue-700 transition-colors flex items-center justify-center w-full"
-                      onClick={() => router.push("/dashboard/notifications")}
-                    >
-                      View all notifications
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-3 w-3 ml-1"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
