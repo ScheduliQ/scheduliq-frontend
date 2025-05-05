@@ -183,22 +183,16 @@ export default function Navbar() {
   // }
 
   return (
-    <div className="relative bg-white z-10 shadow-lg w-full overflow-hidden">
-      <div className="flex justify-between items-center px-2 sm:px-4 md:px-6 py-2">
+    <div className="relative bg-white z-10  shadow-lg    w-full ">
+      <div className="flex justify-between items-center px-6 py-2">
         <div className="flex items-center">
           <Link href="/dashboard">
-            <Image
-              src="/logo.png"
-              alt="logo"
-              width={120}
-              height={48}
-              className="w-24 sm:w-32 md:w-[150px]"
-            />
+            <Image src="/logo.png" alt="logo" width={150} height={60} />
           </Link>
         </div>
 
         {/* פעולות */}
-        <div className="flex items-center space-x-2 sm:space-x-4">
+        <div className="flex items-center space-x-4">
           {/* Dropdown התראות */}
           <div className="dropdown dropdown-end">
             <label
@@ -214,7 +208,7 @@ export default function Navbar() {
                 {/* אייקון ההתראות */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 sm:h-6 sm:w-6 group-hover:text-blue-500 transition-colors duration-200"
+                  className="h-6 w-6 group-hover:text-blue-500 transition-colors duration-200"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -239,7 +233,7 @@ export default function Navbar() {
             </label>
             <div
               tabIndex={0}
-              className="dropdown-content mt-3 w-64 sm:w-80 overflow-hidden z-50 rounded-xl shadow-2xl border border-gray-100"
+              className="dropdown-content mt-3 w-80 overflow-hidden z-50 rounded-xl shadow-2xl border border-gray-100"
               onBlur={handleDropdownClose}
             >
               <div className="bg-white backdrop-blur-md">
