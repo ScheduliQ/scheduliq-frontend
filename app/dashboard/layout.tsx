@@ -3,7 +3,6 @@ import { usePathname } from "next/navigation";
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import DynamicBackground from "../components/DynamicBackground";
 import ProtectedRoute from "../components/ProtectedRoute";
 
 import React from "react";
@@ -20,8 +19,7 @@ export default function Layout({
     pathname.startsWith("/dashboard/terms")
   ) {
     return (
-      <div className="relative min-h-screen w-full overflow-x-hidden">
-        <DynamicBackground /> {/* רקע דינמי */}
+      <div className="relative min-h-screen w-full overflow-x-hidden bg-[#f9fafb]">
         <div className="relative z-50 flex items-center justify-center w-full">
           <Navbar />
         </div>
@@ -33,8 +31,7 @@ export default function Layout({
     );
   } else if (pathname.startsWith("/dashboard/manager/manager-settings")) {
     return (
-      <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
-        <DynamicBackground />
+      <div className="min-h-screen flex flex-col w-full overflow-x-hidden bg-[#f9fafb]">
         {/* Navbar */}
         <div className="relative z-50 flex items-center justify-center w-full">
           <Navbar />
@@ -49,9 +46,7 @@ export default function Layout({
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen box-border w-full overflow-x-hidden">
-        <DynamicBackground />
-
+      <div className="min-h-screen box-border w-full overflow-x-hidden bg-[#f9fafb]">
         <div className="flex flex-col gap-4 sm:gap-6 md:gap-8 w-full">
           {/* Header */}
           <header className="rounded-3xl shadow-md w-full">
