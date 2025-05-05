@@ -20,50 +20,56 @@ export default function Layout({
     pathname.startsWith("/dashboard/terms")
   ) {
     return (
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen w-full overflow-x-hidden">
         <DynamicBackground /> {/* רקע דינמי */}
-        <div className="relative z-50   flex items-center justify-center ">
+        <div className="relative z-50 flex items-center justify-center w-full">
           <Navbar />
         </div>
-        <div className="relative">{children}</div> {/* תוכן הדף */}
+        <div className="relative w-full px-2 sm:px-4 max-w-full overflow-x-hidden">
+          {children}
+        </div>{" "}
+        {/* תוכן הדף */}
       </div>
     );
   } else if (pathname.startsWith("/dashboard/manager/manager-settings")) {
     return (
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
         <DynamicBackground />
         {/* Navbar */}
-        <div className="relative z-50  flex items-center justify-center ">
+        <div className="relative z-50 flex items-center justify-center w-full">
           <Navbar />
+        </div>
+        <div className="relative w-full px-2 sm:px-4 max-w-full overflow-x-hidden">
+          {children}
         </div>{" "}
-        <div className="relative">{children}</div> {/* תוכן הדף */}
+        {/* תוכן הדף */}
       </div>
     );
   }
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen  box-border">
+      <div className="min-h-screen box-border w-full overflow-x-hidden">
         <DynamicBackground />
 
-        <div className=" mx-auto flex flex-col gap-8 w-full">
+        <div className="flex flex-col gap-4 sm:gap-6 md:gap-8 w-full">
           {/* Header */}
-          <header className=" rounded-3xl shadow-md ">
+          <header className="rounded-3xl shadow-md w-full">
             <Navbar />
           </header>
 
           {/* Content Row */}
-          <div className="flex flex-1 h-full flex-col ml-6 mr-6 md:flex-row gap-x-8">
-            <aside className="bg-white rounded-3xl shadow-md p-4 w-full md:w-1/4">
+          <div className="flex flex-1 flex-col mx-2 sm:mx-4 md:mx-6 md:flex-row gap-4 md:gap-x-8">
+            <aside className="bg-white rounded-3xl shadow-md p-3 sm:p-4 w-full md:w-1/4 mb-4 md:mb-0 max-w-full overflow-hidden">
               <Sidebar />
             </aside>
-            <main className="bg-white  rounded-3xl shadow-xl p-4 w-full md:w-3/4">
-              {children}
+            <main className="bg-white rounded-3xl shadow-xl p-3 sm:p-4 w-full md:w-3/4 max-w-full overflow-x-auto">
+              <div className="w-full max-w-full">{children}</div>
             </main>
           </div>
 
           {/* Footer */}
-          <footer className=" rounded-3xl shadow-md ">
+          <footer className="rounded-3xl shadow-md mt-4 w-full">
             <Footer />
           </footer>
         </div>
