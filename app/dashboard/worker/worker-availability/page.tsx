@@ -153,14 +153,6 @@ export default function DynamicScheduleTable() {
       );
       const result = await response.json();
       if (response.ok) {
-        // Swal.fire({
-        //   icon: "success",
-        //   title: "Success",
-        //   text: result.message,
-        //   confirmButtonText: "OK",
-        //   timer: 3000,
-        //   timerProgressBar: true,
-        // });
         ShowSwalAlert("success", result.message);
       } else {
         alert(`Failed to save draft: ${result.error || "Unknown error"}`);
@@ -192,46 +184,15 @@ export default function DynamicScheduleTable() {
         setConstraints(result.draft.constraints || "");
       } else {
         if (response.status === 404 && result.errorType === "NOT_FOUND") {
-          // Swal.fire({
-          //   icon: "error",
-          //   title: "Error",
-          //   // text: "No draft found, try saving one.",
-          //   text: result.error,
-          //   confirmButtonText: "Close",
-          //   timer: 3000,
-          //   timerProgressBar: true,
-          // });
           ShowSwalAlert("error", result.error);
         } else if (response.status === 403 && result.errorType === "OUTDATED") {
-          // Swal.fire({
-          //   icon: "error",
-          //   title: "Error",
-          //   text: result.error,
-          //   confirmButtonText: "Close",
-          //   timer: 3000,
-          //   timerProgressBar: true,
-          // });
           ShowSwalAlert("error", result.error);
         } else {
-          // Swal.fire({
-          //   icon: "error",
-          //   title: "Error",
-          //   text: result.error || "Error loading draft!",
-          //   confirmButtonText: "Close",
-          //   timer: 3000,
-          //   timerProgressBar: true,
-          // });
           ShowSwalAlert("error", result.error || "Error loading draft!");
         }
       }
     } catch (error: any) {
       console.error("Error loading draft:", error);
-      // Swal.fire({
-      //   icon: "error",
-      //   title: "Error",
-      //   text: error.message || String(error),
-      //   confirmButtonText: "Close",
-      // });
       ShowSwalAlert("error", error.message || String(error));
     }
   };
@@ -264,188 +225,187 @@ export default function DynamicScheduleTable() {
         }
       );
       const result = await response.json();
-      // Swal.fire({
-      //   text: "Shift availability submitted successfully!",
-      //   icon: "success",
-      //   timer: 2000,
-      //   showConfirmButton: false,
-      //   width: "300px",
-      //   position: "center",
-      //   background: "#f0f9ff",
-      //   iconColor: "#014DAE",
-      //   customClass: {
-      //     popup: "rounded-lg shadow-md",
-      //     title: "text-2xl font-sans font-semibold text-blue-700",
-      //   },
-      // });
       ShowSwalAlert("success", "Shift availability submitted successfully!");
     } catch (error) {
-      // Swal.fire({
-      //   title: "Error!",
-      //   text: "Error sending constraints!",
-      //   icon: "error",
-      //   confirmButtonText: "OK",
-      //   timer: 3000,
-      //   showConfirmButton: false,
-      //   position: "center",
-      //   width: "300px",
-      //   background: "#fee2e2",
-      //   iconColor: "#dc2626",
-      //   customClass: {
-      //     popup: "rounded-lg shadow-md",
-      //     title: "text-2xl font-sans font-semibold text-red-700",
-      //     htmlContainer: "font-sans text-gray-700",
-      //   },
-      // });
       ShowSwalAlert("error", "Error sending constraints!");
     }
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto font-sans bg-none rounded-2xl">
+    <div className="container px-4 py-6 mx-auto max-w-6xl font-sans">
       {/* Header */}
-      <div className="mb-8 text-center bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-xl shadow-md">
-        <h1 className="text-3xl font-bold tracking-tight">
-          Dynamic Schedule Table
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Shift Availability
         </h1>
-        <p className="mt-2 text-blue-100">
-          Select the desired shifts by clicking on them and add additional
-          constraints in the text box below if needed, then click 'Submit'.
+        <p className="text-gray-600">
+          Select your available shifts for the upcoming schedule. You must
+          select at least {requiredShifts} shifts.
         </p>
       </div>
+
       {/* Shift Counter */}
-      <div className="mb-6 font-sans text-center">
-        <p
-          className={`font-medium ${
-            availableShiftsCount < requiredShifts
-              ? "text-red-600"
-              : "text-green-600"
-          }`}
-        >
-          Selected Shifts: {availableShiftsCount} / {requiredShifts} minimum
-          required
-        </p>
+      <div className="mb-6 bg-white rounded-lg shadow-sm p-4 border border-gray-100">
+        <div className="flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-gray-700">Selected Shifts:</span>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                availableShiftsCount < requiredShifts
+                  ? "bg-red-100 text-red-800"
+                  : "bg-green-100 text-green-800"
+              }`}
+            >
+              {availableShiftsCount} / {requiredShifts} required
+            </span>
+          </div>
+
+          {!isWithinWindow && (
+            <div className="text-amber-600 bg-amber-50 px-4 py-2 rounded-md text-sm flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {submissionOpenMessage}
+            </div>
+          )}
+        </div>
       </div>
+
       {/* Table */}
-      <div className="overflow-auto rounded-xl font-sans border border-gray-200 shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200 bg-white">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 tracking-wider border-b border-r border-gray-200">
-                <div className="flex items-center space-x-2">
-                  <span>Shifts</span>
-                </div>
-              </th>
-              {displayedDays.map((day: any, index: any) => (
-                <th
-                  key={`day-${index}`}
-                  className="px-6 py-4 text-center text-sm font-semibold text-gray-600 tracking-wider border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white"
-                >
-                  <div className="flex flex-col">
-                    <span className="text-gray-800">{day}</span>
+      <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600 tracking-wider border-b">
+                  <div className="flex items-center space-x-2">
+                    <span>Shifts</span>
                   </div>
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {Array.from({ length: shiftsPerDay }).map((_, shiftIndex) => (
-              <tr key={`shift-${shiftIndex}`}>
-                <td className="px-6 py-4 whitespace-nowrap border-r border-gray-200 bg-gray-50">
-                  <div className="text-sm font-medium text-gray-900">
-                    {shiftNames[shiftIndex] || `Shift ${shiftIndex + 1}`}
-                  </div>
-                </td>
-                {displayedDays.map((_: any, dayIndex: any) => (
-                  <td
-                    key={`cell-${shiftIndex}-${dayIndex}`}
-                    className="p-0 text-center border border-gray-100"
+                {displayedDays.map((day: any, index: any) => (
+                  <th
+                    key={`day-${index}`}
+                    className="px-6 py-4 text-center text-sm font-semibold text-gray-600 tracking-wider border-b"
                   >
-                    <button
-                      onClick={() => toggleAvailability(shiftIndex, dayIndex)}
-                      className={`
-                        w-full h-full px-6 py-4
-                        transition-all duration-200 ease-in-out
-                        focus:outline-none
-                        active:scale-95
-                        ${
-                          availability[shiftIndex][dayIndex]
-                            ? "bg-gradient-to-r from-green-400 to-green-500 text-white hover:from-green-500 hover:to-green-600"
-                            : "bg-white hover:bg-gray-50 text-gray-300"
-                        }
-                      `}
-                    >
-                      <span className="font-medium font-sans">
-                        {availability[shiftIndex][dayIndex] ? "Available" : "X"}
-                      </span>
-                    </button>
-                  </td>
+                    <div className="flex flex-col">
+                      <span className="text-gray-800">{day}</span>
+                    </div>
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {Array.from({ length: shiftsPerDay }).map((_, shiftIndex) => (
+                <tr key={`shift-${shiftIndex}`} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap border-r bg-gray-50">
+                    <div className="text-sm font-medium text-gray-800">
+                      {shiftNames[shiftIndex] || `Shift ${shiftIndex + 1}`}
+                    </div>
+                  </td>
+                  {displayedDays.map((_: any, dayIndex: any) => (
+                    <td
+                      key={`cell-${shiftIndex}-${dayIndex}`}
+                      className="p-2 text-center"
+                    >
+                      <button
+                        onClick={() => toggleAvailability(shiftIndex, dayIndex)}
+                        className={`
+                          w-full h-12 md:h-14 rounded-md transition-all duration-200 
+                          focus:outline-none focus:ring-2 focus:ring-offset-1
+                          ${
+                            availability[shiftIndex][dayIndex]
+                              ? "bg-blue-500 hover:bg-blue-600 text-white shadow-sm"
+                              : "bg-gray-100 hover:bg-gray-200 text-gray-400"
+                          }
+                        `}
+                        aria-label={
+                          availability[shiftIndex][dayIndex]
+                            ? "Available"
+                            : "Not available"
+                        }
+                      >
+                        {availability[shiftIndex][dayIndex] ? (
+                          <span className="flex items-center justify-center">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </span>
+                        ) : (
+                          <span className="font-medium">—</span>
+                        )}
+                      </button>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+
       {/* Constraints Text Area */}
-      <div className="mt-8">
-        <label className="block mb-2 font-semibold text-gray-700">
+      <div className="mt-8 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+        <label className="block mb-3 font-medium text-gray-700">
           Additional Constraints
         </label>
         <textarea
           value={constraints}
           onChange={(e) => setConstraints(e.target.value)}
-          placeholder="Enter any specific constraints or preferences..."
-          className="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          rows={4}
+          placeholder="Enter any specific constraints or preferences you may have (e.g., preferred consecutive shifts, specific dates to avoid)..."
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          rows={3}
         ></textarea>
       </div>
+
       {/* Action Buttons */}
-      <div className="flex gap-4 justify-end mt-6">
+      <div className="flex flex-wrap gap-3 mt-8 justify-end">
         <button
           onClick={clearAll}
-          className="px-4 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1"
         >
           Clear All
         </button>
         <button
           onClick={saveDraft}
-          className="px-4 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 rounded-md border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
         >
           Save Draft
         </button>
         <button
           onClick={loadDraft}
-          className="px-4 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+          className="px-4 py-2 rounded-md border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
         >
           Load Draft
         </button>
-        {/* <button
-          onClick={submitAvailability}
-          disabled={availableShiftsCount < requiredShifts}
-          className={`px-4 py-2 rounded text-white transition-colors ${
-            availableShiftsCount < requiredShifts
-              ? "bg-blue-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-          }`}
-        >
-          Submit
-        </button> */}
         <button
           onClick={submitAvailability}
           disabled={!isWithinWindow || availableShiftsCount < requiredShifts}
-          className={`px-4 py-2 rounded text-white transition-colors ${
+          className={`px-5 py-2 rounded-md text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 ${
             !isWithinWindow || availableShiftsCount < requiredShifts
               ? "bg-blue-300 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              : "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
           }`}
         >
-          Submit
+          Submit Availability
         </button>
-        {!isWithinWindow && (
-          <label className="mt-2 text-sm text-gray-600">
-            {submissionOpenMessage}
-          </label>
-        )}
       </div>
     </div>
   );
