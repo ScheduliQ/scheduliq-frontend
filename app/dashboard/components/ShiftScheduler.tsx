@@ -17,6 +17,7 @@ interface Shift {
   time: string;
   employees: Employee[];
   shortages?: { [role: string]: number };
+  color?: string;
 }
 
 interface Day {
@@ -349,8 +350,16 @@ const ShiftScheduler = ({
       setPublishDays(updatedDays);
     } else if (managerSettings && !scheduleData) {
       const basicSchedule = generateBasicSchedule(managerSettings);
-      setDays(basicSchedule);
-      setPublishDays(basicSchedule);
+      // Add colors to basic schedule from manager settings
+      const basicScheduleWithColors = basicSchedule.map((day) => ({
+        ...day,
+        shifts: day.shifts.map((shift) => ({
+          ...shift,
+          color: managerSettings.shift_colors[shift.time] || "white",
+        })),
+      }));
+      setDays(basicScheduleWithColors);
+      setPublishDays(basicScheduleWithColors);
     }
   }, [managerSettings, scheduleData]);
 
@@ -464,6 +473,10 @@ const ShiftScheduler = ({
                 employees: shift.employees.map((employee) =>
                   employee.id === employeeId ? employeeData : employee
                 ),
+                color:
+                  shift.color ||
+                  managerSettings?.shift_colors[shift.time] ||
+                  "white",
               };
             }
             return shift;
@@ -503,14 +516,27 @@ const ShiftScheduler = ({
     );
 
     const newDays = [...days];
-    const [movedEmployee] = newDays[sourceDayIndex].shifts[
-      sourceShiftIndex
-    ].employees.splice(result.source.index, 1);
-    newDays[destDayIndex].shifts[destShiftIndex].employees.splice(
-      result.destination.index,
-      0,
-      movedEmployee
+
+    // Get source and destination shifts
+    const sourceShift = newDays[sourceDayIndex].shifts[sourceShiftIndex];
+    const destShift = newDays[destDayIndex].shifts[destShiftIndex];
+
+    // Move the employee
+    const [movedEmployee] = sourceShift.employees.splice(
+      result.source.index,
+      1
     );
+    destShift.employees.splice(result.destination.index, 0, movedEmployee);
+
+    // Make sure colors are preserved
+    sourceShift.color =
+      sourceShift.color ||
+      managerSettings?.shift_colors[sourceShift.time] ||
+      "white";
+    destShift.color =
+      destShift.color ||
+      managerSettings?.shift_colors[destShift.time] ||
+      "white";
 
     setDays(newDays);
   };
@@ -566,6 +592,10 @@ const ShiftScheduler = ({
               return {
                 ...shift,
                 employees: [...shift.employees, employeeWithId],
+                color:
+                  shift.color ||
+                  managerSettings?.shift_colors[shift.time] ||
+                  "white",
               };
             }
             return shift;
@@ -642,7 +672,7 @@ const ShiftScheduler = ({
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                         style={{
-                          backgroundColor: colors[shift.time] || "white",
+                          backgroundColor: shift.color || "white",
                         }}
                         className={`bg-white p-2 rounded-lg mb-2 shadow-sm min-h-[150px] ${
                           snapshot.isDraggingOver

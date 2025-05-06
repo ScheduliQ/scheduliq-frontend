@@ -13,6 +13,7 @@ describe("Contact Form", () => {
 
     cy.get('input[name="name"]').type("Jane Doe");
     cy.get('input[name="email"]').type("jane@example.com");
+    cy.get('select[name="subject"]').select("General Inquiry");
     cy.get('textarea[name="message"]').type("Hello, this is a test.");
 
     cy.get('button[type="submit"]').click();
@@ -28,6 +29,7 @@ describe("Contact Form", () => {
     cy.visit("/dashboard/contact");
     cy.get('input[name="name"]').type("Jane Doe");
     cy.get('input[name="email"]').type("jane@example.com");
+    cy.get('select[name="subject"]').select("Technical Support");
     cy.get('textarea[name="message"]').type("This will fail.");
     cy.get('button[type="submit"]').click();
     cy.wait("@sendContactFail");
