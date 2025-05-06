@@ -1,96 +1,101 @@
 "use client";
 import Image from "next/image";
 import PrimaryButton from "../../components/PrimaryButton";
-import SecondaryButton from "../../components/SecondaryButton";
 import calendar from "../assets/cal1.png";
+import mockmobiles from "../assets/mockmobiles.png";
 import { motion } from "framer-motion";
-import { ChevronDown } from "lucide-react"; // or any down arrow icon component
+import { ChevronDown } from "lucide-react";
 
 export const Hero = () => {
   return (
-    <section className="pt-8 pb-20 md:pt-5 md:pb-10 bg-none md:overflow-x-clip">
-      <div className="container mx-auto px-4">
-        <div className="md:flex items-center justify-between">
+    <section className="pt-8 pb-16 md:pt-16 md:pb-20 overflow-hidden bg-[#f0f7ff]/70">
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+          {/* Left Content */}
           <motion.div
-            className="md:w-[45%] lg:pl-8 xl:pl-12"
-            initial={{ opacity: 0, y: 30 }}
+            className="w-full md:w-[45%] md:pr-4"
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.7, ease: "easeOut" }}
           >
             <motion.h1
-              className="text-5xl md:text-6xl font-bold tracking-tighter bg-gradient-to-b from-black to-[#001e80] text-transparent bg-clip-text"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
+              className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Effortless Scheduling with ScheduliQ!
+              1 in 3 managers struggle with scheduling
             </motion.h1>
+
             <motion.p
-              className="text-xl text-[#010D3E] tracking-tight mt-6"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+              className="text-base md:text-xl text-blue-500 font-medium uppercase tracking-wide mt-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.4 }}
             >
-              Smart, efficient, and tailored to your needs.
+              The accumulating workplace stress affects productivity
             </motion.p>
-            <motion.div
-              className="flex gap-1 items-center mt-[30px]"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.7, ease: "easeOut" }}
+
+            <motion.p
+              className="text-lg text-gray-700 mt-4 max-w-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
             >
-              <motion.div
-                whileHover={{ y: -2, opacity: 0.95 }}
-                whileTap={{ y: 1 }}
-              >
-                <PrimaryButton label="Get Started" href="/login" />
-              </motion.div>
+              ScheduliQ transforms workforce management with AI-powered
+              scheduling that's smart, efficient, and tailored to your needs.
+            </motion.p>
+
+            <motion.div
+              className="mt-8 flex items-center gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+            >
+              <PrimaryButton label="Get Started" href="/login" />
             </motion.div>
           </motion.div>
 
-          <div className="mt-20 md:mt-0 md:w-[50%] relative">
-            <motion.img
-              src={calendar.src}
-              alt="calendar image"
-              className="md:relative md:h-auto md:w-full md:max-w-none lg:scale-105"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                translateY: [-30, 30],
-              }}
-              transition={{
-                opacity: { duration: 1, ease: "easeOut" },
-                y: { duration: 1, ease: "easeOut" },
-                translateY: {
-                  repeat: Infinity,
-                  repeatType: "mirror",
-                  duration: 2,
-                  ease: "easeInOut",
-                },
-              }}
-            />
-          </div>
+          {/* Right Phone Image */}
+          <motion.div
+            className="w-full md:w-[55%] relative max-w-xl mx-auto md:mx-0 flex justify-center md:justify-end"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            <div className="relative h-[450px] md:h-[580px] w-auto">
+              <Image
+                src={calendar.src}
+                alt="ScheduliQ mobile app"
+                width={1200}
+                height={2400}
+                className="h-full w-auto object-contain"
+                priority
+              />
+            </div>
+          </motion.div>
         </div>
+
+        {/* Scroll indicator */}
         <motion.div
-          className="relative bottom-8 left-1/2 -translate-x-1/2 cursor-pointer"
-          initial={{ opacity: 0, y: 0 }}
-          animate={{
-            opacity: 1,
-            y: [0, -15, 0], // Increased bounce height
-          }}
-          transition={{
-            duration: 1.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          className="mt-12 flex justify-center cursor-pointer"
           onClick={() =>
             window.scrollTo({ top: window.innerHeight, behavior: "smooth" })
           }
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: 1,
+            y: [0, -8, 0],
+          }}
+          transition={{
+            delay: 1,
+            duration: 1.5,
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
           aria-label="Scroll down"
         >
-          <ChevronDown className="w-12 h-12 text-[#001e80] hover:text-[#000d3e] transition-colors" />{" "}
-          {/* Increased size */}
+          <ChevronDown className="w-8 h-8 text-[#001e80] hover:text-[#000d3e] transition-colors" />
         </motion.div>
       </div>
     </section>

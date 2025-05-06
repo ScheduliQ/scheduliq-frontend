@@ -160,6 +160,17 @@ const ShiftScheduler = () => {
   const updateSchedule = async () => {
     try {
       const scheduleId = daysId[currentIndex];
+
+      // Make sure all shifts have their color property preserved
+      const daysWithColors = days.map((day) => ({
+        ...day,
+        shifts: day.shifts.map((shift) => ({
+          ...shift,
+          // Ensure color property is present
+          color: shift.color || "white",
+        })),
+      }));
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/schedule/update/${scheduleId}`,
         {
@@ -167,42 +178,12 @@ const ShiftScheduler = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ days }),
+          body: JSON.stringify({ days: daysWithColors }),
         }
       );
       if (!response.ok) throw new Error("Failed to update schedule");
-      // Swal.fire({
-      //   title: "Schedule Updated!",
-      //   icon: "success",
-      //   timer: 2000,
-      //   showConfirmButton: false,
-      //   width: "300px",
-      //   position: "center",
-      //   background: "#f0f9ff",
-      //   iconColor: "#014DAE",
-      //   customClass: {
-      //     popup: "rounded-lg shadow-md",
-      //     title: "text-2xl font-sans font-semibold text-blue-700",
-      //   },
-      // });
       ShowSwalAlert("success", "Schedule updated successfully!");
     } catch (error: any) {
-      // Swal.fire({
-      //   text: "Schedule not found or no changes made",
-      //   icon: "info",
-      //   confirmButtonText: "OK",
-      //   timer: 3000,
-      //   showConfirmButton: false,
-      //   position: "center",
-      //   width: "300px",
-      //   background: "#fee2e2",
-      //   iconColor: "#dc2626",
-      //   customClass: {
-      //     popup: "rounded-lg shadow-md",
-      //     title: "text-2xl font-sans font-semibold text-red-700",
-      //     htmlContainer: "font-sans text-gray-700",
-      //   },
-      // });
       ShowSwalAlert("error", "No changes made or schedule not found!");
     }
   };
@@ -249,6 +230,8 @@ const ShiftScheduler = () => {
                 employees: shift.employees.map((employee) =>
                   employee.id === employeeId ? employeeData : employee
                 ),
+                // Preserve the color property
+                color: shift.color || "white",
               };
             }
             return shift;
@@ -283,14 +266,22 @@ const ShiftScheduler = () => {
       (s) => s.id === result.destination.droppableId
     );
     const newDays = [...days];
-    const [movedEmployee] = newDays[sourceDayIndex].shifts[
-      sourceShiftIndex
-    ].employees.splice(result.source.index, 1);
-    newDays[destDayIndex].shifts[destShiftIndex].employees.splice(
-      result.destination.index,
-      0,
-      movedEmployee
+
+    // Get source and destination shifts by reference to preserve their properties
+    const sourceShift = newDays[sourceDayIndex].shifts[sourceShiftIndex];
+    const destShift = newDays[destDayIndex].shifts[destShiftIndex];
+
+    // Move the employee
+    const [movedEmployee] = sourceShift.employees.splice(
+      result.source.index,
+      1
     );
+    destShift.employees.splice(result.destination.index, 0, movedEmployee);
+
+    // Ensure colors are preserved
+    sourceShift.color = sourceShift.color || "white";
+    destShift.color = destShift.color || "white";
+
     setDays(newDays);
   };
 
@@ -345,6 +336,8 @@ const ShiftScheduler = () => {
               return {
                 ...shift,
                 employees: [...shift.employees, employeeWithId],
+                // Preserve the color property
+                color: shift.color || "white",
               };
             }
             return shift;

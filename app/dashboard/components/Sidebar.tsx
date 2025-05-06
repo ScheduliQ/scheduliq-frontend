@@ -113,17 +113,29 @@ export default function Sidebar() {
       .catch((err) => console.error("Error fetching messages:", err));
   };
 
-  // Determine color based on priority
-  const getPriorityColor = (priority: string) => {
+  // Determine priority styling
+  const getPriorityStyles = (priority: string) => {
     switch (priority) {
       case "urgent":
-        return "bg-red-100 border-red-500 text-red-800";
+        return {
+          indicator: "bg-red-500",
+          text: "text-gray-900",
+        };
       case "important":
-        return "bg-amber-100 border-amber-500 text-amber-800";
+        return {
+          indicator: "bg-amber-500",
+          text: "text-gray-900",
+        };
       case "update":
-        return "bg-green-100 border-green-500 text-green-800";
+        return {
+          indicator: "bg-emerald-500",
+          text: "text-gray-900",
+        };
       default:
-        return "";
+        return {
+          indicator: "bg-gray-400",
+          text: "text-gray-900",
+        };
     }
   };
 
@@ -297,106 +309,159 @@ export default function Sidebar() {
   >(null);
 
   return (
-    <aside className="h-[calc(100vh-8rem-2rem)] bg-white flex flex-col  rounded-3xl  ">
-      {/* Fixed header */}
-      <div className="text-xl font-bold mb-4 text-center border-b border-gray-200 pb-3 text-blue-700">
-        System message
-      </div>
+    <aside className="h-[calc(100vh-8rem-2rem)] bg-white flex flex-col rounded-3xl overflow-hidden">
+      {/* Header */}
+      <header className="text-xl font-semibold py-4 text-center border-b text-gray-800 flex items-center justify-center gap-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <span>System Messages</span>
+      </header>
 
       {/* Message display area with auto-scroll */}
-      <div className="flex-1 overflow-y-auto px-2">
-        <div className="space-y-6">
-          {messages.map((msg, index) => (
-            <div
+      <section className="flex-1 overflow-y-auto p-4 w-full mt-4">
+        {messages.map((msg, index) => {
+          const priorityStyles = getPriorityStyles(msg.priority);
+          return (
+            <article
               key={index}
-              className={`rounded-xl border-l-4 shadow-md bg-white overflow-hidden ${getPriorityColor(
-                msg.priority
-              )}`}
+              className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow mb-4 last:mb-0"
             >
-              {/* Header with profile picture, name, and options dropdown */}
-              <div className="flex items-center p-3 bg-blue-100/50 border-b border-blue-200 relative">
-                <div className="flex-shrink-0">
-                  <img
-                    alt="Manager Avatar"
-                    src={
-                      msg.profile_picture ||
-                      "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
-                    }
-                    className="w-10 h-10 rounded-full border-2 border-blue-300 object-cover"
-                  />
-                </div>
-                <div className="ml-3">
-                  <p className="font-semibold text-blue-800">
-                    {msg.first_name && msg.last_name
-                      ? `${msg.first_name} ${msg.last_name}`
-                      : "Loading..."}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formatDate(msg.created_at)}
-                  </p>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(
-                      msg.priority
-                    )}`}
-                  >
-                    {msg.priority}
-                  </span>
-                </div>
-                {/* Options dropdown trigger (three dots) */}
-                {role === "manager" && uid === msg.uid && (
-                  <div className="absolute right-3 top-3">
-                    <button
-                      className="text-gray-600 hover:text-gray-800 focus:outline-none"
-                      onClick={() =>
-                        setOpenOptionsMessageId(
-                          openOptionsMessageId === msg._id
-                            ? null
-                            : msg._id || null
-                        )
-                      }
-                    >
-                      ⋮
-                    </button>
-                    {openOptionsMessageId === msg._id && (
-                      <div className="absolute right-0 mt-2 w-24 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+              <header className="flex items-center p-3 border-b border-gray-100">
+                <img
+                  alt="Manager"
+                  src={
+                    msg.profile_picture ||
+                    "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                  }
+                  className="w-10 h-10 rounded-full object-cover mr-3"
+                />
+
+                <div className="flex-1 flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium text-gray-800">
+                      {msg.first_name && msg.last_name
+                        ? `${msg.first_name} ${msg.last_name}`
+                        : "Loading..."}
+                    </h3>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(msg.created_at)}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`h-2 w-2 rounded-full ${priorityStyles.indicator}`}
+                    ></div>
+                    <span className="text-xs text-gray-500 capitalize">
+                      {msg.priority}
+                    </span>
+
+                    {/* Options menu for managers */}
+                    {role === "manager" && uid === msg.uid && (
+                      <div className="relative ml-2">
                         <button
-                          className="w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-gray-100"
-                          onClick={() => handleEditMessage(msg)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100"
+                          className="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors"
                           onClick={() =>
-                            msg._id && handleDeleteMessage(msg._id)
+                            setOpenOptionsMessageId(
+                              openOptionsMessageId === msg._id
+                                ? null
+                                : msg._id || null
+                            )
                           }
                         >
-                          Delete
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="12" cy="5" r="1"></circle>
+                            <circle cx="12" cy="19" r="1"></circle>
+                          </svg>
                         </button>
+                        {openOptionsMessageId === msg._id && (
+                          <div className="absolute right-0 top-8 w-32 bg-white border border-gray-100 rounded-lg shadow-md z-10 overflow-hidden">
+                            <button
+                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                              onClick={() => handleEditMessage(msg)}
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                              Edit
+                            </button>
+                            <button
+                              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                              onClick={() =>
+                                msg._id && handleDeleteMessage(msg._id)
+                              }
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                )}
-              </div>
+                </div>
+              </header>
 
               {/* Message content */}
               <div className="p-4">
                 {editingMessageId === msg._id ? (
-                  <div className="flex flex-col gap-3">
+                  <div>
                     <textarea
-                      className="w-full p-3 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-24"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-400 focus:border-blue-400 min-h-24 bg-white"
                       value={editedText}
                       onChange={(e) => setEditedText(e.target.value)}
                     />
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-2 mt-3">
                       <button
-                        className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium border border-gray-200"
                         onClick={handleCancelEdit}
                       >
                         Cancel
                       </button>
                       <button
-                        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                         onClick={handleSaveEdit}
                       >
                         Save
@@ -404,61 +469,75 @@ export default function Sidebar() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-800 whitespace-pre-wrap">
+                  <p className={`${priorityStyles.text} whitespace-pre-wrap`}>
                     {msg.text}
                   </p>
                 )}
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-      </div>
+            </article>
+          );
+        })}
+        <div ref={messagesEndRef} />
+      </section>
 
       {/* Message input area for managers */}
       {role === "manager" && (
-        <div className="pt-4 border-t border-gray-200 mt-2 ">
+        <footer className="border-t border-gray-200 p-4">
           {showInput ? (
-            <div className="flex flex-col gap-3">
+            <>
               <textarea
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none min-h-24"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-400 focus:border-blue-400 resize-none min-h-24"
                 placeholder="Enter a new message..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-between items-center mt-3">
                 <select
                   value={messageType}
                   onChange={(e) => setMessageType(e.target.value)}
-                  className="px-4 py-2 border rounded-md text-gray-700"
+                  className="px-4 py-2 border rounded-lg text-gray-700 bg-white"
                 >
-                  <option value="update">update</option>
-                  <option value="important">important</option>
-                  <option value="urgent">urgent</option>
+                  <option value="update">Update</option>
+                  <option value="important">Important</option>
+                  <option value="urgent">Urgent</option>
                 </select>
-                <button
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
-                  onClick={() => setShowInput(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
-                  onClick={handleSendMessage}
-                >
-                  Send
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium border border-gray-200"
+                    onClick={() => setShowInput(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    onClick={handleSendMessage}
+                  >
+                    Send
+                  </button>
+                </div>
               </div>
-            </div>
+            </>
           ) : (
             <button
               className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors font-medium"
               onClick={() => setShowInput(true)}
             >
-              <span>New message +</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 5v14M5 12h14"></path>
+              </svg>
+              <span>New Message</span>
             </button>
           )}
-        </div>
+        </footer>
       )}
     </aside>
   );
