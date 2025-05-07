@@ -19,19 +19,18 @@ export default function Layout({
     pathname.startsWith("/dashboard/terms")
   ) {
     return (
-      <div className="relative min-h-screen w-full overflow-x-hidden bg-[#f9fafb]">
+      <div className="relative min-h-screen w-full overflow-x-hidden bg-[#f0f7ff]">
         <div className="relative z-50 flex items-center justify-center w-full">
           <Navbar />
         </div>
         <div className="relative w-full px-2 sm:px-4 max-w-full overflow-x-hidden">
           {children}
         </div>{" "}
-        {/* תוכן הדף */}
       </div>
     );
   } else if (pathname.startsWith("/dashboard/manager/manager-settings")) {
     return (
-      <div className="min-h-screen flex flex-col w-full overflow-x-hidden bg-[#f9fafb]">
+      <div className="min-h-screen flex flex-col w-full overflow-x-hidden bg-[#f0f7ff]">
         {/* Navbar */}
         <div className="relative z-50 flex items-center justify-center w-full">
           <Navbar />
@@ -39,14 +38,13 @@ export default function Layout({
         <div className="relative w-full px-2 sm:px-4 max-w-full overflow-x-hidden">
           {children}
         </div>{" "}
-        {/* תוכן הדף */}
       </div>
     );
   }
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen box-border w-full overflow-x-hidden bg-[#f9fafb]">
+      <div className="min-h-screen box-border w-full overflow-x-hidden bg-[#f0f7ff]">
         <div className="flex flex-col gap-4 sm:gap-6 md:gap-8 w-full">
           {/* Header */}
           <header className="rounded-3xl shadow-md w-full">
@@ -55,10 +53,10 @@ export default function Layout({
 
           {/* Content Row */}
           <div className="flex flex-1 flex-col mx-2 sm:mx-4 md:mx-6 md:flex-row gap-4 md:gap-x-8">
-            <aside className="bg-white rounded-3xl shadow-md p-3 sm:p-4 w-full md:w-1/4 mb-4 md:mb-0 max-w-full overflow-hidden">
+            <aside className="bg-white rounded-3xl  shadow-md p-3 sm:p-4 w-full md:w-1/4 mb-4 md:mb-0 max-w-full overflow-hidden">
               <Sidebar />
             </aside>
-            <main className="bg-white rounded-3xl shadow-xl p-3 sm:p-4 w-full md:w-3/4 max-w-full overflow-x-auto">
+            <main className="bg-white rounded-3xl  shadow-xl p-3 sm:p-4 w-full md:w-3/4 max-w-full overflow-x-auto">
               <div className="w-full max-w-full">{children}</div>
             </main>
           </div>

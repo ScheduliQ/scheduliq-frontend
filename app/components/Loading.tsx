@@ -1,19 +1,69 @@
-import Lottie from "lottie-react";
-import loadingAnimation from "../../public/animations/animated_coffee.json";
+import React from "react";
 
 export default function Loading() {
   return (
     <div className="fixed inset-0 z-50 flex items-center rounded-xl justify-center bg-white/20 backdrop-blur-md">
       <div className="bg-none p-2 text-center flex flex-col items-center justify-center">
-        <Lottie
-          animationData={loadingAnimation}
-          loop={true}
-          autoplay={true}
-          className="w-96 h-96 object-contain"
-        />
-        <p className="text-blue-950 font-medium text-xl -mt-24">
-          How about a coffee animation while you wait?
-        </p>
+        <span className="loader"></span>
+        <style jsx>{`
+          .loader {
+            width: 48px;
+            height: 48px;
+            margin: auto;
+            position: relative;
+          }
+          .loader:before {
+            content: "";
+            width: 48px;
+            height: 5px;
+            background: #014dae;
+            opacity: 0.25;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            border-radius: 50%;
+            animation: shadow 0.5s linear infinite;
+          }
+          .loader:after {
+            content: "";
+            width: 100%;
+            height: 100%;
+            background: #014dae;
+            animation: bxSpin 0.5s linear infinite;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 4px;
+          }
+          @keyframes bxSpin {
+            17% {
+              border-bottom-right-radius: 3px;
+            }
+            25% {
+              transform: translateY(9px) rotate(22.5deg);
+            }
+            50% {
+              transform: translateY(18px) scale(1, 0.9) rotate(45deg);
+              border-bottom-right-radius: 40px;
+            }
+            75% {
+              transform: translateY(9px) rotate(67.5deg);
+            }
+            100% {
+              transform: translateY(0) rotate(90deg);
+            }
+          }
+
+          @keyframes shadow {
+            0%,
+            100% {
+              transform: scale(1, 1);
+            }
+            50% {
+              transform: scale(1.2, 1);
+            }
+          }
+        `}</style>
       </div>
     </div>
   );
