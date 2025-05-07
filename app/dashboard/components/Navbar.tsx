@@ -260,7 +260,7 @@ export default function Navbar() {
               }}
             >
               <div className="bg-white backdrop-blur-md">
-                <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-500 px-3 sm:px-4 py-2 sm:py-3 text-white">
+                <div className="flex items-center justify-between bg-[#014DAE] px-3 sm:px-4 py-2 sm:py-3 text-white">
                   <h3 className="font-semibold text-sm sm:text-base flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
