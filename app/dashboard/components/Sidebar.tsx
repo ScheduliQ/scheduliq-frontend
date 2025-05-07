@@ -90,10 +90,12 @@ export default function Sidebar() {
 
   // Auto-scroll to the bottom of the messages list
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
   };
 
   // Fetch messages from the server (GET)
@@ -173,7 +175,10 @@ export default function Sidebar() {
         }
         return [...prev, newMessage];
       });
-      scrollToBottom();
+      // Use setTimeout to ensure scrolling happens after state update and rendering
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
     });
     socket.on("update_manager_message", (updatedMessage: ManagerMessage) => {
       setMessages((prev) =>
@@ -232,7 +237,10 @@ export default function Sidebar() {
       })
       .then((createdMessage: ManagerMessage) => {
         setMessages((prev) => [...prev, createdMessage]);
-        scrollToBottom();
+        // Use setTimeout to ensure scrolling happens after state update and rendering
+        setTimeout(() => {
+          scrollToBottom();
+        }, 100);
       })
       .catch((err) => console.error("Error posting message:", err));
 
