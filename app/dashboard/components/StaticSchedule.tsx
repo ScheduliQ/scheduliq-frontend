@@ -25,18 +25,26 @@ interface Day {
   id: string;
   name: string;
   shifts: Shift[];
+  week_range?: string;
 }
 
 interface EmployeeDropdown {
   id: string;
   first_name: string;
   last_name: string;
-  jobs: string[]; // מערך של תפקידים (מחרוזות)
+  jobs: string[];
+}
+
+interface Schedule {
+  _id: string;
+  days: Day[];
+  week_range?: string;
+  created_at: string;
 }
 
 const ShiftScheduler = () => {
   const { role } = useRole();
-  const [schedules, setSchedules] = useState<Day[][]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [days, setDays] = useState<Day[]>([]);
@@ -78,7 +86,7 @@ const ShiftScheduler = () => {
     if (currentIndex < schedules.length - 1) {
       const newIndex = currentIndex + 1;
       setCurrentIndex(newIndex);
-      setDays(schedules[newIndex]);
+      setDays(schedules[newIndex].days);
     }
   };
 
@@ -86,13 +94,13 @@ const ShiftScheduler = () => {
     if (currentIndex > 0) {
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
-      setDays(schedules[newIndex]);
+      setDays(schedules[newIndex].days);
     }
   };
 
   const goToLatest = () => {
     setCurrentIndex(0);
-    setDays(schedules[0]);
+    setDays(schedules[0].days);
   };
 
   useEffect(() => {
@@ -105,11 +113,11 @@ const ShiftScheduler = () => {
 
         const result = await response.json();
         setDaysId(result.map((schedule: any) => schedule._id));
-        setSchedules(result.map((schedule: any) => schedule.days)); // שולח רק את ה-"days"
+        setSchedules(result); // Store the complete schedule objects
         setCurrentIndex(0);
         setDays(result[0].days);
       } catch (error) {
-        console.error("Error fetching schedules:", error);
+        // console.error("Error fetching schedules:", error);
       }
     };
     fetchSchedules();
@@ -378,6 +386,12 @@ const ShiftScheduler = () => {
       </div> */}
       <div className="flex flex-col  sm:flex-row justify-between  items-center mb-6 gap-4">
         <h1 className="text-2xl font-semibold text-gray-800">Shift Schedule</h1>
+
+        {schedules[currentIndex]?.week_range && (
+          <div className="text-base font-sans text-gray-700 font-medium">
+            {schedules[currentIndex].week_range}
+          </div>
+        )}
 
         {isEditing && (
           <div className="text-indigo-600 font-medium text-sm px-3 py-1 bg-indigo-100 rounded-full">
