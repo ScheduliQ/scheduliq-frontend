@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { RoleProvider } from "../hooks/RoleContext"; // ייבוא ה-Provider
-
+import { RoleProvider } from "../hooks/RoleContext";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",

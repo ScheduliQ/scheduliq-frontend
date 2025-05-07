@@ -90,10 +90,12 @@ export default function Sidebar() {
 
   // Auto-scroll to the bottom of the messages list
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
-    });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }
   };
 
   // Fetch messages from the server (GET)
@@ -173,7 +175,10 @@ export default function Sidebar() {
         }
         return [...prev, newMessage];
       });
-      scrollToBottom();
+      // Use setTimeout to ensure scrolling happens after state update and rendering
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
     });
     socket.on("update_manager_message", (updatedMessage: ManagerMessage) => {
       setMessages((prev) =>
@@ -232,7 +237,10 @@ export default function Sidebar() {
       })
       .then((createdMessage: ManagerMessage) => {
         setMessages((prev) => [...prev, createdMessage]);
-        scrollToBottom();
+        // Use setTimeout to ensure scrolling happens after state update and rendering
+        setTimeout(() => {
+          scrollToBottom();
+        }, 100);
       })
       .catch((err) => console.error("Error posting message:", err));
 
@@ -486,30 +494,30 @@ export default function Sidebar() {
           {showInput ? (
             <>
               <textarea
-                className="w-full p-4 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-400 focus:border-blue-400 resize-none min-h-24"
+                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500/50 resize-none min-h-24 bg-white/50 backdrop-blur-sm font-sans text-[15px] placeholder:text-gray-400"
                 placeholder="Enter a new message..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
               />
-              <div className="flex justify-between items-center mt-3">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mt-4">
                 <select
                   value={messageType}
                   onChange={(e) => setMessageType(e.target.value)}
-                  className="px-4 py-2 border rounded-lg text-gray-700 bg-white"
+                  className="w-full sm:w-auto px-4 py-2.5 border border-gray-200 rounded-xl text-gray-700 bg-white/50 backdrop-blur-sm font-sans text-[15px] focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500/50"
                 >
                   <option value="update">Update</option>
                   <option value="important">Important</option>
                   <option value="urgent">Urgent</option>
                 </select>
-                <div className="flex gap-2">
+                <div className="flex gap-3 w-full sm:w-auto">
                   <button
-                    className="px-4 py-2 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium border border-gray-200"
+                    className="flex-1 sm:flex-none px-5 py-2.5 bg-white text-gray-700 rounded-xl hover:bg-gray-50 font-medium border border-gray-200 font-sans text-[15px]"
                     onClick={() => setShowInput(false)}
                   >
                     Cancel
                   </button>
                   <button
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 font-medium shadow-sm hover:shadow-md font-sans text-[15px]"
                     onClick={handleSendMessage}
                   >
                     Send
@@ -519,7 +527,7 @@ export default function Sidebar() {
             </>
           ) : (
             <button
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors font-medium"
+              className="w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl flex items-center justify-center gap-2.5 shadow-sm hover:shadow-md hover:from-blue-700 hover:to-blue-800 font-medium font-sans text-[15px] tracking-wide"
               onClick={() => setShowInput(true)}
             >
               <svg

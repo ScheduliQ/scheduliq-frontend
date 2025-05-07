@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import { initiateSocketConnection } from "@/hooks/socket";
 import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
 import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
+import InfoButton from "../../components/InfoButton";
 
 type ShiftType = {
   id: number;
@@ -668,7 +669,7 @@ export default function ManagerSettingsPage() {
     return <Loading />;
   }
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#f0f7ff] min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-blue-700 mb-2">
           Manager Settings
@@ -680,8 +681,9 @@ export default function ManagerSettingsPage() {
 
       {/* General Settings Card */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-white">General Settings</h2>
+          <InfoButton infoText="Configure basic scheduling parameters like maximum consecutive shifts, required shifts per employee, and submission time windows for shift preferences." />
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -840,8 +842,9 @@ export default function ManagerSettingsPage() {
 
       {/* Working Days Card */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-white">Working Days</h2>
+          <InfoButton infoText="Select which days of the week your business operates. These are the only days that shifts can be scheduled on." />
         </div>
         <div className="p-6">
           <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
@@ -876,8 +879,9 @@ export default function ManagerSettingsPage() {
 
       {/* Shift Types Card */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-white">Shift Types</h2>
+          <InfoButton infoText="Define different types of shifts (e.g., Morning, Evening, Night) and assign them distinct colors for easy visual identification in the schedule." />
         </div>
         <div className="p-6">
           <div
@@ -961,8 +965,9 @@ export default function ManagerSettingsPage() {
 
       {/* Role Types Card */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-white">Role Types</h2>
+          <InfoButton infoText="Create and manage different job roles in your organization. Assign importance levels to each role to help with shift scheduling prioritization." />
         </div>
         <div className="p-6">
           <div
@@ -1041,8 +1046,9 @@ export default function ManagerSettingsPage() {
 
       {/* Roles per Shift Card */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-white">Roles per Shift</h2>
+          <InfoButton infoText="Specify which roles are required for each shift type and how many employees with each role are needed. This ensures proper staffing for every shift." />
         </div>
         <div className="p-6 space-y-6">
           {shiftTypes.map((shift) => (
@@ -1174,10 +1180,11 @@ export default function ManagerSettingsPage() {
       </div>
       {/* Employee Management Card */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6 border border-gray-100">
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 px-6 py-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold text-white">
             Employee Management
           </h2>
+          <InfoButton infoText="Manage your employees and their assigned roles. Add or remove roles for each employee and control who can work which shifts based on their qualifications." />
         </div>
         <div className="p-6">
           <div

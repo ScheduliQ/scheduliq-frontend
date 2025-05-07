@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, CSSProperties } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface InfoButtonProps {
   infoText: string;
@@ -8,16 +8,17 @@ interface InfoButtonProps {
 
 const InfoButton: React.FC<InfoButtonProps> = ({ infoText }) => {
   const [visible, setVisible] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [tooltipStyle, setTooltipStyle] = useState<CSSProperties>({});
 
-  //    Close tooltip when clicking outside
+  // Close tooltip when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node) &&
+        tooltipRef.current &&
+        !tooltipRef.current.contains(event.target as Node)
       ) {
         setVisible(false);
       }
@@ -29,54 +30,16 @@ const InfoButton: React.FC<InfoButtonProps> = ({ infoText }) => {
     };
   }, []);
 
-  // Adjust tooltip horizontal position when visible
-  useEffect(() => {
-    if (visible && containerRef.current && tooltipRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const tooltipRect = tooltipRef.current.getBoundingClientRect();
-      const gap = 10; // space from viewport edge
-      let style: CSSProperties = {
-        top: "100%",
-        transform: "translateX(-50%)",
-        marginTop: "0.5rem",
-      };
-
-      // Check if tooltip exceeds the right boundary
-      if (
-        containerRect.left + tooltipRect.width / 2 >
-        window.innerWidth - gap
-      ) {
-        style = {
-          top: "100%",
-          left: "auto",
-          right: 0,
-          transform: "none",
-          marginTop: "0.5rem",
-        };
-      }
-      // Check if tooltip exceeds the left boundary
-      if (containerRect.left - tooltipRect.width / 2 < gap) {
-        style = {
-          top: "100%",
-          left: 0,
-          right: "auto",
-          transform: "none",
-          marginTop: "0.5rem",
-        };
-      }
-      setTooltipStyle(style);
-    }
-  }, [visible]);
-
   return (
-    <div ref={containerRef} className="relative inline-block">
+    <div className="relative inline-block">
       <button
+        ref={buttonRef}
         onClick={() => setVisible(!visible)}
-        className="ml-1 text-gray-400 hover:text-gray-600 focus:outline-none"
+        className="ml-1 text-gray-400 focus:outline-none"
         aria-label="More information"
       >
         <svg
-          className="w-8 h-8"
+          className="w-6 h-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -93,8 +56,11 @@ const InfoButton: React.FC<InfoButtonProps> = ({ infoText }) => {
       {visible && (
         <div
           ref={tooltipRef}
-          className="absolute z-[9999] p-3 bg-gray-700 text-white text-xs rounded-md shadow-md mt-2 min-w-[200px] max-w-lg"
-          style={{ whiteSpace: "normal", ...tooltipStyle }}
+          className="absolute z-[9999] p-3 bg-gray-800/95 backdrop-blur-sm text-white text-sm rounded-lg shadow-lg min-w-[200px] max-w-lg right-0 mt-2"
+          style={{
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+          }}
         >
           {infoText}
         </div>

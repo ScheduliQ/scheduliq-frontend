@@ -29,6 +29,20 @@ export default function Navbar() {
   const [notificationDropdownOpen, setNotificationDropdownOpen] =
     useState(false);
   // const [hasMounted, setHasMounted] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(0);
+
+  useEffect(() => {
+    // Set initial window width
+    setWindowWidth(window.innerWidth);
+
+    // Update window width on resize
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -194,7 +208,7 @@ export default function Navbar() {
         {/* פעולות */}
         <div className="flex items-center space-x-4">
           {/* Dropdown התראות */}
-          <div className="dropdown dropdown-end">
+          <div className="dropdown dropdown-end relative">
             <label
               tabIndex={0}
               className="btn btn-ghost btn-circle relative group"
@@ -233,15 +247,24 @@ export default function Navbar() {
             </label>
             <div
               tabIndex={0}
-              className="dropdown-content mt-3 w-80 overflow-hidden z-50 rounded-xl shadow-2xl border border-gray-100"
+              className="dropdown-content mt-3 overflow-hidden z-50 rounded-xl shadow-2xl border border-gray-100"
               onBlur={handleDropdownClose}
+              style={{
+                position: "fixed",
+                top: "4rem",
+                left: windowWidth >= 640 ? "auto" : "50%",
+                right: windowWidth >= 640 ? "1rem" : "auto",
+                transform: windowWidth >= 640 ? "none" : "translateX(-50%)",
+                maxHeight: "80vh",
+                width: "min(320px, 85vw)",
+              }}
             >
               <div className="bg-white backdrop-blur-md">
-                <div className="flex items-center justify-between bg-gradient-to-r from-blue-600 to-blue-500 px-4 py-3 text-white">
-                  <h3 className="font-semibold flex items-center">
+                <div className="flex items-center justify-between bg-[#014DAE] px-3 sm:px-4 py-2 sm:py-3 text-white">
+                  <h3 className="font-semibold text-sm sm:text-base flex items-center">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-2"
+                      className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -258,7 +281,7 @@ export default function Navbar() {
                 </div>
 
                 <div
-                  className={`max-h-[320px] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent`}
+                  className={`max-h-[min(320px,60vh)] max-w-full overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent`}
                 >
                   {notifications.length > 0 ? (
                     <ul className="divide-y divide-gray-100">
@@ -273,13 +296,13 @@ export default function Navbar() {
                             handleNotificationHover(notif._id)
                           }
                         >
-                          <div className="p-4">
+                          <div className="p-3 sm:p-4">
                             <div className="flex items-start">
-                              <div className="flex-shrink-0 mr-3">
-                                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+                              <div className="flex-shrink-0 mr-2 sm:mr-3">
+                                <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-blue-100 flex items-center justify-center">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 text-blue-500"
+                                    className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                     stroke="currentColor"
@@ -293,15 +316,15 @@ export default function Navbar() {
                                   </svg>
                                 </div>
                               </div>
-                              <div>
+                              <div className="flex-1 min-w-0">
                                 <p
-                                  className={`text-sm ${
+                                  className={`text-xs sm:text-sm ${
                                     !notif.read ? "font-bold" : "font-medium"
-                                  } text-gray-800`}
+                                  } text-gray-800 break-words`}
                                 >
                                   {notif.message}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-[10px] sm:text-xs text-gray-500 mt-1 break-words">
                                   {notif.data}
                                 </p>
                               </div>
