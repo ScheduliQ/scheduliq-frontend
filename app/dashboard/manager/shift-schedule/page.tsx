@@ -11,6 +11,8 @@ import { initiateSocketConnection } from "@/hooks/socket";
 import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
 import { ShowSwalAlert } from "@/app/dashboard/components/ShowSwalAlert";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import EmployeeConstraintsButton from "../../components/EmployeeConstraintsButton";
+
 interface Employee {
   id: string;
   name: string;
@@ -188,6 +190,9 @@ export default function ManagerDashboard() {
           </button>
 
           <CarouselSwal pages={solutionText} />
+
+          {/* Employee Constraints Button */}
+          <EmployeeConstraintsButton />
         </div>
         <ChatBOT />
       </footer>
