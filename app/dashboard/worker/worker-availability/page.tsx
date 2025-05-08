@@ -61,9 +61,9 @@ export default function DynamicScheduleTable() {
           )
         );
         const now = new Date();
-        console.log("managerSettings", settings);
-        console.log("submissionStart", settings.submissionStart);
-        console.log("submissionEnd", settings.submissionEnd);
+        // console.log("managerSettings", settings);
+        // console.log("submissionStart", settings.submissionStart);
+        // console.log("submissionEnd", settings.submissionEnd);
 
         if (settings && settings.submissionStart && settings.submissionEnd) {
           const submissionStartDate = new Date(settings.submissionStart);
@@ -155,11 +155,11 @@ export default function DynamicScheduleTable() {
       if (response.ok) {
         ShowSwalAlert("success", result.message);
       } else {
-        alert(`Failed to save draft: ${result.error || "Unknown error"}`);
+        ShowSwalAlert("error", result.error || "Unknown error");
         console.error("Error from server:", result);
       }
     } catch (error: any) {
-      alert(`An unexpected error occurred: ${error.message}`);
+      ShowSwalAlert("error", `An unexpected error occurred: ${error.message}`);
       console.error("Error saving draft:", error);
     }
   };
@@ -199,7 +199,10 @@ export default function DynamicScheduleTable() {
 
   const submitAvailability = async () => {
     if (availableShiftsCount < requiredShifts) {
-      alert(`You must select at least ${requiredShifts} shifts to submit.`);
+      ShowSwalAlert(
+        "error",
+        `You must select at least ${requiredShifts} shifts to submit.`
+      );
       return;
     }
     const submissionData = {

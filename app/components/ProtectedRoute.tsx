@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     const checkSession = async () => {
-      console.log("user", user);
+      // console.log("user", user);
       if (!isLoading) {
         if (!user) {
           router.push("/login"); // הפניה לעמוד התחברות
