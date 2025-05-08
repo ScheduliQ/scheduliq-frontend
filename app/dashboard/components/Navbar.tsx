@@ -9,6 +9,7 @@ import { useRole } from "../../../hooks/RoleContext";
 import { initiateSocketConnection } from "../../../hooks/socket"; // SOCKET: Import socket functions
 import { Socket } from "socket.io-client"; // SOCKET: Import Socket type
 import { motion } from "framer-motion";
+import { ShowSwalAlert } from "./ShowSwalAlert";
 
 export default function Navbar() {
   const router = useRouter();
@@ -94,9 +95,9 @@ export default function Navbar() {
     const socket = initiateSocketConnection();
     socketRef.current = socket;
     if (!socket) {
-      console.log("Socket not connected, initiating connection...");
+      // console.log("Socket not connected, initiating connection...");
     } else {
-      console.log("Socket connection established");
+      // console.log("Socket connection established");
       const handleNewNotification = (payload: any) => {
         // payload יכול להכיל את ההתראה החדשה וגם את הספירה המעודכנת (אם השרת שולח unread_count)
         setNotifications((prev) => [
@@ -111,7 +112,7 @@ export default function Navbar() {
       };
 
       if (socket) {
-        console.log("Socket listener added for notifications");
+        // console.log("Socket listener added for notifications");
         socket.on("notification", handleNewNotification);
       }
       return () => {
@@ -170,7 +171,10 @@ export default function Navbar() {
       router.push("/login"); // ניתוב מחדש לדף כניסה
     } catch (error) {
       console.error("Error signing out:", error);
-      alert("An error occurred while signing out. Please try again.");
+      ShowSwalAlert(
+        "error",
+        "An error occurred while signing out. Please try again."
+      );
     }
     setTimeout(() => {
       const activeElement = document.activeElement;

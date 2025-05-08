@@ -187,7 +187,7 @@ export default function ManagerSettingsPage() {
           setlastName(userdata.last_name);
         }
       } catch (err: any) {
-        console.log(err.message);
+        // console.log(err.message);
       }
     }
     fetchUserDetails();

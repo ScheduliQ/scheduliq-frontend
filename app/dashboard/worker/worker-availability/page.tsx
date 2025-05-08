@@ -61,9 +61,9 @@ export default function DynamicScheduleTable() {
           )
         );
         const now = new Date();
-        console.log("managerSettings", settings);
-        console.log("submissionStart", settings.submissionStart);
-        console.log("submissionEnd", settings.submissionEnd);
+        // console.log("managerSettings", settings);
+        // console.log("submissionStart", settings.submissionStart);
+        // console.log("submissionEnd", settings.submissionEnd);
 
         if (settings && settings.submissionStart && settings.submissionEnd) {
           const submissionStartDate = new Date(settings.submissionStart);
@@ -155,11 +155,11 @@ export default function DynamicScheduleTable() {
       if (response.ok) {
         ShowSwalAlert("success", result.message);
       } else {
-        alert(`Failed to save draft: ${result.error || "Unknown error"}`);
+        ShowSwalAlert("error", result.error || "Unknown error");
         console.error("Error from server:", result);
       }
     } catch (error: any) {
-      alert(`An unexpected error occurred: ${error.message}`);
+      ShowSwalAlert("error", `An unexpected error occurred: ${error.message}`);
       console.error("Error saving draft:", error);
     }
   };
@@ -199,7 +199,10 @@ export default function DynamicScheduleTable() {
 
   const submitAvailability = async () => {
     if (availableShiftsCount < requiredShifts) {
-      alert(`You must select at least ${requiredShifts} shifts to submit.`);
+      ShowSwalAlert(
+        "error",
+        `You must select at least ${requiredShifts} shifts to submit.`
+      );
       return;
     }
     const submissionData = {
@@ -227,7 +230,7 @@ export default function DynamicScheduleTable() {
       const result = await response.json();
       ShowSwalAlert("success", "Shift availability submitted successfully!");
     } catch (error) {
-      ShowSwalAlert("error", "Error sending constraints!");
+      ShowSwalAlert("error", "Error sending constraints. Please try again.");
     }
   };
 
@@ -369,7 +372,7 @@ export default function DynamicScheduleTable() {
         <textarea
           value={constraints}
           onChange={(e) => setConstraints(e.target.value)}
-          placeholder="Enter any specific constraints or preferences you may have (e.g., preferred consecutive shifts, specific dates to avoid)..."
+          placeholder="Enter any specific constraints or preferences you may have (e.g. 'I prefer to work mornings only')..."
           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
           rows={3}
         ></textarea>
