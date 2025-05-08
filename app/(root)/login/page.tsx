@@ -35,7 +35,6 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, loginEmail, loginPassword);
-      // alert("Login successful!");
       router.push("/dashboard");
     } catch (err: any) {
       if (err.message === "Firebase: Error (auth/invalid-credential).")

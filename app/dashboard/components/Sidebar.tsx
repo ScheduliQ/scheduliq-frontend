@@ -222,7 +222,7 @@ export default function Sidebar() {
       last_name: managerInfo.last_name,
       sid: socketRef.current?.id, // <-- SEND the socket id with the message
     };
-    console.log(`the sid: ${newMessage.sid} `);
+    // console.log(`the sid: ${newMessage.sid} `);
 
     fetch(`${baseUrl}/manager-messages/`, {
       method: "POST",

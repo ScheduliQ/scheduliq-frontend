@@ -10,7 +10,7 @@ export const initiateSocketConnection = (): Socket => {
     socket = io(process.env.NEXT_PUBLIC_BASE_URL, {
       transports: ["websocket"], // You can configure additional options as needed
     });
-    console.log("Socket connected:", socket.id);
+    // console.log("Socket connected:", socket.id);
   }
   return socket;
 };
@@ -20,7 +20,7 @@ export const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
     socket = null;
-    console.log("Socket disconnected");
+    // console.log("Socket disconnected");
   }
 };
 

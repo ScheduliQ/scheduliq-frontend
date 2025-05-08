@@ -318,7 +318,7 @@ const ShiftScheduler = ({
         const settings = await response.json();
         setManagerSettings(settings);
         setColors(settings.shift_colors);
-        console.log("Manager settings:", settings);
+        // console.log("Manager settings:", settings);
       } catch (error) {
         console.error("Error fetching manager settings:", error);
       }

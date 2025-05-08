@@ -4,6 +4,7 @@ import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import ProtectedRoute from "../components/ProtectedRoute";
+import BackButton from "../components/BackButton";
 
 import React from "react";
 
@@ -11,6 +12,12 @@ export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const pathname = usePathname();
+
+  // Check if we're on the main dashboard page or excluded pages
+  const isMainDashboard =
+    pathname === "/dashboard" ||
+    pathname === "/dashboard/worker" ||
+    pathname === "/dashboard/manager";
 
   // אם המשתמש נמצא ב-'/dashboard/contact', אל תשתמש ב-Layout הזה
   if (
@@ -24,6 +31,11 @@ export default function Layout({
           <Navbar />
         </div>
         <div className="relative w-full px-2 sm:px-4 max-w-full overflow-x-hidden">
+          {!isMainDashboard && (
+            <div className="my-2 mx-4">
+              <BackButton />
+            </div>
+          )}
           {children}
         </div>{" "}
       </div>
@@ -36,6 +48,11 @@ export default function Layout({
           <Navbar />
         </div>
         <div className="relative w-full px-2 sm:px-4 max-w-full overflow-x-hidden">
+          {!isMainDashboard && (
+            <div className="my-2 mx-4">
+              <BackButton />
+            </div>
+          )}
           {children}
         </div>{" "}
       </div>
@@ -57,6 +74,11 @@ export default function Layout({
               <Sidebar />
             </aside>
             <main className="bg-white rounded-3xl  shadow-xl p-3 sm:p-4 w-full md:w-3/4 max-w-full overflow-x-auto">
+              {!isMainDashboard && (
+                <div className="mb-4">
+                  <BackButton />
+                </div>
+              )}
               <div className="w-full max-w-full">{children}</div>
             </main>
           </div>
