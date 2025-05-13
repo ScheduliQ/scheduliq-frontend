@@ -17,15 +17,11 @@ export const LogoTicker = () => {
   }, []);
 
   const notificationItems = [
-    "The next shift starts at 08:00",
-    "Please check your shift schedule",
-    "Yossi's shift has been moved to Station 2",
-    "Break times are now available in the app",
-    "Reminder: Night shift starts at 22:00",
-    "Please confirm your Thursday shift",
-    "A new assignment has been updated at Workstation 3",
-    "Pay attention to changes in the shift schedule",
-    "Thank you for your cooperation in weekly shifts",
+    "Your schedule draft is ready—review and publish when you’re ready.",
+    "Availability settings updated successfully.",
+    "New manager message: Staff meeting tomorrow at 9:00 AM.",
+    "PDF report for last week’s shifts is available to download.",
+    "Reminder: Today’s first shift starts in one hour.",
   ];
 
   const totalItems = [...notificationItems, ...notificationItems];

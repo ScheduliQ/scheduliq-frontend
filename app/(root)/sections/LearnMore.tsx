@@ -1,6 +1,9 @@
 "use client";
 import Image from "next/image";
 import heropic from "../assets/heropic.png";
+import macMock from "../assets/macmock.png";
+import chatImg from "../assets/chat.jpeg";
+import shiftassImg from "../assets/shiftass.jpeg";
 import { motion } from "framer-motion";
 import {
   Monitor,
@@ -10,37 +13,43 @@ import {
   Award,
   TrendingUp,
   CheckCircle,
+  Play,
+  Zap,
+  MessageSquare,
+  Keyboard,
+  HeartHandshake,
 } from "lucide-react";
+import { useState, useRef } from "react";
 
 export const LearnMore = () => {
   // Feature cards with icons
   const features = [
     {
-      title: "Smart Scheduling Algorithm",
+      title: "Instant, Optimized Schedules",
       description:
-        "Automates shift assignments in seconds, ensuring optimal efficiency and fairness for your workforce.",
-      icon: <Clock className="w-6 h-6 text-blue-600" />,
+        "Generate efficient, compliant, and balanced shift schedules within seconds, dramatically reducing manual effort.",
+      icon: <Zap className="w-6 h-6 text-blue-600" />,
       delay: 0.1,
     },
     {
-      title: "AI-Powered Input",
+      title: "Smart AI Assistant",
       description:
-        "Describe your scheduling needs in plain language, and our AI automatically creates the perfect schedule.",
-      icon: <TrendingUp className="w-6 h-6 text-blue-600" />,
+        "Our intelligent chatbot helps managers with insightful suggestions and guidance. Ask questions about team availability, shift constraints, or optimal staffing strategies, and get clear, helpful answers instantly.",
+      icon: <MessageSquare className="w-6 h-6 text-blue-600" />,
       delay: 0.2,
     },
     {
-      title: "Real-Time Adjustments",
+      title: "Natural Constraint Processing",
       description:
-        "Easily adapt to last-minute changes like absences or increased demand with seamless updates.",
-      icon: <Users className="w-6 h-6 text-blue-600" />,
+        "Employees can easily submit their preferences and availability in everyday language—ScheduliQ automatically interprets and integrates these constraints into the scheduling process.",
+      icon: <Keyboard className="w-6 h-6 text-blue-600" />,
       delay: 0.3,
     },
     {
-      title: "Employee Satisfaction",
+      title: "Happier, More Engaged Teams",
       description:
-        "Improve morale by aligning shifts with preferences while reducing burnout and improving retention.",
-      icon: <Award className="w-6 h-6 text-blue-600" />,
+        "By respecting preferences, minimizing burnout, and promoting fairness, ScheduliQ significantly enhances employee satisfaction and retention.",
+      icon: <HeartHandshake className="w-6 h-6 text-blue-600" />,
       delay: 0.4,
     },
   ];
@@ -48,57 +57,32 @@ export const LearnMore = () => {
   // Alternating sections data
   const alternatingContent = [
     {
-      title: "Intelligent Shift Management",
+      title: "Seamless Team Coordination",
       description:
-        "Our AI-driven scheduling engine analyzes your workforce needs and creates optimized schedules that balance employee preferences, business requirements, and compliance rules. Managers save hours per week with automated scheduling that reduces conflicts and improves satisfaction.",
-      image: heropic,
-      imageAlt: "Intelligent Shift Management",
+        "Instantly update your entire workforce. ScheduliQ ensures every team member stays informed about shifts, changes, and important announcements, so your workplace runs smoothly and efficiently—no more missed updates.",
+      image: chatImg,
+      imageAlt: "Seamless Team Coordination",
       points: [
-        "Reduced scheduling time by 85%",
-        "Balances workload fairly among team",
-        "Considers employee preferences",
+        "Real-time shift alerts and reminders",
+        "Immediate shift swap notifications",
       ],
     },
     {
-      title: "Real-Time Workforce Insights",
+      title: "Flexible, Intelligent Scheduling",
       description:
-        "Get complete visibility into your workforce with real-time analytics. Track attendance, monitor shift swaps, identify productivity patterns, and make data-driven decisions to improve your operations and reduce costs.",
-      image: heropic,
+        "Build schedules effortlessly and intuitively. ScheduliQ quickly generates optimized shift rosters that meet employee preferences and business needs, allowing easy adjustments on the fly.",
+      image: shiftassImg,
       imageAlt: "Workforce Analytics Dashboard",
       points: [
-        "Dynamic reporting dashboard",
-        "Attendance and productivity tracking",
-        "Cost optimization insights",
-      ],
-    },
-    {
-      title: "Seamless Communication",
-      description:
-        "Keep your entire team informed with built-in notifications. Employees get instant updates about schedule changes, shift opportunities, and urgent messages directly through the app, reducing confusion and improving coordination.",
-      image: heropic,
-      imageAlt: "Mobile Communication Features",
-      points: [
-        "Instant notification system",
-        "Group and individual messaging",
-        "Shift change alerts",
+        "Quick one-click schedule creation",
+        "Intuitive drag-and-drop editing",
+        "Detailed shortages view.",
       ],
     },
   ];
 
   // Support options
   const supportOptions = [
-    {
-      title: "24/7 Live Chat",
-      description:
-        "Get real-time assistance from our team, anytime you need help with your scheduling.",
-      icon: "💬",
-    },
-    {
-      title: "Knowledge Base",
-      description:
-        "Access our comprehensive library of tutorials, FAQs, and troubleshooting guides.",
-      icon: "📚",
-    },
     {
       title: "Email Support",
       description:
@@ -133,63 +117,62 @@ export const LearnMore = () => {
           custom={0}
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-br from-black to-[#001e80] text-transparent bg-clip-text mb-6">
-            Smart Shift Management System
+            One-Click Schedule Generation
           </h2>
           <p className="text-lg text-[#010D3E] leading-relaxed">
-            ScheduliQ transforms workforce management with an advanced
-            AI-powered system that creates efficient and fair schedules in
-            minutes. No more spreadsheets or manual calculations — our
-            intelligent platform makes workforce scheduling faster and more
-            accurate than ever before.
+            With a single click on{" "}
+            <span className="relative inline-block">
+              <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#0055b8] to-[#7400e0]">
+                Generate
+              </span>{" "}
+            </span>
+            , ScheduliQ's intelligent engine delivers a complete shift roster in
+            seconds. All your constraints—from staff availability and role
+            preferences to compliance requirements—are seamlessly integrated
+            into a ready-to-edit schedule. Simply drag-and-drop team members,
+            tweak hours or roles, and export or publish your optimized roster
+            without ever opening a spreadsheet.
           </p>
         </motion.div>
 
-        {/* Device mockups section */}
-        <motion.div
-          className="relative mb-20 md:mb-28"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 md:p-10 shadow-lg">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-              {/* Mock Desktop App - SMALLER SIZE */}
-              <div className="w-full lg:w-3/5 relative mx-auto max-w-2xl">
-                <div className="rounded-xl overflow-hidden shadow-2xl border-8 border-gray-800 bg-gray-800">
-                  <Image
-                    src={heropic}
-                    alt="ScheduliQ Dashboard"
-                    className="w-full h-auto"
-                  />
-                </div>
-                <div className="absolute -bottom-6 -right-6 bg-blue-100 p-4 rounded-lg shadow-lg transform rotate-3">
-                  <p className="text-blue-800 font-medium">
-                    Coming soon: Interactive demo
-                  </p>
+        {/* Video Display with Custom Mockup */}
+        <div className="relative mb-20 md:mb-28">
+          <div className="  p-6 md:p-10">
+            <div className="flex flex-col items-center justify-center">
+              <div className="w-full max-w-4xl mx-auto">
+                {/* Custom Browser/App Window Mock */}
+                <div className="overflow-hidden rounded-xl shadow-2xl border border-gray-200">
+                  {/* Window Header Bar */}
+                  <div className="h-8 bg-gray-800 flex items-center px-3">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="text-gray-400 text-xs mx-auto font-mono">
+                      ScheduliQ Dashboard
+                    </div>
+                  </div>
+
+                  {/* Video Container */}
+                  <div className="bg-black aspect-video">
+                    <video
+                      className="w-full h-full object-contain"
+                      src="/assets/ourv.mp4"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      controls={false}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
                 </div>
               </div>
-
-              {/* Mock Mobile App */}
-              <div className="w-full lg:w-1/3 flex justify-center">
-                <div className="relative w-[180px] h-[360px] border-[14px] border-black rounded-[36px] shadow-xl bg-white overflow-hidden">
-                  <div className="absolute top-0 w-[40%] h-[30px] bg-black left-1/2 transform -translate-x-1/2 rounded-b-xl"></div>
-                  <Image
-                    src={heropic}
-                    alt="ScheduliQ Mobile App"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mt-10">
-              <p className="text-blue-800 font-medium text-lg">
-                Experience ScheduliQ across all your devices
-              </p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Alternating sections */}
         <div className="space-y-24 mb-24">
@@ -207,12 +190,30 @@ export const LearnMore = () => {
             >
               {/* Image side */}
               <div className="w-full lg:w-1/2">
-                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-5 rounded-xl shadow-md">
-                  <Image
-                    src={content.image}
-                    alt={content.imageAlt}
-                    className="w-full h-auto rounded-lg shadow-sm"
-                  />
+                {/* Window style wrapper */}
+                <div className="overflow-hidden rounded-xl shadow-xl border border-gray-200">
+                  {/* Window Header Bar */}
+                  <div className="h-8 bg-gray-800 flex items-center px-3">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div className="text-gray-400 text-xs mx-auto font-mono">
+                      {content.imageAlt}
+                    </div>
+                  </div>
+
+                  {/* Image container */}
+                  <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-0">
+                    <Image
+                      src={content.image}
+                      alt={content.imageAlt}
+                      className="w-full h-auto object-cover"
+                      width={800}
+                      height={500}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -248,11 +249,12 @@ export const LearnMore = () => {
             Who Is It For?
           </h2>
           <p className="text-lg text-[#010D3E] leading-relaxed">
-            Whether you run a bustling restaurant, manage a retail chain,
-            oversee a hospital unit, or coordinate a customer service team,
-            ScheduliQ is your perfect scheduling partner. Our system makes
-            scheduling seamless for managers while giving employees better
-            control and clarity over their shifts.
+            ScheduliQ is designed for any organization aiming to simplify and
+            modernize its shift scheduling. Whether you're running a busy café,
+            managing a retail store, coordinating hospital staff, or supervising
+            customer support teams—ScheduliQ streamlines the scheduling process,
+            giving managers effortless control and employees greater flexibility
+            and clarity.
           </p>
         </motion.div>
 
@@ -301,7 +303,7 @@ export const LearnMore = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 max-w-sm mx-auto">
             {supportOptions.map((option, index) => (
               <motion.div
                 key={index}

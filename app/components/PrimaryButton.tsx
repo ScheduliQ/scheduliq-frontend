@@ -14,7 +14,7 @@ export default function PrimaryButton({
   return href ? (
     <Link href={href}>
       <button
-        className="whitespace-nowrap rounded-full bg-[#014DAE] px-8 py-3 text-lg font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#012F70]"
+        className="whitespace-nowrap rounded-xl bg-[#014DAE] px-8 py-3 text-lg font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#012F70]"
         onClick={onClick}
       >
         {label}
@@ -22,7 +22,7 @@ export default function PrimaryButton({
     </Link>
   ) : (
     <button
-      className="whitespace-nowrap rounded-full bg-[#014DAE] px-8 py-3 text-lg font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#012F70]"
+      className="whitespace-nowrap rounded-xl bg-[#014DAE] px-8 py-3 text-lg font-semibold text-white shadow-md transition-all duration-300 hover:bg-[#012F70]"
       onClick={onClick}
     >
       {label}
