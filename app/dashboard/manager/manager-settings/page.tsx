@@ -372,9 +372,80 @@ export default function ManagerSettingsPage() {
     }
   };
 
-  const deleteEmployee = (uid: string) => {
-    setEmployees(employees.filter((emp) => emp.uid !== uid));
-    setUpdatedEmployeeUids(updatedEmployeeUids.filter((id) => id !== uid));
+  const deleteEmployee = async (uid: string) => {
+    const result = await Swal.fire({
+      title: "Delete Account",
+      html: `
+        <div class="mb-4">
+          <p class="text-gray-600 mb-4">Are you sure you want to delete this account? This action is irreversible.</p>
+          <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+            <p class="text-md text-gray-500 mb-2">Please type <span class="font-medium text-gray-700">'Delete'</span> to confirm</p>
+          </div>
+        </div>
+      `,
+      input: "text",
+      inputPlaceholder: "Type 'Delete' to confirm",
+      inputAttributes: {
+        autocapitalize: "off",
+        class: "swal2-input focus:ring-blue-500 focus:border-blue-500",
+      },
+      showCancelButton: true,
+      confirmButtonText: "Delete Account",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#dc2626",
+      cancelButtonColor: "#4B5563",
+      showLoaderOnConfirm: true,
+      backdrop: `
+        rgba(0,0,0,0.4)
+        url("/images/nyan-cat.gif")
+        left top
+        no-repeat
+      `,
+      customClass: {
+        container: "font-sans",
+        popup: "rounded-xl shadow-2xl border-0",
+        title: "text-2xl font-semibold text-gray-800 border-b pb-4",
+        htmlContainer: "text-base",
+        input:
+          "mt-2 focus:ring-2 focus:ring-blue-500 border-gray-300 rounded-lg shadow-sm",
+        actions: "border-t pt-4 gap-2",
+        confirmButton:
+          "rounded-lg px-6 py-2.5 font-medium text-sm transition-all duration-200 hover:bg-red-700",
+        cancelButton:
+          "rounded-lg px-6 py-2.5 font-medium text-sm transition-all duration-200 hover:bg-gray-600",
+      },
+      preConfirm: (inputValue) => {
+        if (inputValue !== "Delete") {
+          Swal.showValidationMessage(`
+            <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+            Please type "Delete" exactly to confirm
+          `);
+          return false;
+        }
+        return fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/user/delete/${uid}`, {
+          method: "DELETE",
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(response.statusText);
+            }
+            return response.json();
+          })
+          .catch((error) => {
+            Swal.showValidationMessage(`
+              <i class="fas fa-exclamation-circle text-red-500 mr-2"></i>
+              Request failed: ${error}
+            `);
+          });
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    });
+
+    if (result.isConfirmed) {
+      setEmployees(employees.filter((emp) => emp.uid !== uid));
+      setUpdatedEmployeeUids(updatedEmployeeUids.filter((id) => id !== uid));
+      ShowSwalAlert("success", "User has been deleted successfully");
+    }
   };
 
   const addEmployeeRole = (uid: string, newRole: string) => {
