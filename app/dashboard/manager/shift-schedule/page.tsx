@@ -96,13 +96,23 @@ export default function ManagerDashboard() {
     // 2. Show loading overlay
     setIsLoading(true);
 
-    // 3. Register listener *first*
+    // Remove any existing listeners to prevent duplicates
+    socket.off("schedule_ready");
+    socket.off("schedule_error");
+
+    // 3. Register listeners *first*
     socket.on("schedule_ready", ({ solution, text }) => {
       const parsed = JSON.parse(solution);
       setSolutionText(text);
       setScheduleData(parsed);
       setIsLoading(false); // Hide loading when done
       // ShowSwalAlert("success", "Schedule ready!");
+    });
+
+    // Add listener for schedule error
+    socket.on("schedule_error", ({ error }) => {
+      setIsLoading(false); // Hide loading when there's an error
+      ShowSwalAlert("error", error || "Could not generate schedule");
     });
 
     // 4. Now enqueue the job
