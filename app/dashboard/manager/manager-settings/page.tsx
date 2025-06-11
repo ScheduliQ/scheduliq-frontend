@@ -693,7 +693,7 @@ export default function ManagerSettingsPage() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               uid: socketRef.current?.id,
-              message: "Manager settings have been updated123123",
+              message: "Manager settings have been updated",
               data: `${firstName} ${lastName} updated the settings.`,
             }),
           }

@@ -271,9 +271,7 @@ export default function ContactPage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-white">Phone</p>
-                        <p className="text-sm text-blue-100">
-                          +1 (555) 123-4567
-                        </p>
+                        <p className="text-sm text-blue-100">050-1234567</p>
                       </div>
                     </div>
 
@@ -305,9 +303,9 @@ export default function ContactPage() {
                           Office Location
                         </p>
                         <p className="text-sm text-blue-100">
-                          123 Innovation Ave
+                          SCE
                           <br />
-                          Tech City, TC 12345
+                          Ashdod, Israel
                         </p>
                       </div>
                     </div>
