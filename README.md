@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SchedulIQ - Scheduling System Frontend
+
+## Overview
+
+SchedulIQ is a comprehensive scheduling and management system designed as a final project for a Software Engineering degree. This repository contains the frontend implementation built with Next.js and modern web technologies.
+
+## Features
+
+- **Role-based access control** - Different interfaces for managers and workers
+- **Interactive calendar management** - Using FullCalendar integration
+- **Real-time updates** - Socket.IO implementation for live data
+- **Drag and drop functionality** - Using Hello Pangea DnD
+- **Responsive design** - Mobile-friendly interface with TailwindCSS
+- **Data visualization** - Charts and reports using Chart.js
+- **Authentication system** - Secure login and session management
+
+## Technology Stack
+
+- **Framework**: Next.js 15.0.0 with App Router
+- **Language**: TypeScript
+- **Styling**: TailwindCSS, DaisyUI
+- **UI Components**: NextUI
+- **State Management**: React Context API
+- **Authentication**: Firebase
+- **Real-time Communication**: Socket.IO
+- **Testing**: Cypress
+
+## Project Structure
+
+```
+scheduliq-frontend/
+├── app/                    # Main application code (Next.js App Router)
+│   ├── (root)/             # Root routes
+│   ├── components/         # Shared UI components
+│   ├── dashboard/          # Dashboard pages
+│   │   ├── manager/        # Manager-specific views
+│   │   └── worker/         # Worker-specific views
+│   ├── reports/            # Reporting functionalities
+│   └── layout.tsx          # Root layout
+├── hooks/                  # Custom React hooks
+├── lib/                    # Utilities and services
+├── public/                 # Static assets
+├── cypress/                # End-to-end tests
+└── config/                 # Configuration files
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18.x or higher
+- npm 10.x or higher
+
+### Installation
+
+1. Clone the repository
+
+   ```bash
+   git clone https://github.com/your-username/scheduliq-frontend.git
+   cd scheduliq-frontend
+   ```
+
+2. Install dependencies
+
+   ```bash
+   npm install
+   ```
+
+3. Run the development server
+
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Build for Production
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Testing
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Run end-to-end tests with Cypress:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Open Cypress UI
+npm run cypress:open
 
-## Learn More
+# Run tests headlessly
+npm run cypress:run
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Docker Support
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+A Dockerfile is included for containerization:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Build the Docker image
+docker build -t scheduliq-frontend .
 
-## Deploy on Vercel
+# Run the container
+docker run -p 3000:3000 scheduliq-frontend
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Contributors
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Kobi Alen
+- Matan Kahlon
+
+## License
+
+This project was developed as an academic final project for a Software Engineering degree and is intended for educational purposes only. All rights reserved.
