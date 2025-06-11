@@ -7,7 +7,7 @@ SchedulIQ is a comprehensive scheduling and management system designed as a fina
 ## Features
 
 - **Role-based access control** - Different interfaces for managers and workers
-- **Interactive calendar management** - Using FullCalendar integration
+- **Interactive calendar management** - Custom calendar implementation
 - **Real-time updates** - Socket.IO implementation for live data
 - **Drag and drop functionality** - Using Hello Pangea DnD
 - **Responsive design** - Mobile-friendly interface with TailwindCSS
