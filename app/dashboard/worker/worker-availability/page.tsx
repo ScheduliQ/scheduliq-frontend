@@ -227,11 +227,37 @@ export default function DynamicScheduleTable() {
           body: JSON.stringify(submissionData),
         }
       );
+
+      if (response.status === 200) {
+        ShowSwalAlert(
+          "success",
+          "Shift availability submitted and optimized successfully!"
+        );
+      } else if (response.status === 201) {
+        ShowSwalAlert(
+          "error",
+          "Shift availability submitted successfully (without AI optimization)"
+        );
+      }
+
       const result = await response.json();
-      ShowSwalAlert("success", "Shift availability submitted successfully!");
     } catch (error) {
       ShowSwalAlert("error", "Error sending constraints. Please try again.");
     }
+    // try {
+    //   const response = await fetch(
+    //     `${process.env.NEXT_PUBLIC_BASE_URL}/constraints/`,
+    //     {
+    //       method: "POST",
+    //       headers: { "Content-Type": "application/json" },
+    //       body: JSON.stringify(submissionData),
+    //     }
+    //   );
+    //   const result = await response.json();
+    //   ShowSwalAlert("success", "Shift availability submitted successfully!");
+    // } catch (error) {
+    //   ShowSwalAlert("error", "Error sending constraints. Please try again.");
+    // }
   };
 
   return (
